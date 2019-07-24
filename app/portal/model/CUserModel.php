@@ -37,9 +37,9 @@ class CUserModel extends Model{
         $userInfo['role'] = $roleName;
 
         // session存储个人信息
-        session('user_info', $userInfo->toArray());
+        session('user_info', $userInfo->toArray(),'portal');
         // session存储权限
-        session('auth', $auth);
+        session('auth', $auth,'portal');
         return 1;
 
     }

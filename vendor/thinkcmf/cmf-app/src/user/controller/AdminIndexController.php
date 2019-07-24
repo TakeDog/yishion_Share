@@ -61,21 +61,28 @@ class AdminIndexController extends AdminBaseController
         // if (!empty($content)) {
         //     return $content;
         // }
-        $list = Db::name('c_user')
-            ->where(function (Query $query) {
+
+        $list = Db::name('c_user')-> alias('u')
+            -> join('c_user_role ur','u.id = ur.user_id','LEFT')
+            -> join('c_role r','ur.role_id=r.id','LEFT')
+            -> where(function (Query $query) {
                 $data = $this->request->param();
+
                 if (!empty($data['uid'])) {
-                    $query->where('id', intval($data['uid']));
+                    $query->where('u.id', intval($data['uid']));
                 }
 
                 if (!empty($data['keyword'])) {
                     $keyword = $data['keyword'];
-                    $query->where('user_name|user_nickname|user_email|mobile', 'like', "%$keyword%");
+                    $query->where('u.user_name|u.user_nickname|u.user_email|u.mobile', 'like', "%$keyword%");
+                }if ( isset($data['user_status']) && $data['user_status'] !== '' ) {
+                    $user_status = $data['user_status'];
+                    $query->where('u.user_status', $user_status);
                 }
-
             })
-            ->order("create_time DESC")
-            ->paginate(10);
+            -> field('u.*,r.role_name')
+            -> order("create_time DESC")
+            -> paginate(10);
         // 获取分页显示
         $page = $list->render();
         $this->assign('list', $list);
@@ -101,7 +108,7 @@ class AdminIndexController extends AdminBaseController
     {
         $id = input('param.id', 0, 'intval');
         if ($id) {
-            $result = Db::name("user")->where(["id" => $id, "user_type" => 2])->setField('user_status', 0);
+            $result = Db::name("c_user")->where('id',$id)->setField('user_status', 0);
             if ($result) {
                 $this->success("会员拉黑成功！", "adminIndex/index");
             } else {
@@ -129,7 +136,7 @@ class AdminIndexController extends AdminBaseController
     {
         $id = input('param.id', 0, 'intval');
         if ($id) {
-            Db::name("user")->where(["id" => $id, "user_type" => 2])->setField('user_status', 1);
+            Db::name("c_user")->where('id',$id)->setField('user_status', 1);
             $this->success("会员启用成功！", '');
         } else {
             $this->error('数据传入失败！');

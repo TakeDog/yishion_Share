@@ -23,7 +23,7 @@ class IndexController extends HomeBaseController
     }
 
     public function login(){
-        if(session('?user_info')){
+        if(session('?user_info','','portal')){
             $this -> redirect("staff");
         }else{
             return $this -> fetch();
@@ -73,7 +73,7 @@ class IndexController extends HomeBaseController
     }
     //注销
     public function logout(){
-        session(null);
+        session(null,'portal');
         $this -> redirect("login");
     }
 
