@@ -11,7 +11,9 @@ class OperateBehavior extends Controller{
         'portal/index/index',
         'portal/index/login',
         'portal/index/verify',
-        'portal/index/test'
+        'portal/index/regist',
+        'portal/index/register',
+        'portal/index/test',
     ];
 
     // 定义未登陆需要排除的权限路由
@@ -48,7 +50,7 @@ class OperateBehavior extends Controller{
                 $user_info = session('user_info','','portal');
                 if($user_info['super']){return;}
             }
-            
+
             if(!session('?user_info','','portal') && !in_array($url, $this->exclude) && !in_array(strtolower($Request->module()), $this->moudel)){
                 $this->error('请先登录','portal/index/login');
             }

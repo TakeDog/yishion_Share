@@ -61,13 +61,11 @@ class AdminIndexController extends AdminBaseController
         // if (!empty($content)) {
         //     return $content;
         // }
-        
-        $list = Db::name('c_user')
-            -> alias('u')
+
+        $list = Db::name('c_user')-> alias('u')
             -> join('c_user_role ur','u.id = ur.user_id','LEFT')
             -> join('c_role r','ur.role_id=r.id','LEFT')
             -> where(function (Query $query) {
-
                 $data = $this->request->param();
 
                 if (!empty($data['uid'])) {
@@ -77,14 +75,10 @@ class AdminIndexController extends AdminBaseController
                 if (!empty($data['keyword'])) {
                     $keyword = $data['keyword'];
                     $query->where('u.user_name|u.user_nickname|u.user_email|u.mobile', 'like', "%$keyword%");
-                }
-
-                if ( isset($data['user_status']) && $data['user_status'] !== '' ) {
+                }if ( isset($data['user_status']) && $data['user_status'] !== '' ) {
                     $user_status = $data['user_status'];
                     $query->where('u.user_status', $user_status);
                 }
-
-
             })
             -> field('u.*,r.role_name')
             -> order("create_time DESC")

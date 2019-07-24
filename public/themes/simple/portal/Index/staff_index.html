@@ -1,8 +1,9 @@
 <layout name="public@layout" />
-<link rel="stylesheet" href="__STATIC__/css/ueditor.css">
+<!-- <link rel="stylesheet" href="__STATIC__/css/ueditor.css"> -->
 <script src="__STATIC__/lib/ueditor_php/utf8-php/ueditor.config.js"></script>
 <script src="__STATIC__/lib/ueditor_php/utf8-php/ueditor.all.js"></script>
 <script type="text/javascript" charset="utf-8" src="__STATIC__/lib/ueditor_php/utf8-php/lang/zh-cn/zh-cn.js"></script>
+<script src="__STATIC__/js/axios.min.js"></script>
 <div id="app">
     <el-container>
         <div class="container" style="margin-bottom:20px;min-height: 750px;width:100%;padding:0 30px;" id="main">
@@ -450,7 +451,7 @@
                     <!-- 加载编辑器的容器 -->
                     <div class="edit-style clearfix">
                         <script id="myEdit" name="content" type="text/plain"></script>
-                        <button class="btn btn-light-blue pull-right" style="margin:20px">确认发布</button>
+                        <button class="btn btn-light-blue pull-right" style="margin:20px" @click="publish">确认发布</button>
                     </div>
                 </el-main>
                 <el-aside>
@@ -544,7 +545,7 @@
         ],
         enableAutoSave:false,
         maximumWords:5000,
-
+        allHtmlEnabled: true
     });
 
     var vue = {
@@ -554,7 +555,21 @@
             age:18
         },
         methods: {
-            
+            publish(){
+                var content = JSON.stringify(/<body[^>]*>([\s\S]*)<\/body>/.exec(ue.getAllHtml())[1]);
+                axios.post("{:url('saveEditor')}",{"content": content}).then((res)=>{
+                    // if(res.data == 1001){
+                    //     ue.setContent("");
+                    //     this.$alert('发布成功!!!').then(() => {
+                    //         done();
+                    //     }).catch(() => {});
+                    // }else{
+                    //     this.$alert('发布失败!!!').then(() => {
+                    //         done();
+                    //     }).catch(() => {});
+                    // }
+                });
+            }
         },
     };
 </script>

@@ -75,8 +75,8 @@
                         <switch name="vo.user_status">
                             <case value="1">
                                 <a class="btn btn-xs btn-warning js-ajax-dialog-btn"
-                                    href="{:url('adminIndex/ban',array('id'=>$vo['id']))}"
-                                    data-msg="{:lang('BLOCK_USER_CONFIRM_MESSAGE')}">{:lang('BLOCK_USER')}</a>
+                                   href="{:url('adminIndex/ban',array('id'=>$vo['id']))}"
+                                   data-msg="{:lang('BLOCK_USER_CONFIRM_MESSAGE')}">{:lang('BLOCK_USER')}</a>
                                 <a class="btn btn-xs btn-primary js-ajax-dialog-btn"
                                    href="{:url('adminIndex/ban',array('id'=>$vo['id']))}"
                                    data-msg="{:lang('BLOCK_USER_CONFIRM_MESSAGE')}">角色管理</a>
@@ -95,7 +95,6 @@
                                     data-msg="{:lang('ACTIVATE_USER_CONFIRM_MESSAGE')}">{:lang('ACTIVATE_USER')}</a>
                             </case>
                         </switch>
-
                     </td>
                 </tr>
             </foreach>
