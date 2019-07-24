@@ -11,7 +11,9 @@ class OperateBehavior extends Controller{
         'portal/index/index',
         'portal/index/login',
         'portal/index/verify',
-        'portal/index/test'
+        'portal/index/regist',
+        'portal/index/register',
+        'portal/index/test',
     ];
 
     // 定义未登陆需要排除的权限路由
@@ -44,17 +46,17 @@ class OperateBehavior extends Controller{
             $url  = $this->getActionUrl();
 
             //if($user_info['super']){return;} // 超级用户不需要验证
-            if(session('?user_info','','portal')){
-                $user_info = session('user_info','','portal');
+            if(session('?user_info')){
+                $user_info = session('user_info');
                 if($user_info['super']){return;}
             }
-            
-            if(!session('?user_info','','portal') && !in_array($url, $this->exclude) && !in_array(strtolower($Request->module()), $this->moudel)){
+
+            if(!session('?user_info') && !in_array($url, $this->exclude) && !in_array(strtolower($Request->module()), $this->moudel)){
                 $this->error('请先登录','portal/index/login');
             }
 
             // 用户所拥有的权限路由
-            $auth = session('auth','','portal')?session('auth','','portal'):[];
+            $auth = session('auth')?session('auth'):[];
 
             if(!$auth  && !in_array($url, $this->exclude) && !in_array(strtolower($Request->module()), $this->moudel)){
                 $this->error('请先登录1','portal/index/login');

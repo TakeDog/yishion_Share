@@ -37,11 +37,33 @@ class CUserModel extends Model{
         $userInfo['role'] = $roleName;
 
         // session存储个人信息
-        session('user_info', $userInfo->toArray(),'portal');
+        session('user_info', $userInfo->toArray());
         // session存储权限
-        session('auth', $auth,'portal');
+        session('auth', $auth);
         return 1;
 
+    }
+
+    public function registVerify($user){
+
+        $userInfo = $this -> where("user_name",$user['user_name']) -> find();
+
+        if($userInfo) return -1;
+
+        $user['pwd'] = MD5($user['pwd']);
+        $user['user_status'] = 1;
+        $user['super'] = 0;
+        $user['create_time'] = time();
+        Db::startTrans();
+        try{
+            $this -> save($user);
+            $res = Db::name("c_user_role") -> insert(['user_id'=>$this->id,'role_id'=>1]);
+            Db::commit();
+            return $res;
+        }catch(\Exception $e){
+            Db::rollback();
+            return 0;
+        }
     }
 
     public function getUserRoleName($user_id){

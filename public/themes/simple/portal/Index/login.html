@@ -75,6 +75,7 @@
                 </el-row>
                 <el-button type="primary" style="margin:20px  0 0;float: right;" @click="login">登&emsp;录</el-button>
                 <el-button style="margin:20px 20px 0 0;float: right;">忘了密码</el-button>
+                <el-link type="primary" style="margin:40px 10px 0px;float: right;" @click="toRegist">点击注册</el-link>
             </div> 
             
         </el-card>
@@ -107,8 +108,11 @@
                     }else{
                         window.location.href = "{:url('"+ res.data.url +"')}";
                     }
-                })      
+                });     
 
+            },
+            toRegist(){
+                window.location.href = "./regist.html";
             }
         }
     });
