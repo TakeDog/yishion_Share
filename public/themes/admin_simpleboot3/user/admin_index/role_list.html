@@ -1,0 +1,47 @@
+<include file="public@header" />
+</head>
+<body>
+	<div class="wrap js-check-wrap">
+		<ul class="nav nav-tabs">
+			<li class="active"><a href="{:url('adminIndex/roleList')}">用户角色管理</a></li>
+			<li><a href="{:url('adminIndex/roleAdd')}">用户角色添加</a></li>
+		</ul>
+		<form action="{:url('Rbac/listorders')}" method="post" class="margin-top-20">
+			<table class="table table-hover table-bordered">
+				<thead>
+					<tr>
+						<th width="40">ID</th>
+						<th align="left">角色名称</th>
+						<th align="left">角色描述</th>
+						<th width="60" align="left">状态</th>
+						<th width="160">操作</th>
+					</tr>
+				</thead>
+				<tbody>
+					<foreach name="roles" item="vo">
+					<tr>
+						<td>{$vo.id}</td>
+						<td>{$vo.role_name}</td>
+						<td>{$vo.role_desc}</td>
+						<td>
+							<if condition="$vo['status'] eq 1">
+								<span class="label label-success">已启用</span>
+							<else />
+								<span class="label label-danger">已禁用</span>
+							</if>
+						</td>
+						<td>
+							<a class="btn btn-xs btn-primary" href="{:url('adminIndex/authorize',array('id'=>$vo['id']))}">{:lang('ROLE_SETTING')}</a>
+							<!-- <a href="javascript:openIframeDialog('{:url('rbac/member',array('id'=>$vo['id']))}','成员管理');">成员管理</a>| -->
+							<a class="btn btn-xs btn-primary" href="{:url('adminIndex/editrole',array('id'=>$vo['id']))}">{:lang('EDIT')}</a>
+							<a class="btn btn-xs btn-danger js-ajax-delete" class="" href="{:url('adminIndex/roledelete',array('id'=>$vo['id']))}">{:lang('DELETE')}</a>
+						</td>
+					</tr>
+					</foreach>
+				</tbody>
+			</table>
+		</form>
+	</div>
+	<script src="__STATIC__/js/admin.js"></script>
+</body>
+</html>

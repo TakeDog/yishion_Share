@@ -88,6 +88,7 @@ class CUserModel extends Model{
         -> join('share_c_role_action ra','r.id=ra.role_id')
         -> join('share_c_action a','ra.action_id = a.id')
         -> where('ur.user_id',$user_id)
+        -> distinct(true)
         -> column('a.url');
         
         foreach($action_list as $k => $v){
