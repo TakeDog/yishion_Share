@@ -557,6 +557,7 @@
         methods: {
             publish(){
                 var content = JSON.stringify(/<body[^>]*>([\s\S]*)<\/body>/.exec(ue.getAllHtml())[1]);
+                console.log(content);
                 axios.post("{:url('saveEditor')}",{"content": content}).then((res)=>{
                     // if(res.data == 1001){
                     //     ue.setContent("");

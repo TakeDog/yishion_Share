@@ -88,8 +88,8 @@ class IndexController extends HomeBaseController
             $ueditor_img=$res[1][$i];
             //新建日期文件夹
             $tmp_arr = explode('/',$ueditor_img);
-            $oldFloder = './static/images/ueditor/img_temp/'.$tmp_arr[7];
-            $newFloder = './static/images/ueditor/img/'.$tmp_arr[7];
+            $oldFloder = './upload/portal/ueditor/img_temp/'.$tmp_arr[7];
+            $newFloder = './upload/portal/ueditor/img/'.$tmp_arr[7];
             if(!is_dir($newFloder)){
                 mkdir($newFloder,0777);
             }
