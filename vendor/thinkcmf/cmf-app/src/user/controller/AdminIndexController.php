@@ -680,7 +680,7 @@ class AdminIndexController extends AdminBaseController
                 $this->error($result);
             } else {
                 Db::name('CAction')->strict(false)->field(true) ->update($this->request->param());
-                $this->success("保存成功！","adminIndex/addList"); 
+                $this->success("保存成功！","adminIndex/actionList"); 
             }
         }
 

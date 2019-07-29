@@ -11,6 +11,10 @@
 .blue-bgc>.el-card__header{background-color: #409eff;color:#fff;}
 .blue-bgc{border-color: #409eff;}
 
+.font-c-blue{color:#409eff !important;}
+.font12{font-size: 12px !important;}
+.font14{font-size: 14px !important;}
+
 /* 整体布局样式 */
 .el-header {padding: 0;}
 .el-main {padding:0;overflow: hidden;margin:0 20px;}
