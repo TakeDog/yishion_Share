@@ -56,8 +56,8 @@
                        
                         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                             <ul class="nav navbar-nav">
-                                <li class="active"><a href="{:url('staff_index')}">论坛</a></li>
-                                <li><a href="#">培训</a></li>
+                                <li class="active"><a href="{:url('staff_index')}" id="test">论坛</a></li>
+                                <li><a href="{:url('Train/index')}">培训</a></li>
                                 <li><a href="#">店铺</a></li>
                                 <li><a href="#">工作任务</a></li>
                             </ul>
@@ -78,7 +78,19 @@
 
 <script>
 
-    $(".heightfull").css("height",$(document).height());
+    $(function(){
+        $(".heightfull").css("height",$(document).height());
+       
+        $(".navbar-nav").children("li").click(function(){
+            console.log(666);
+            $(this).siblings("li").removeClass("active");
+            $(this).addClass("active");
+        })
+    })
+
+    
+
+    
 
     var vm = new Vue({
         el: "#app",

@@ -76,9 +76,6 @@ aside.el-aside{width:350px;}
 
 
 
-/* 最近活动 */
-#activity .activity-item p>a{} 
-
 /* 卡片选项为img items */
 .el-card__body{padding:10px;}
 .card-img{display: block;width: 100%;height: 120px;}
