@@ -3,7 +3,6 @@
 <script src="__STATIC__/lib/ueditor_php/utf8-php/ueditor.config.js"></script>
 <script src="__STATIC__/lib/ueditor_php/utf8-php/ueditor.all.js"></script>
 <script type="text/javascript" charset="utf-8" src="__STATIC__/lib/ueditor_php/utf8-php/lang/zh-cn/zh-cn.js"></script>
-<script src="__STATIC__/js/axios.min.js"></script>
 <div id="app">
     <el-container>
         <div class="container" style="margin-bottom:20px;min-height: 750px;width:100%;padding:0 30px;" id="main">
@@ -15,6 +14,7 @@
                     <el-card class="aside-item" id="urgent" :body-style="{ backgroundColor: '#ddeeff'}">
                         <div slot="header">
                             <span class="bold">以纯动态</span>
+                            <a href="" style="float: right;">更多</a>
                         </div>
                         <div class="activity-item">
                             <p class="color-dark"><a href="#">1.抖音携手以纯共筑年轻时尚堡垒大挑战，优胜者可获终身6折购物券！！</a></p>
@@ -25,6 +25,7 @@
                     <el-card class="aside-item" id="new">
                         <div slot="header">
                             <span>流行趋势</span>
+                            <a href="" style="float: right;">更多</a>
                         </div>
                         <div class="activity-item">
                             <p><a href="#">1.抖音携手以纯共筑年轻时尚堡垒大挑战，优胜者可获终身6折购物券！！</a></p>
@@ -45,9 +46,9 @@
                                 </el-tab-pane>
                                 <div class="search-row">
                                     <div class="input-group" style="margin-bottom:10px;">
-                                        <input type="text" class="form-control" placeholder="查找主题" style="height: 43px;">
+                                        <input type="text" class="form-control" placeholder="查找主题" style="height: 43px;" v-model="keyword" @keyup.enter="getArticle(1)">
                                         <span class="input-group-btn">
-                                            <button class="btn btn-light-blue" type="button" style="line-height: 29px;">
+                                            <button class="btn btn-light-blue" type="button" style="line-height: 29px;" @click="getArticle(1)">
                                                 <span class="glyphicon glyphicon-search"></span>
                                                 搜索
                                             </button>
@@ -56,7 +57,7 @@
                                 </div>
                                 <div class="main_wrap">
                                     <ul class="main_list">
-                                        <li class="main-row">
+                                        <li class="main-row" v-for="item in articleList" :key="item.id">
                                             <div class="avatar">
                                                 <a href="#">
                                                     <img src="__STATIC__/images/avatar.jpg" alt="">
@@ -64,13 +65,13 @@
                                             </div>
                                             <div class="list-content">
                                                 <p class="title" style="margin-left:10px;">
-                                                    <a href="">敲黑板，划重点：秋季搭配最全汇总来了！</a>
-                                                    <span class="label label-danger" style="padding-top:0.3em;">精</span>
+                                                    <a :href="'/{$Request.module}/{$Request.controller}/articleDet/id/' + item.id">{{item.title}}</a>
+                                                    <!-- <span class="label label-danger" style="padding-top:0.3em;">精</span> -->
                                                 </p>
                                                 <div class="auth_msg">
-                                                    <a href="#">管理员</a>
-                                                    <span>一分钟前</span>
-                                                    <span>置顶</span>
+                                                    <a href="#" style="color:#000;">{{item.user_nickname}}</a>
+                                                    <span>{{item.offsetTime}}</span>
+                                                    <!-- <span>置顶</span> -->
                                                     <p class="pull-right">
                                                         <span>
                                                             <span class="glyphicon glyphicon-eye-open"></span>&nbsp;66666
@@ -83,365 +84,17 @@
                                                 </div>
                                             </div>
                                         </li>
-                                        <li class="main-row">
-                                            <div class="avatar">
-                                                <a href="#">
-                                                    <img src="__STATIC__/images/avatar1.jpg" alt="">
-                                                </a>
-                                            </div>
-                                            <div class="list-content">
-                                                <p class="title" style="margin-left:10px;">
-                                                    <a href="">敲黑板，划重点：秋季搭配最全汇总来了！</a>
-                                                    <span class="label label-danger" style="padding-top:0.3em;">精</span>
-                                                </p>
-                                                <div class="auth_msg">
-                                                    <a href="#">管理员</a>
-                                                    <span>一分钟前</span>
-                                                    <span>置顶</span>
-                                                    <p class="pull-right">
-                                                        <span>
-                                                            <span class="glyphicon glyphicon-eye-open"></span>&nbsp;66666
-                                                        </span>
-                                                        &nbsp;&nbsp;
-                                                        <span>
-                                                            <span class="glyphicon glyphicon-comment"></span>&nbsp;25
-                                                        </span>   
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li class="main-row">
-                                            <div class="avatar">
-                                                <a href="#">
-                                                    <img src="__STATIC__/images/avatar.jpg" alt="">
-                                                </a>
-                                            </div>
-                                            <div class="list-content">
-                                                <p class="title" style="margin-left:10px;">
-                                                    <a href="">敲黑板，划重点：秋季搭配最全汇总来了！</a>
-                                                    <span class="label label-danger" style="padding-top:0.3em;">精</span>
-                                                </p>
-                                                <div class="auth_msg">
-                                                    <a href="#">管理员</a>
-                                                    <span>一分钟前</span>
-                                                    <span>置顶</span>
-                                                    <p class="pull-right">
-                                                        <span>
-                                                            <span class="glyphicon glyphicon-eye-open"></span>&nbsp;66666
-                                                        </span>
-                                                        &nbsp;&nbsp;
-                                                        <span>
-                                                            <span class="glyphicon glyphicon-comment"></span>&nbsp;25
-                                                        </span>   
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li class="main-row">
-                                            <div class="avatar">
-                                                <a href="#">
-                                                    <img src="__STATIC__/images/avatar1.jpg" alt="">
-                                                </a>
-                                            </div>
-                                            <div class="list-content">
-                                                <p class="title" style="margin-left:10px;">
-                                                    <a href="">敲黑板，划重点：秋季搭配最全汇总来了！</a>
-                                                    <span class="label label-danger" style="padding-top:0.3em;">精</span>
-                                                </p>
-                                                <div class="auth_msg">
-                                                    <a href="#">管理员</a>
-                                                    <span>一分钟前</span>
-                                                    <span>置顶</span>
-                                                    <p class="pull-right">
-                                                        <span>
-                                                            <span class="glyphicon glyphicon-eye-open"></span>&nbsp;66666
-                                                        </span>
-                                                        &nbsp;&nbsp;
-                                                        <span>
-                                                            <span class="glyphicon glyphicon-comment"></span>&nbsp;25
-                                                        </span>   
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li class="main-row">
-                                            <div class="avatar">
-                                                <a href="#">
-                                                    <img src="__STATIC__/images/avatar.jpg" alt="">
-                                                </a>
-                                            </div>
-                                            <div class="list-content">
-                                                <p class="title" style="margin-left:10px;">
-                                                    <a href="">敲黑板，划重点：秋季搭配最全汇总来了！</a>
-                                                    <span class="label label-danger" style="padding-top:0.3em;">精</span>
-                                                </p>
-                                                <div class="auth_msg">
-                                                    <a href="#">管理员</a>
-                                                    <span>一分钟前</span>
-                                                    <span>置顶</span>
-                                                    <p class="pull-right">
-                                                        <span>
-                                                            <span class="glyphicon glyphicon-eye-open"></span>&nbsp;66666
-                                                        </span>
-                                                        &nbsp;&nbsp;
-                                                        <span>
-                                                            <span class="glyphicon glyphicon-comment"></span>&nbsp;25
-                                                        </span>   
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li class="main-row">
-                                            <div class="avatar">
-                                                <a href="#">
-                                                    <img src="__STATIC__/images/avatar1.jpg" alt="">
-                                                </a>
-                                            </div>
-                                            <div class="list-content">
-                                                <p class="title" style="margin-left:10px;">
-                                                    <a href="">敲黑板，划重点：秋季搭配最全汇总来了！</a>
-                                                    <span class="label label-danger" style="padding-top:0.3em;">精</span>
-                                                </p>
-                                                <div class="auth_msg">
-                                                    <a href="#">管理员</a>
-                                                    <span>一分钟前</span>
-                                                    <span>置顶</span>
-                                                    <p class="pull-right">
-                                                        <span>
-                                                            <span class="glyphicon glyphicon-eye-open"></span>&nbsp;66666
-                                                        </span>
-                                                        &nbsp;&nbsp;
-                                                        <span>
-                                                            <span class="glyphicon glyphicon-comment"></span>&nbsp;25
-                                                        </span>   
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li class="main-row">
-                                            <div class="avatar">
-                                                <a href="#">
-                                                    <img src="__STATIC__/images/avatar.jpg" alt="">
-                                                </a>
-                                            </div>
-                                            <div class="list-content">
-                                                <p class="title" style="margin-left:10px;">
-                                                    <a href="">敲黑板，划重点：秋季搭配最全汇总来了！</a>
-                                                    <span class="label label-danger" style="padding-top:0.3em;">精</span>
-                                                </p>
-                                                <div class="auth_msg">
-                                                    <a href="#">管理员</a>
-                                                    <span>一分钟前</span>
-                                                    <span>置顶</span>
-                                                    <p class="pull-right">
-                                                        <span>
-                                                            <span class="glyphicon glyphicon-eye-open"></span>&nbsp;66666
-                                                        </span>
-                                                        &nbsp;&nbsp;
-                                                        <span>
-                                                            <span class="glyphicon glyphicon-comment"></span>&nbsp;25
-                                                        </span>   
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li class="main-row">
-                                            <div class="avatar">
-                                                <a href="#">
-                                                    <img src="__STATIC__/images/avatar1.jpg" alt="">
-                                                </a>
-                                            </div>
-                                            <div class="list-content">
-                                                <p class="title" style="margin-left:10px;">
-                                                    <a href="">敲黑板，划重点：秋季搭配最全汇总来了！</a>
-                                                    <span class="label label-danger" style="padding-top:0.3em;">精</span>
-                                                </p>
-                                                <div class="auth_msg">
-                                                    <a href="#">管理员</a>
-                                                    <span>一分钟前</span>
-                                                    <span>置顶</span>
-                                                    <p class="pull-right">
-                                                        <span>
-                                                            <span class="glyphicon glyphicon-eye-open"></span>&nbsp;66666
-                                                        </span>
-                                                        &nbsp;&nbsp;
-                                                        <span>
-                                                            <span class="glyphicon glyphicon-comment"></span>&nbsp;25
-                                                        </span>   
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li class="main-row">
-                                            <div class="avatar">
-                                                <a href="#">
-                                                    <img src="__STATIC__/images/avatar.jpg" alt="">
-                                                </a>
-                                            </div>
-                                            <div class="list-content">
-                                                <p class="title" style="margin-left:10px;">
-                                                    <a href="">敲黑板，划重点：秋季搭配最全汇总来了！</a>
-                                                    <span class="label label-danger" style="padding-top:0.3em;">精</span>
-                                                </p>
-                                                <div class="auth_msg">
-                                                    <a href="#">管理员</a>
-                                                    <span>一分钟前</span>
-                                                    <span>置顶</span>
-                                                    <p class="pull-right">
-                                                        <span>
-                                                            <span class="glyphicon glyphicon-eye-open"></span>&nbsp;66666
-                                                        </span>
-                                                        &nbsp;&nbsp;
-                                                        <span>
-                                                            <span class="glyphicon glyphicon-comment"></span>&nbsp;25
-                                                        </span>   
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li class="main-row">
-                                            <div class="avatar">
-                                                <a href="#">
-                                                    <img src="__STATIC__/images/avatar1.jpg" alt="">
-                                                </a>
-                                            </div>
-                                            <div class="list-content">
-                                                <p class="title" style="margin-left:10px;">
-                                                    <a href="">敲黑板，划重点：秋季搭配最全汇总来了！</a>
-                                                    <span class="label label-danger" style="padding-top:0.3em;">精</span>
-                                                </p>
-                                                <div class="auth_msg">
-                                                    <a href="#">管理员</a>
-                                                    <span>一分钟前</span>
-                                                    <span>置顶</span>
-                                                    <p class="pull-right">
-                                                        <span>
-                                                            <span class="glyphicon glyphicon-eye-open"></span>&nbsp;66666
-                                                        </span>
-                                                        &nbsp;&nbsp;
-                                                        <span>
-                                                            <span class="glyphicon glyphicon-comment"></span>&nbsp;25
-                                                        </span>   
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li class="main-row">
-                                            <div class="avatar">
-                                                <a href="#">
-                                                    <img src="__STATIC__/images/avatar.jpg" alt="">
-                                                </a>
-                                            </div>
-                                            <div class="list-content">
-                                                <p class="title" style="margin-left:10px;">
-                                                    <a href="">敲黑板，划重点：秋季搭配最全汇总来了！</a>
-                                                    <span class="label label-danger" style="padding-top:0.3em;">精</span>
-                                                </p>
-                                                <div class="auth_msg">
-                                                    <a href="#">管理员</a>
-                                                    <span>一分钟前</span>
-                                                    <span>置顶</span>
-                                                    <p class="pull-right">
-                                                        <span>
-                                                            <span class="glyphicon glyphicon-eye-open"></span>&nbsp;66666
-                                                        </span>
-                                                        &nbsp;&nbsp;
-                                                        <span>
-                                                            <span class="glyphicon glyphicon-comment"></span>&nbsp;25
-                                                        </span>   
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li class="main-row">
-                                            <div class="avatar">
-                                                <a href="#">
-                                                    <img src="__STATIC__/images/avatar1.jpg" alt="">
-                                                </a>
-                                            </div>
-                                            <div class="list-content">
-                                                <p class="title" style="margin-left:10px;">
-                                                    <a href="">敲黑板，划重点：秋季搭配最全汇总来了！</a>
-                                                    <span class="label label-danger" style="padding-top:0.3em;">精</span>
-                                                </p>
-                                                <div class="auth_msg">
-                                                    <a href="#">管理员</a>
-                                                    <span>一分钟前</span>
-                                                    <span>置顶</span>
-                                                    <p class="pull-right">
-                                                        <span>
-                                                            <span class="glyphicon glyphicon-eye-open"></span>&nbsp;66666
-                                                        </span>
-                                                        &nbsp;&nbsp;
-                                                        <span>
-                                                            <span class="glyphicon glyphicon-comment"></span>&nbsp;25
-                                                        </span>   
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li class="main-row">
-                                            <div class="avatar">
-                                                <a href="#">
-                                                    <img src="__STATIC__/images/avatar.jpg" alt="">
-                                                </a>
-                                            </div>
-                                            <div class="list-content">
-                                                <p class="title" style="margin-left:10px;">
-                                                    <a href="">敲黑板，划重点：秋季搭配最全汇总来了！</a>
-                                                    <span class="label label-danger" style="padding-top:0.3em;">精</span>
-                                                </p>
-                                                <div class="auth_msg">
-                                                    <a href="#">管理员</a>
-                                                    <span>一分钟前</span>
-                                                    <span>置顶</span>
-                                                    <p class="pull-right">
-                                                        <span>
-                                                            <span class="glyphicon glyphicon-eye-open"></span>&nbsp;66666
-                                                        </span>
-                                                        &nbsp;&nbsp;
-                                                        <span>
-                                                            <span class="glyphicon glyphicon-comment"></span>&nbsp;25
-                                                        </span>   
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li class="main-row">
-                                            <div class="avatar">
-                                                <a href="#">
-                                                    <img src="__STATIC__/images/avatar1.jpg" alt="">
-                                                </a>
-                                            </div>
-                                            <div class="list-content">
-                                                <p class="title" style="margin-left:10px;">
-                                                    <a href="">敲黑板，划重点：秋季搭配最全汇总来了！</a>
-                                                    <span class="label label-danger" style="padding-top:0.3em;">精</span>
-                                                </p>
-                                                <div class="auth_msg">
-                                                    <a href="#">管理员</a>
-                                                    <span>一分钟前</span>
-                                                    <span>置顶</span>
-                                                    <p class="pull-right">
-                                                        <span>
-                                                            <span class="glyphicon glyphicon-eye-open"></span>&nbsp;66666
-                                                        </span>
-                                                        &nbsp;&nbsp;
-                                                        <span>
-                                                            <span class="glyphicon glyphicon-comment"></span>&nbsp;25
-                                                        </span>   
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        
+
                                     </ul>
-                                    <div class="pagination">
+                                    <div class="pagination" v-if="total">
                                         <el-pagination
                                             background
                                             layout="prev, pager, next"
-                                            size="10"
-                                            :total="100">
+                                            :page-size="page_size"
+                                            :total="total"
+                                            @current-change="toPage"
+                                            @prev-click="toPage"
+                                            @next-click="toPage">
                                         </el-pagination>
                                     </div>
                                 </div> 
@@ -449,6 +102,10 @@
                         </div>
                     <!-- </el-card> -->
                     <!-- 加载编辑器的容器 -->
+
+                   
+                    <input type="text" class="form-control" placeholder="请输入文章标题" style="height: 43px;margin-bottom:10px;" v-model="title">
+
                     <div class="edit-style clearfix">
                         <script id="myEdit" name="content" type="text/plain"></script>
                         <button class="btn btn-light-blue pull-right" style="margin:20px" @click="publish">确认发布</button>
@@ -460,9 +117,9 @@
                             <img src="__STATIC__/images/avatar1.jpg" alt="">
                             
                             <div class="personal-desc">
-                                <p class="title">GodenWind</p>
-                                <p style="font-size:12px;"><span class="bold">个性签名：</span> 你是大千世界尘埃等闲，却是我仅有的风花雪月</p>
-                                <p style="font-size:12px;"><span class="bold">累计在线：</span> 200天</p>
+                                <p class="title">{$user_info['user_nickname']}</p>
+                                <p style="font-size:12px;"><span class="bold">个性签名：</span>「Sticky Fingers!」&&「Gold Experience Requiem」</p>
+                                <p style="font-size:12px;"><span class="bold">累计在线：</span> 3天</p>
                                 <p style="font-size:12px;"><span class="bold">论坛等级：</span> LV1.星星之火</p>
                             </div>
                             <div style="margin-top:25px;">
@@ -491,6 +148,7 @@
                     <el-card class="aside-item" id="shopMsg">
                         <div slot="header">
                             <span>趣味生活</span>
+                            <a href="" style="float: right;">更多</a>
                         </div>
                         <div class="activity-item">
                             <p><a href="#">1.抖音携手以纯共筑年轻时尚堡垒大挑战，优胜者可获终身6折购物券！！</a></p>
@@ -502,6 +160,7 @@
                     <el-card class="aside-item" id="myMsg">
                         <div slot="header">
                             <span>招兵买马</span>
+                            <a href="" style="float: right;">更多</a>
                         </div>
                         <div class="activity-item">
                             <p><a href="#">1.抖音携手以纯共筑年轻时尚堡垒大挑战，优胜者可获终身6折购物券！！</a></p>
@@ -512,6 +171,7 @@
                     <el-card class="aside-item bgc-light-blue" id="hot-class">
                         <div slot="header">
                             <span>店铺地址</span>
+                            <a href="" style="float: right;">更多</a>
                         </div>
                         <el-card shadow="hover" class="card-img-item">
                             <a href="#" class="img-hover"><img src="__STATIC__/images/hot1.png" class="card-img"></a>
@@ -551,25 +211,60 @@
     var vue = {
         el:"#app",
         data:{
+            title:'',
             name:"yejianfa",
-            age:18
+            age:18,
+            articleList:[],
+            total:0,
+            page_size:0,
+            keyword:''
         },
         methods: {
             publish(){
-                var content = JSON.stringify(/<body[^>]*>([\s\S]*)<\/body>/.exec(ue.getAllHtml())[1]);
-                axios.post("{:url('saveEditor')}",{"content": content}).then((res)=>{
-                    // if(res.data == 1001){
-                    //     ue.setContent("");
-                    //     this.$alert('发布成功!!!').then(() => {
-                    //         done();
-                    //     }).catch(() => {});
-                    // }else{
-                    //     this.$alert('发布失败!!!').then(() => {
-                    //         done();
-                    //     }).catch(() => {});
-                    // }
-                });
+
+                if(this.title){
+                    var content = JSON.stringify(/<body[^>]*>([\s\S]*)<\/body>/.exec(ue.getAllHtml())[1]);
+                    axios.post("{:url('saveEditor')}",{
+                        "content": content,
+                        "title":this.title
+                        }).then((res)=>{
+                        if(res.data == 1001){
+                            ue.setContent("");
+                            this.$message("发布成功");
+                            this.getArticle();
+                        }else{
+                            this.$message("发布失败");
+                        }
+                    });
+                }else{
+                    this.$message("请输入标题");
+                }
+
+            },
+            getArticle(page){
+                axios.get("{:url('Index/getArticle')}",{
+                    params:{
+                        page,
+                        keyword:this.keyword
+                    }
+                }).then((res) => {
+                    var data = res.data;
+                    this.articleList = data['list'];
+                    this.total = data['total'];
+                    this.page_size = data['page_size'];
+                })
+            },
+            toPage(page){
+                this.getArticle(page);
             }
         },
+        watch:{
+            keyword:function(newV,oldV){
+                this.getArticle(1);
+            }
+        },
+        mounted () {
+            this.getArticle(1);
+        }
     };
 </script>

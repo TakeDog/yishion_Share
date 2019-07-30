@@ -21,7 +21,7 @@ class AdminOauthController extends AdminBaseController
      * @adminMenu(
      *     'name'   => '第三方用户',
      *     'parent' => 'user/AdminIndex/default1',
-     *     'display'=> true,
+     *     'display'=> false,
      *     'hasView'=> true,
      *     'order'  => 10000,
      *     'icon'   => '',

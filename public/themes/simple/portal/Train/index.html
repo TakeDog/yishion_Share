@@ -1,0 +1,103 @@
+<layout name="public@layout"/>
+<style>
+    .block-wrap{text-align: center;margin:20px auto;width: 1540px;}
+    .list-block{width:250px;display: inline-block;margin:0 20px;text-align: left;vertical-align:top;}
+    .list-block .el-card__body{height: 350px;}
+
+    .el-carousel__item h3 {color: #FFF;font-size: 16px;margin: 0;position: absolute;left: 45%;top:85%;}
+    /* .el-carousel__item h3 {color: #475669;font-size: 14px;opacity: 0.75;line-height: 300px;margin: 0;} */
+    /* .el-carousel__item:nth-child(2n) {background-color: #99a9bf;} */
+    /* .el-carousel__item:nth-child(2n+1) {background-color: #d3dce6;} */
+    .carousel-img{width:100%;}
+</style>
+<div class="container-fluid" id="app">
+
+    <div style="width:1430px;margin:0 auto;">
+        <el-carousel :interval="3000" type="card" height="300px">
+            <el-carousel-item v-for="item in carousel_items" :key="item.id">
+                <h3 style="text-align: center;">{{item.title}}</h3>
+                <img :src="item.img" class="carousel-img">
+            </el-carousel-item>
+        </el-carousel>
+    </div>
+    
+    <div class="block-wrap">
+        <!-- 店铺规范 -->
+        <el-card class="aside-item list-block" :body-style="{ backgroundColor: '#FFDDDD'}">
+            <div slot="header">
+                <span class="bold">店铺规范</span>
+                <a href="" style="float: right;">更多</a>
+            </div>
+            <div class="activity-item">
+                <p class="color-dark"><a href="{:url('Train/detail')}">1.初级导购</a></p>
+                <p class="color-dark"><a href="{:url('Train/detail')}">2.中级导购</a></p>
+                <p class="color-dark"><a href="{:url('Train/detail')}">3.资深导购</a></p>
+                <p class="color-dark"><a href="{:url('Train/detail')}">1.收银</a></p>
+                <p class="color-dark"><a href="{:url('Train/detail')}">2.仓管</a></p>
+                <p class="color-dark"><a href="{:url('Train/detail')}">3.初级店长</a></p>
+                <p class="color-dark"><a href="{:url('Train/detail')}">1.中级店长</a></p>
+                <p class="color-dark"><a href="{:url('Train/detail')}">1.资深店长</a></p>
+            </div> 
+        </el-card>
+        <!-- 店铺运营 -->
+        <el-card class="aside-item list-block" :body-style="{ backgroundColor: '#FFEBDD'}">
+            <div slot="header">
+                <span class="bold">店铺运营</span>
+                <a href="" style="float: right;">更多</a>
+            </div>
+            <div class="activity-item">
+                <p class="color-dark"><a href="{:url('Train/detail')}">1.BI系统</a></p>
+                <p class="color-dark"><a href="{:url('Train/detail')}">2.采购系统</a></p>
+                <p class="color-dark"><a href="{:url('Train/detail')}">3.订货会下/加单</a></p>
+            </div> 
+        </el-card>
+        <!-- 商品指引 -->
+        <el-card class="aside-item list-block" :body-style="{ backgroundColor: '#FFFFDD'}">
+            <div slot="header">
+                <span class="bold">商品指引</span>
+                <a href="" style="float: right;">更多</a>
+            </div>
+            <div class="activity-item">
+                
+            </div> 
+        </el-card>
+        <!-- 陈列指引 -->
+        <el-card class="aside-item list-block" :body-style="{ backgroundColor: '#EBFFDD'}">
+            <div slot="header">
+                <span class="bold">陈列指引</span>
+                <a href="" style="float: right;">更多</a>
+            </div>
+            <div class="activity-item">
+            </div> 
+        </el-card>
+        <!-- 其他 -->
+        <el-card class="aside-item list-block" :body-style="{ backgroundColor: '#ddeeff'}">
+            <div slot="header">
+                <span class="bold">其他</span>
+                <a href="" style="float: right;">更多</a>
+            </div>
+            <div class="activity-item">
+                <p class="color-dark"><a href="{:url('Train/detail')}">1.优秀经验分享</a></p>
+                <p class="color-dark"><a href="{:url('Train/detail')}">2.个人技能提升</a></p>
+                <p class="color-dark"><a href="{:url('Train/detail')}">3.培训讲师</a></p>
+            </div> 
+        </el-card>
+    </div>
+</div>
+
+<script>
+   
+    var vue = {
+        el:"#app",
+        data:{
+            carousel_items:[
+                {id:1,img:"/static/images/train/111.png","title":"导购的自我修养"},
+                {id:2,img:"/static/images/train/222.png","title":"导购的自我修养"},
+                {id:3,img:"/static/images/train/333.png","title":"导购的自我修养"},
+                {id:4,img:"/static/images/train/444.png","title":"导购的自我修养"}
+            ]
+        },
+        methods: {},
+      
+    }
+</script>

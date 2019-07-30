@@ -1,0 +1,141 @@
+<layout name="public@layout" />
+<style>
+.article_wrap{background-color: #fff;padding:20px;margin-bottom: 10px;font-size: 16px;}
+.article_wrap p{margin-bottom: 0;}
+
+/* 评论，分页 */
+.comment_wrap{background-color: #fff;}
+.comment_list{padding:0;list-style: none;margin:20px 0;}
+.avatar{float: left;}
+.avatar>a>img{float: left;width:50px;height: 50px;border-radius: 50%;}
+.title > a{font-size:16px;color:#333;}
+.title > a:hover{color:#337ab7;}
+.auth_msg{color:#000;overflow: hidden;margin-left: 10px;font-size:12px;}
+.auth_msg a:hover{color:#337ab7;}
+.list-content{margin-left:50px;border-bottom:1px solid #e6e6e6;}
+.comment-row{overflow: hidden;margin-bottom:10px;}
+.pagination{width:100%;text-align: center;}
+
+.comment .el-tabs__content{padding:0 20px;}
+.comment .el-tabs__header{padding:5px 20px;margin:0;}
+.comment .el-tabs{background-color: #fff;border: 1px solid #d2d2d2;margin-bottom:20px;}
+.comment .el-tabs__item{font-size:16px;font-weight: bold;}
+
+</style>
+<div class="container" id="app">
+    <div class="article_wrap">
+        <h3 style="text-align: center;margin-top:0;padding:10px 0;">{$data['title']}</h3>
+        {$data['content']|raw}
+    </div>
+
+    <div class="input-group" style="margin-bottom:10px;">
+        <input type="text" class="form-control" placeholder="说说你的看法" style="height: 43px;" v-model="comment">
+        <span class="input-group-btn">
+            <button class="btn btn-light-blue" type="button" style="line-height: 29px;" @click="addComment">
+                <span class="glyphicon glyphicon-search"></span>
+                发表
+            </button>
+        </span>
+    </div>
+    
+    <div class="comment">
+        <el-tabs >
+            <el-tab-pane label="最新评论" name="first">
+                <span slot="label"><i class="el-icon-sunny"></i> 最新评论</span>
+            </el-tab-pane>
+
+            <div class="comment_wrap">
+                <ul class="comment_list">
+                    <li class="comment-row" v-for="item in comment_list" :key="item.id">
+                        <div class="avatar">
+                            <a href="#">
+                                <img src="__STATIC__/images/avatar.jpg" alt="">
+                            </a>
+                        </div>
+                        <div class="list-content">
+                            <p class="title" style="margin:0 0 5px 10px;" >
+                                <a href="#" class="font-c-blue font14">{{item.user_nickname}}</a>&nbsp; 
+                                <span style="font-size: 12px;color:#8c8c8c;">发表于{{item.date}}</span>
+                            </p>
+                            <div class="auth_msg" style="font-size: 16px;margin-bottom:10px;">
+                                <span>{{item.comment}}</span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <div class="pagination" style="margin-top:0;">
+                    <!-- <el-pagination
+                        background
+                        layout="prev, pager, next"
+                        :page-size="page_size"
+                        :total="total"
+                        @current-change="toPage"
+                        @prev-click="toPage"
+                        @next-click="toPage">
+                    </el-pagination> -->
+                    
+                    <el-pagination
+                        background
+                        layout="prev, pager, next"
+                        :page-size="page_size"
+                        :total="total"
+                        @current-change="toPage"
+                        @prev-click="toPage"
+                        @next-click="toPage"
+                        v-if="listCount > 0">
+                    </el-pagination>
+                    <p style="margin:0;color:#ab1515;" v-else> 还没有人评论，赶紧来抢沙发吧！ </p>
+                </div>
+            </div> 
+        </el-tabs>
+    </div>
+    
+</div>
+<script>
+    var vue = {
+        el:"#app",
+        data:{
+            comment:'',
+            article_id:"{$data['id']}",
+            comment_list:[],
+            total:0,
+            page_size:0
+        },
+        methods: {
+            addComment(){
+                axios.post("{:url('Index/addComment')}",{
+                    comment:this.comment,
+                    article_id:this.article_id
+                    
+                }).then((res)=>{
+                    if(res.data.error > 1000){
+                        this.$message("评论出错了，错误码：" + res.data.error + ",错误信息：" + res.data.msg);
+                    }else{
+                        this.comment = '';
+                        this.$message("评论成功");
+                        this.getComList(1);
+                    }
+                })
+            },
+            getComList(page){
+                //getComList
+                axios.get("/{$Request.module}/{$Request.controller}/getComList?article_id={$data['id']}&page=" + page).then((res)=>{
+                    this.comment_list = res.data['list'];
+                    this.total = res.data['total'];
+                    this.page_size = res.data['page_size'];
+                })
+            },
+            toPage(page){
+                this.getComList(page);
+            }
+        },
+        computed: {
+            listCount:function(){
+                return this.comment_list.length;
+            }
+        },
+        mounted () {
+            this.getComList(1);
+        }
+    }
+</script>

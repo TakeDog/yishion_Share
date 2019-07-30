@@ -1,5 +1,6 @@
+
 <footer class="el-footer" style="height: auto;">
-    <div class="container footer-content">
+    <div class="footer-content">
         <p>bbs.yishion.com</p> 
         <p>京ICP证110507号 京ICP备10046444号 京公网安备11010802020134号</p>
     </div>
@@ -10,10 +11,12 @@
 </html>
 
 <script>
-    // $(window.parent.document).find("#main").load(function(){
-    //     var main = $(window.parent.document).find("#main");
-    //     var thisheight = $(document).height();
-    //     main.height(thisheight);
-    // });
+    $(function(){
+        $(window).on("resize",function(){
+            var documentW = $(document).width();
+            $(".el-footer").css({"width":documentW});
+        })
+    })
+    
     var vm = new Vue(vue);
 </script>

@@ -77,9 +77,9 @@
                                 <a class="btn btn-xs btn-warning js-ajax-dialog-btn"
                                    href="{:url('adminIndex/ban',array('id'=>$vo['id']))}"
                                    data-msg="{:lang('BLOCK_USER_CONFIRM_MESSAGE')}">{:lang('BLOCK_USER')}</a>
-                                <a class="btn btn-xs btn-primary js-ajax-dialog-btn"
-                                   href="{:url('adminIndex/ban',array('id'=>$vo['id']))}"
-                                   data-msg="{:lang('BLOCK_USER_CONFIRM_MESSAGE')}">角色管理</a>
+                                <a class="btn btn-xs btn-primary"
+                                   href="{:url('adminIndex/roleEdit',array('u_id'=>$vo['id']))}"
+                                  >角色管理</a>
                             </case>
                             <case value="2">
                                 <a class="btn btn-xs btn-success js-ajax-dialog-btn"
