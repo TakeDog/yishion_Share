@@ -130,9 +130,11 @@ class IndexController extends HomeBaseController
         $keyword = input("param.keyword");
         $num = 10;
 
-        $query = Db::name("CArticle") -> alias('at') -> join("CUser u","at.user_id = u.id","LEFT") -> where('at.title','like','%'.$keyword.'%') -> order("date desc");
+        // $query = Db::name("CArticle") -> alias('at') -> join("CUser u","at.user_id = u.id","LEFT") -> where('at.title','like','%'.$keyword.'%') -> order("date desc");
+        $list = Db::query("SELECT at.*,u.user_name,u.avatar,u.user_nickname,(SELECT COUNT(id) FROM share_c_article_comment scac WHERE scac.article_id=at.id) AS comment_count FROM share_c_article AT LEFT JOIN share_c_user u ON at.user_id=u.id
+        WHERE at.title LIKE '%$keyword%' ORDER BY DATE DESC limit ".($cur_page-1)*$num .", $num");
 
-        $list = $query -> limit(($cur_page-1)*$num , $num) -> field("at.*,u.user_name,u.avatar,u.user_nickname") -> select() -> toArray();
+        // $list = $query -> limit(($cur_page-1)*$num , $num) -> field("at.*,u.user_name,u.avatar,u.user_nickname") -> select() -> toArray();
 
         $currentTime = time();
 
@@ -155,21 +157,36 @@ class IndexController extends HomeBaseController
 
         $data['list'] = $list;
         $data['page_size'] =  $num;
-        $data['total'] = $query -> count();
+        $data['total'] =  count($list);
         return json($data);
     }
 
 
     public function articleDet(){
         $id = $this -> request -> param('id',0,'intval');
+        // $data = Db::name('CArticle') -> alias('a') -> join('CUser u','a.user_id = u.id','LEFT') -> where('a.id',$id) -> field('a.*,u.user_name,u.user_nickname') -> select();
+        $data = Db::query("SELECT at.*,u.user_name,u.avatar,u.user_nickname,(SELECT COUNT(id) FROM share_c_article_comment scac WHERE scac.article_id=at.id) AS comment_count FROM share_c_article AT LEFT JOIN share_c_user u ON at.user_id=u.id
+        WHERE at.id=$id");
+        $content = str_replace('\\','',trim($data[0]['content'],'"'));
 
-        $data = Db::name('CArticle') -> get($id);
+        $currentTime = time();
+        $offsetTime = $currentTime - intval($data[0]['date']);
+        
+        if($offsetTime / 60 / 60 > 1){
+            $data[0]['offsetTime'] = floor(($offsetTime / 60 / 60)).'小时前';
+        }else{
 
-        $content = str_replace('\\','',trim($data['content'],'"'));
+            if($offsetTime / 60  > 1){
+                $data[0]['offsetTime'] = floor(($offsetTime / 60)).'分钟前';
+            }else{
+                $data[0]['offsetTime'] = "刚刚";
+            }
 
-        $data['content'] = $content;
+        }
 
-        $this -> assign('data',$data);
+        $data[0]['content'] = $content;
+
+        $this -> assign('data',$data[0]);
         return $this -> fetch();
     }
 
@@ -177,7 +194,6 @@ class IndexController extends HomeBaseController
         $data = $this -> request -> param();
         $data['date'] = date("Y-m-d H:i:s");
         $data['user_id'] = getUser('id');
-        $data['parent_id'] = 0;
 
         if(!trim($data['comment'])){
             $error['error'] = 1001;
@@ -205,14 +221,47 @@ class IndexController extends HomeBaseController
 
         $num = 5;
 
-        $query = Db::name("CArticleComment") -> alias('ac') -> join('CUser u','ac.user_id = u.id','LEFT') -> join('CArticle a','ac.article_id = a.id','LEFT')  -> where('ac.article_id',$article_id);
+        $query = Db::name("CArticleComment") -> alias('ac') -> join('CUser u','ac.user_id = u.id','LEFT') -> join('CUser u2','ac.fuser_id = u2.id','LEFT') -> join('CArticle a','ac.article_id = a.id','LEFT') -> where(array('ac.article_id'=>$article_id,'ac.top_id'=>0));
 
-        $list = $query -> order("ac.date desc") -> field('ac.id,ac.comment,ac.date,u.user_name,u.user_nickname') ->limit(($cur_page-1)*$num,$num) -> select() -> toArray();
+        $list = $query -> order("ac.date desc") -> field('ac.*,u.user_name,u.user_nickname hname,u2.user_nickname fname') ->limit(($cur_page-1)*$num,$num) -> select() -> toArray();
+
+        foreach($list as $k => $v){
+
+            $query2 = Db::name("CArticleComment") -> alias('ac') -> join('CUser u','ac.user_id = u.id','LEFT') -> join('CUser u2','ac.fuser_id = u2.id', 'LEFT') -> join('CArticle a','ac.article_id = a.id','LEFT') -> where(array('ac.article_id'=>$article_id,'ac.top_id'=>$v['id']));
+
+            $list2 = $query2 -> order("ac.date desc") -> field('ac.*,u.user_name,u.user_nickname hname,u2.user_nickname fname') -> select() -> toArray();
+            if(count($list2)>0)
+                $list[$k]['ctree'] = $list2;
+                $list[$k]['total'] = $query2 -> count();
+        }
 
         $data['list'] = $list;
         $data['page_size'] = $num;
-        $data['total'] = $query -> count();
+        $data['total'] = $query -> count();;
         return json($data);
     }
 
+    public function getComListById(){
+        $comment_id = $this -> request -> param('comment_id',0,'intval');
+
+        $list = Db::name("CArticleComment") -> alias('ac') -> join('CUser u','ac.user_id = u.id','LEFT') -> join('CUser u2','ac.fuser_id = u2.id','LEFT') -> join('CArticle a','ac.article_id = a.id','LEFT') -> where('ac.id',$comment_id) -> order("ac.date desc") -> field('ac.*,u.user_name,u.user_nickname hname,u2.user_nickname fname') -> find();
+
+        $query2 = Db::name("CArticleComment") -> alias('ac') -> join('CUser u','ac.user_id = u.id','LEFT') -> join('CUser u2','ac.fuser_id = u2.id', 'LEFT') -> join('CArticle a','ac.article_id = a.id','LEFT') -> where('ac.top_id',$comment_id);
+
+        $list2 = $query2 -> order("ac.date desc") -> field('ac.*,u.user_name,u.user_nickname hname,u2.user_nickname fname') -> select() -> toArray();
+
+        if(count($list2)>0){
+            $list['ctree'] = $list2;
+            $list['subTotal'] = $query2 -> count();
+        }
+
+        return json($list);
+    }
+
+    public function addViewCount(){
+        $article_id = $this -> request -> param('article_id',0,'intval');
+        
+        $res = Db::name('CArticle') -> WHERE('id',$article_id) -> setInc("view_count",1);
+
+    }
 }

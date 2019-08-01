@@ -74,11 +74,11 @@
                                                     <!-- <span>置顶</span> -->
                                                     <p class="pull-right">
                                                         <span>
-                                                            <span class="glyphicon glyphicon-eye-open"></span>&nbsp;66666
+                                                            <span class="glyphicon glyphicon-eye-open"></span>&nbsp;{{item.view_count>999?"999+":item.view_count}}
                                                         </span>
                                                         &nbsp;&nbsp;
                                                         <span>
-                                                            <span class="glyphicon glyphicon-comment"></span>&nbsp;25
+                                                            <span class="glyphicon glyphicon-comment"></span>&nbsp;{{item.comment_count>999?"999+":item.comment_count}}
                                                         </span>   
                                                     </p>
                                                 </div>
@@ -249,6 +249,7 @@
                     }
                 }).then((res) => {
                     var data = res.data;
+                    console.log(data);
                     this.articleList = data['list'];
                     this.total = data['total'];
                     this.page_size = data['page_size'];
