@@ -11,9 +11,19 @@
 .blue-bgc>.el-card__header{background-color: #409eff;color:#fff;}
 .blue-bgc{border-color: #409eff;}
 
+.font-white{color:#FFF;}
+
 .font-c-blue{color:#409eff !important;}
 .font12{font-size: 12px !important;}
 .font14{font-size: 14px !important;}
+.font16{font-size: 16px !important;}
+.font18{font-size: 18px !important;}
+.font20{font-size: 20px !important;}
+
+.a-black:link{color:#232323;}
+.a-black:hover{color:#00456f;}
+.a-white:link{color:#FFF;}
+.a-white:hover{color:#e4e4e4;}
 
 /* 整体布局样式 */
 .el-header {padding: 0;}
@@ -21,18 +31,18 @@
 aside.el-aside{width:350px;}
 .el-footer{padding:0;}
 .el-footer{background-color: #717171;}
-.footer-content{padding:20px;color:#dfdfdf;}
+.footer-content{padding:20px;color:#FFF;text-align: center;}
 
 /* 顶部通栏 */
-.full-head{background-color:#000;padding:5px;}
+.full-head{background-color:#717171;padding:5px;position:absolute;right:0;bottom:0;}
 .full-head p{float: right;padding-right: 20px;}
-.full-head p,.full-head p>a{color:#dfdfdf;font-size:12px;margin:0;}
-.full-head p>a:hover{color:#fff;}
+.full-head p,.full-head p>a{color:#FFF;font-size:12px;margin:0;}
+.full-head p>a:hover{color:#FFF;}
 
 /* 导航条 */
 .navbar-default .navbar-link{color:#FFF;}
 .navbar-default .navbar-link:hover{color:#95c8f5;}
-.navbar-default {background-color: #717171;border-bottom: #e7e7e7;border: none;}
+.navbar-default {background-color: #717171;border-bottom: #e7e7e7;border-top: 1px solid #fff;}
 .navbar-default .navbar-nav>.active>a {background-color: #f3f3f3;color: #337ab7;border-radius: 5px 5px 0 0;}
 .navbar-default .navbar-nav>li>a {color: #FFF;}
 .navbar-default .navbar-nav>li>a:hover {color: #95c8f5;}
@@ -77,6 +87,7 @@ aside.el-aside{width:350px;}
 
 
 /* 卡片选项为img items */
+.main-color-header .el-card__header{background: #717171;} 
 .el-card__body{padding:10px;}
 .card-img{display: block;width: 100%;height: 120px;}
 .img-hover{display: block;}
