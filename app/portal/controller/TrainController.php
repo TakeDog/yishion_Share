@@ -12,4 +12,8 @@ class TrainController extends HomeBaseController{
     public function detail(){
         return $this -> fetch();
     }
+
+    public function trainVideo(){
+        return $this -> fetch();
+    }
 }

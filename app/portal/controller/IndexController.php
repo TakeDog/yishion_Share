@@ -19,7 +19,12 @@ class IndexController extends HomeBaseController
         return $this -> fetch();
     }
 
-    public function staff_index(){
+    public function staff_index1(){
+        $this -> assign('user_info',session("user_info",'','portal'));
+        return $this -> fetch();
+    }
+
+    public function staff_index2(){
         $this -> assign('user_info',session("user_info",'','portal'));
         return $this -> fetch();
     }
