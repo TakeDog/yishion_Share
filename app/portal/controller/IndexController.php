@@ -253,7 +253,6 @@ class IndexController extends HomeBaseController
         return json($data);
     }
 
-<<<<<<< HEAD
     public function openPdf(){
         $filename = $this -> request -> param('name');
         $file = "./static/PDF/".$filename.".pdf";
@@ -271,7 +270,6 @@ class IndexController extends HomeBaseController
         return $news;
     }
 
-=======
     public function getComListById(){
         $comment_id = $this -> request -> param('comment_id',0,'intval');
 
@@ -295,5 +293,4 @@ class IndexController extends HomeBaseController
         $res = Db::name('CArticle') -> WHERE('id',$article_id) -> setInc("view_count",1);
 
     }
->>>>>>> f304b5592a63f58f72b41164523b68827fe1c242
 }
