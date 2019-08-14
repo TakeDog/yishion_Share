@@ -87,7 +87,7 @@ class AdminIndexController extends AdminBaseController
             })
             -> field("u.*,GROUP_CONCAT(r.role_name separator ' | ') as role_name")
             -> group('u.id')
-            -> order("create_time DESC")
+            -> order("u.user_status desc,create_time DESC")
             -> paginate(10);
         // 获取分页显示
         $page = $list->render();

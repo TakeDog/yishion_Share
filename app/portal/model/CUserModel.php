@@ -96,6 +96,5 @@ class CUserModel extends Model{
         }
         return $action_list;
     }
-
    
 }

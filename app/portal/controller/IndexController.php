@@ -12,6 +12,7 @@ class IndexController extends HomeBaseController
     }
 
     public function staff(){
+        $this -> assign('news',$this -> indexNews());
         return $this -> fetch();
     }
 
@@ -25,8 +26,10 @@ class IndexController extends HomeBaseController
     }
 
     public function staff_index2(){
+
         $this -> assign('user_info',session("user_info",'','portal'));
         return $this -> fetch();
+
     }
 
     public function login(){
@@ -48,10 +51,14 @@ class IndexController extends HomeBaseController
 
         if(!$user['pwd'])  return json(array('code'=>0,'msg'=>'密码不能为空'));
 
+        if(!$user['real_name'])  return json(array('code'=>0,'msg'=>'真实名字不能为空'));
+
+        if(!$user['dept'])  return json(array('code'=>0,'msg'=>'部门不能为空'));
+
         $res = model('c_user') -> registVerify($user);
 
         if($res && $res > 0){
-            return json(array('code'=>1,'msg'=>'注册成功！！！'));
+            return json(array('code'=>1,'msg'=>'注册信息已发送至管理员，请静候审批。'));
         }else{
             if($res == -1){
                 return json(array('code'=>0,'msg'=>'注册失败，用户名已存在！！！'));
@@ -218,6 +225,23 @@ class IndexController extends HomeBaseController
         $data['page_size'] = $num;
         $data['total'] = $query -> count();
         return json($data);
+    }
+
+    public function openPdf(){
+        $filename = $this -> request -> param('name');
+        $file = "./static/PDF/".$filename.".pdf";
+        header('Content-type: application/pdf'); 
+        header('filename='.$file); 
+        return readfile($file);
+    }
+
+    private function indexNews(){
+        $joinNews = intval(Db::name("CUser") -> where("user_status",2) -> count());
+
+        $news['join_news'] = $joinNews;
+        //$news['count'] = $joinNews + a +b +c;
+        $news['count'] = $joinNews;
+        return $news;
     }
 
 }

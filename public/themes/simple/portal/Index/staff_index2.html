@@ -1,8 +1,5 @@
 <layout name="public@layout" />
-<!-- <link rel="stylesheet" href="__STATIC__/css/ueditor.css"> -->
-<script src="__STATIC__/lib/ueditor_php/utf8-php/ueditor.config.js"></script>
-<script src="__STATIC__/lib/ueditor_php/utf8-php/ueditor.all.js"></script>
-<script type="text/javascript" charset="utf-8" src="__STATIC__/lib/ueditor_php/utf8-php/lang/zh-cn/zh-cn.js"></script>
+
 
 <style>
 .el-carousel__item h3 {color: #FFF;font-size: 16px;margin: 0;position: absolute;left: 45%;bottom:10%;}
@@ -20,9 +17,8 @@
                             <a href="#" class="a-white" style="float: right;">更多</a>
                         </div>
                         <div class="activity-item">
-                            <p class="color-dark"><a href="#">1.抖音携手以纯共筑年轻时尚堡垒大挑战，优胜者可获终身6折购物券！！</a></p>
-                            <p class="color-dark"><a href="#">2.抖音携手以纯共筑年轻时尚堡垒大挑战，优胜者可获终身6折购物券！！</a></p>
-                            <p class="color-dark"><a href="#">3.抖音携手以纯共筑年轻时尚堡垒大挑战，优胜者可获终身6折购物券！！</a></p>
+                            <p class="color-dark"><a href="/./openPdf.php?name=11" target="_blank">1.以纯-Y2八月秋季度陈列指引.广东办事处(9)</a></p>
+                            <p class="color-dark"><a href="/./openPdf.php?name=22" target="_blank">2.以纯-休闲八月秋季陈列指引.广东办事处(4)</a></p>
                         </div> 
                     </el-card>
                     <el-card class="aside-item main-color-header">
@@ -108,26 +104,11 @@
 </div>
 
 <script>
-    var ue = UE.getEditor('myEdit',{
-        toolbars:[
-            ['bold','fontsize','blockquote','forecolor','justifyleft','justifycenter','justifyright','link','unlink','simpleupload','source']
-        ],
-        enableAutoSave:false,
-        maximumWords:5000,
-        allHtmlEnabled: true
-    });
+    
 
     var vue = {
         el:"#app",
         data:{
-            title:'',
-            name:"yejianfa",
-            age:18,
-            articleList:[],
-            total:0,
-            page_size:0,
-            keyword:'',
-
             carousel_items:[
                 {id:1,img:"/static/images/train/111.png","title":"导购的自我修养"},
                 {id:2,img:"/static/images/train/222.png","title":"导购的自我修养"},

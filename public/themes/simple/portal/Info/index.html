@@ -17,81 +17,6 @@ el-icon-s-promotion -- 指引 -->
             <div class="activity-item">
                 <div class="clearfix">
                     <div style="float:left;margin-right: 100px;">
-                        <i class="el-icon-s-home font70 colorGrey"></i>
-                        <button class="el-button el-button--info" style="vertical-align: text-bottom;">制度类</button>
-                    </div>
-                    <div style="float:left;">
-                        <el-tabs v-model="activeName1" @tab-click="handleClick">
-                            <el-tab-pane label="人事行政制度" name="first1">
-                                <ul>
-                                    <li>制度类内容1</li>
-                                    <li>制度类内容2</li>
-                                    <li>制度类内容3</li>
-                                    <li>制度类内容4</li>
-                                    <li>制度类内容5</li>
-                                </ul>
-                            </el-tab-pane>
-                            <el-tab-pane label="零售运营管理制度" name="second1">
-                                <ul>
-                                    <li>零售运营管理制度1</li>
-                                    <li>零售运营管理制度2</li>
-                                    <li>零售运营管理制度3</li>
-                                    <li>零售运营管理制度4</li>
-                                    <li>零售运营管理制度5</li>
-                                </ul>
-                            </el-tab-pane>
-                            <el-tab-pane label="财务管理制度" name="third1">
-                                <ul>
-                                    <li>财务管理制度1</li>
-                                    <li>财务管理制度2</li>
-                                    <li>财务管理制度3</li>
-                                    <li>财务管理制度4</li>
-                                    <li>财务管理制度5</li>
-                                </ul>
-                            </el-tab-pane>
-                        </el-tabs>
-                    </div>
-                </div>
-            </div> 
-        </el-card>
-        <br/>
-        <el-card shadow="never">
-            <div class="activity-item">
-                <div class="clearfix">
-                    <div style="float:left;margin-right: 100px;">
-                        <i class="el-icon-bangzhu font70 colorGrey"></i>
-                        <button class="el-button el-button--info" style="vertical-align: text-bottom;">通知类</button>
-                    </div>
-                    <div style="float:left;">
-                        <el-tabs v-model="activeName2" @tab-click="handleClick">
-                            <el-tab-pane label="人事行政通知" name="first2">
-                                <ul>
-                                    <li>人事行政通知1</li>
-                                    <li>人事行政通知2</li>
-                                    <li>人事行政通知3</li>
-                                    <li>人事行政通知4</li>
-                                    <li>人事行政通知5</li>
-                                </ul>
-                            </el-tab-pane>
-                            <el-tab-pane label="订货会通知" name="second2">
-                                <ul>
-                                    <li>订货会通知1</li>
-                                    <li>订货会通知2</li>
-                                    <li>订货会通知3</li>
-                                    <li>订货会通知4</li>
-                                    <li>订货会通知5</li>
-                                </ul>
-                            </el-tab-pane>
-                        </el-tabs>
-                    </div>
-                </div>
-            </div> 
-        </el-card>
-        <br/>
-        <el-card shadow="never">
-            <div class="activity-item">
-                <div class="clearfix">
-                    <div style="float:left;margin-right: 100px;">
                         <i class="el-icon-chat-line-square font70 colorGrey"></i>
                         <button class="el-button el-button--info" style="vertical-align: text-bottom;">资讯类</button>
                     </div>
@@ -180,6 +105,85 @@ el-icon-s-promotion -- 指引 -->
                 </div>
             </div> 
         </el-card>
+        <br/>
+        <el-card shadow="never">
+            <div class="activity-item">
+                <div class="clearfix">
+                    <div style="float:left;margin-right: 100px;">
+                        <i class="el-icon-bangzhu font70 colorGrey"></i>
+                        <button class="el-button el-button--info" style="vertical-align: text-bottom;">通知类</button>
+                    </div>
+                    <div style="float:left;">
+                        <el-tabs v-model="activeName2" @tab-click="handleClick">
+                            <el-tab-pane label="人事行政通知" name="first2">
+                                <ul>
+                                    <li>人事行政通知1</li>
+                                    <li>人事行政通知2</li>
+                                    <li>人事行政通知3</li>
+                                    <li>人事行政通知4</li>
+                                    <li>人事行政通知5</li>
+                                </ul>
+                            </el-tab-pane>
+                            <el-tab-pane label="订货会通知" name="second2">
+                                <ul>
+                                    <li>订货会通知1</li>
+                                    <li>订货会通知2</li>
+                                    <li>订货会通知3</li>
+                                    <li>订货会通知4</li>
+                                    <li>订货会通知5</li>
+                                </ul>
+                            </el-tab-pane>
+                        </el-tabs>
+                    </div>
+                </div>
+            </div> 
+        </el-card>
+        <br/>
+        <el-card shadow="never">
+            <div class="activity-item">
+                <div class="clearfix">
+                    <div style="float:left;margin-right: 100px;">
+                        <i class="el-icon-s-home font70 colorGrey"></i>
+                        <button class="el-button el-button--info" style="vertical-align: text-bottom;">制度类</button>
+                    </div>
+                    <div style="float:left;">
+                        <el-tabs v-model="activeName1" @tab-click="handleClick">
+                            <el-tab-pane label="人事行政制度" name="first1">
+                                <ul>
+                                    <li>制度类内容1</li>
+                                    <li>制度类内容2</li>
+                                    <li>制度类内容3</li>
+                                    <li>制度类内容4</li>
+                                    <li>制度类内容5</li>
+                                </ul>
+                            </el-tab-pane>
+                            <el-tab-pane label="零售运营管理制度" name="second1">
+                                <ul>
+                                    <li>零售运营管理制度1</li>
+                                    <li>零售运营管理制度2</li>
+                                    <li>零售运营管理制度3</li>
+                                    <li>零售运营管理制度4</li>
+                                    <li>零售运营管理制度5</li>
+                                </ul>
+                            </el-tab-pane>
+                            <el-tab-pane label="财务管理制度" name="third1">
+                                <ul>
+                                    <li>财务管理制度1</li>
+                                    <li>财务管理制度2</li>
+                                    <li>财务管理制度3</li>
+                                    <li>财务管理制度4</li>
+                                    <li>财务管理制度5</li>
+                                </ul>
+                            </el-tab-pane>
+                        </el-tabs>
+                    </div>
+                </div>
+            </div> 
+        </el-card>
+        
+        
+        
+        
     </div>
 </div>
 
