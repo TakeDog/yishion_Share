@@ -55,6 +55,10 @@ class IndexController extends HomeBaseController
 
         if(!$user['dept'])  return json(array('code'=>0,'msg'=>'部门不能为空'));
 
+        if(!$user['part'])  return json(array('code'=>0,'msg'=>'机构不能为空'));
+
+        if(!$user['jop'])  return json(array('code'=>0,'msg'=>'职位不能为空'));
+
         $res = model('c_user') -> registVerify($user);
 
         if($res && $res > 0){
