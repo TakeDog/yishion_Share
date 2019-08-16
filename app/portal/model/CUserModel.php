@@ -51,7 +51,7 @@ class CUserModel extends Model{
         if($userInfo) return -1;
 
         $user['pwd'] = MD5($user['pwd']);
-        $user['user_status'] = 0;
+        $user['user_status'] = 2;
         $user['super'] = 0;
         $user['create_time'] = time();
         Db::startTrans();
@@ -96,6 +96,5 @@ class CUserModel extends Model{
         }
         return $action_list;
     }
-
    
 }

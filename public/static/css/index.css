@@ -36,7 +36,7 @@ aside.el-aside{width:350px;}
 /* 顶部通栏 */
 .full-head{background-color:#717171;padding:5px;position:absolute;right:0;bottom:0;}
 .full-head p{float: right;padding-right: 20px;}
-.full-head p,.full-head p>a{color:#FFF;font-size:12px;margin:0;}
+.full-head p,.full-head p>a{color:#FFF;font-size:13px;margin:0;}
 .full-head p>a:hover{color:#FFF;}
 
 /* 导航条 */
