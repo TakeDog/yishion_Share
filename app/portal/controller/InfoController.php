@@ -33,5 +33,9 @@ class InfoController extends HomeBaseController{
         return json($data);
     }
 
-   
+   public function sell_index(){
+        return $this -> fetch();
+   }
+
+
 }

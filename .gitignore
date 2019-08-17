@@ -10,3 +10,5 @@
 Vagrantfile
 .vagrant
 /data/runtime
+/public/static/video
+/public/static/PDF
