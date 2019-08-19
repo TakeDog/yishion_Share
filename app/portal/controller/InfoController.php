@@ -26,11 +26,13 @@ class InfoController extends HomeBaseController{
         $page = $this -> request -> param("page",1,"intval");
         $size = $this -> request -> param("size",5,"intval");
         
-        $current = ($page-1)*$size;
+        $total = Db::name('WorkInfo') -> where('pid',$pid) -> count();
+        $current = $page * $size;
 
-        $data = Db::name('WorkInfo') -> where('pid',$pid) -> order('sort') -> limit($current,$size) -> select();
-
-        return json($data);
+        $data = Db::name('WorkInfo') -> where('pid',$pid) -> order('sort') -> limit(0,$current) -> select();
+        $res['files'] = $data;
+        $res['total'] = $total;
+        return json($res);
     }
 
    

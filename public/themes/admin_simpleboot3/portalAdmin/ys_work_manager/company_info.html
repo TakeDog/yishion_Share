@@ -326,14 +326,19 @@ ul,li{
                                         type: 'success'
                                     });
                                     this.createTree();
-                                }else if(1002){
+                                }else if(res.data === 1002){
                                     this.$message({
                                         message: "删除项目失败！！！",
                                         type: 'error'
                                     });
-                                }else if(1003){
+                                }else if(res.data === 1003){
                                     this.$message({
                                         message: "有子项不能删除！！！",
+                                        type: 'error'
+                                    });
+                                }else if(res.data === 1004){
+                                    this.$message({
+                                        message: "删除文件失败！！！文件不存在...",
                                         type: 'error'
                                     });
                                 }
