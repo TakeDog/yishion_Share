@@ -8,6 +8,8 @@
    ul{list-style: none;padding:0;font-size: 16px;}
    ul>li>a{color:#484848;text-decoration: none;}
    ul>li>a:hover,ul>li>a:focus{color:#9c9b9b;text-decoration: none;}
+   .more_files{color:#409EFF;cursor: pointer;}
+   .more_files:hover{color:#74b6fb;}
 </style>
 <!-- el-icon-s-home -- 制度类
 el-icon-bangzhu -- 通知类
@@ -27,12 +29,14 @@ el-icon-s-promotion -- 指引 -->
                     <div style="float:left;">
                         <el-tabs v-model="item.cActive" @tab-click="tabCut($event,i)">
                             <el-tab-pane :label="ktem.name" :name="ktem.id+''" v-for="(ktem,k) in item.children" :page="ktem.page" lazy>
-                                <ul>
-                                    <li v-for="(jtem,j) in ktem.children">
-                                        <a :href="'http://www.share.com/'+jtem.files" target="view_window">{{jtem.name}}</a>
-                                    </li>
-                                </ul>
-                                <!-- <a v-if="ktem.children.length > 5">更多</a> -->
+                                <div v-if="ktem.children">
+                                    <ul>
+                                        <li v-for="(jtem,j) in ktem.children">
+                                            <a :href="'http://www.share.com/'+jtem.files" target="view_window">{{jtem.name}}</a>
+                                        </li>
+                                    </ul>
+                                    <span v-if="ktem.total > ktem.children.length" class="more_files" @click="getMoreFiles(ktem,i,k)">更多</span>
+                                </div>
                             </el-tab-pane>
                         </el-tabs>
                     </div>
@@ -52,6 +56,7 @@ el-icon-s-promotion -- 指引 -->
         },
         mounted () {
             this.createTree();
+            console.log(this.infoTree);
         },
         methods: {
             getInfo(id,callback){
@@ -66,8 +71,17 @@ el-icon-s-promotion -- 指引 -->
             },
             tabCut(tag, i) {
                 let item = {id:tag.name,page:tag.$attrs.page};
-                this.getFiles(item, files => {
-                    this.infoTree[i].children[tag.index].children = files;
+                this.getFiles(item, res => {
+                    this.infoTree[i].children[tag.index].children = res.files;
+                    this.infoTree[i].children[tag.index].total = res.total;
+                    Vue.set(this.infoTree,i,this.infoTree[i]);
+                });
+            },
+            getMoreFiles(ktem,i,k){
+                ktem.page += 1;
+                this.getFiles(ktem, res => {
+                    this.infoTree[i].children[k].children = res.files;
+                    this.infoTree[i].children[k].total = res.total;
                     Vue.set(this.infoTree,i,this.infoTree[i]);
                 });
             },
@@ -76,13 +90,13 @@ el-icon-s-promotion -- 指引 -->
                     this.infoTree = this.makeTree(res).children;
                     this.infoTree.forEach((item,i) => {
                         item.children.forEach((ktem,k) => {
-                            console.log(ktem['children']);
                             ktem.page = 1;
                             if(k===0){
-                                this.getFiles(ktem, files => {
+                                this.getFiles(ktem, res2 => {
                                     this.infoTree[i].cActive = ktem.id+'';
+                                    ktem.children = res2.files;
+                                    ktem.total = res2.total;
                                     this.infoTree[i].children[k] = ktem;
-                                    ktem.children = files;
                                     Vue.set(this.infoTree,i,this.infoTree[i]);
                                 });
                             }

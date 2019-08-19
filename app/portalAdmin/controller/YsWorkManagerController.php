@@ -67,7 +67,11 @@ class YsWorkManagerController extends AdminBaseController{
         $data['files'] = $this -> request -> param("files");
         
         if($lev == 3){
-            unlink($data['files']);
+            if(file_exists($data['files'])){
+                unlink($data['files']);
+            }else{
+                return 1004;
+            }
         }
         $count = Db::name('WorkInfo') -> where('pid',$data['id']) -> count();
         if($count <= 0){
