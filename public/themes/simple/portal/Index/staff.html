@@ -94,7 +94,22 @@
                                 <li><a href="{:url('Info/sell_index')}">运营指南</a></li>
                                 <li><a href="{:url('Train/index')}">技能提升</a></li>
                                 <li><a>工作任务</a></li>
-                                <li><a>我的</a></li>
+                                <li>
+                                    <el-dropdown trigger="hover" placement="bottom" style="font-size:15px;color:#FFF;line-height: 50px;">
+                                
+                                        <span class="el-dropdown-link">
+                                            我的
+                                        </span>
+
+                                        <el-dropdown-menu slot="dropdown">
+                                            <el-dropdown-item  :disabled='true'>历史记录：</el-dropdown-item>
+                                            <el-dropdown-item ><a href="/./openPdf.php?name=11" target="_blank">1.以纯-Y2八月秋季度陈列指引.广东办事处</a></el-dropdown-item>
+                                            <el-dropdown-item ><a href="/./openPdf.php?name=11" target="_blank">2.以纯-休闲八月秋季陈列指引.广东办事处</a></el-dropdown-item>
+                                            <el-dropdown-item ><a href="/static/PDF/运营指南/以纯零售管理精细化运营指南--店铺使用手册" target="_blank">3.以纯零售管理精细化运营指南</a></el-dropdown-item>
+                                            <el-dropdown-item ><a href="/static/PDF/运营指南/以纯终端店铺视觉陈列手册" target="_blank">4.以纯终端店铺视觉陈列手册</a></el-dropdown-item>
+                                        </el-dropdown-menu>
+                                    </el-dropdown>
+                                </li>
                             </ul>
                         </div>
                        

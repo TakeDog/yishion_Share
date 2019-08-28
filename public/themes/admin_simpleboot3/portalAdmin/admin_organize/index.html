@@ -1,0 +1,246 @@
+<layout name="public@layout" />
+
+<style>
+    
+    body{background: #f6f6f6;}
+    .el-tree{font-size: 14px;}
+    .set_input{text-align: center;margin-top:10px;}
+    .el-tree-node__content{height:35px;position: relative;}
+    .set_input .el-input__inner{height: 32px;}
+    .set_input .el-input__icon{line-height: 32px;}
+    .main-right{padding:14px;border-bottom:1px solid #DADADA;}
+    .main-right span{font-size: 18px;line-height: 22px;}
+
+    .table th{text-align: center;}
+
+    /*定义滚动条样式（高宽及背景）*/ 
+    ::-webkit-scrollbar { 
+        width: 6px;   /* 滚动条宽度， width：对应竖滚动条的宽度  height：对应横滚动条的高度*/
+        background: #f6f6f6;
+    } 
+    
+    /*定义滑块 样式*/ 
+    ::-webkit-scrollbar-thumb { 
+        border-radius: 3px; 
+        height: 100px;    /* 滚动条滑块长度 */
+        background-color: #ccc; 
+    }
+
+</style>
+
+<div class="container" id="app" >
+
+    <div class="custom-tree-container">
+
+            <el-row style="border:1px solid #DADADA;margin:30px 0;background: #FFF;">
+                <el-col :span="5" style="padding-top:10px;height: 800px;border-right: 1px solid #DADADA;overflow-y: auto;">
+                    <div class="grid-content bg-purple">
+                        <div class="block">
+                            
+                            <p style="font-size:16px;padding:0 0 10px 10px;line-height: 30px;border-bottom: 1px solid #DADADA;">
+                                组织架构
+                                <el-button type="primary" plain size="mini" class="pull-right" style="margin-right: 10px;" @click="dialogVisible=true">添加部门</el-button>
+                            </p>
+                            <div class="set_input">
+                                <el-input placeholder="输入关键字进行过滤" v-model="filterText" style="width: 95%;" >
+                                    <i slot="prefix" class="el-input__icon el-icon-search"></i>
+                                </el-input>
+                            </div>
+                
+                            <el-tree
+                                :data="tree_data"
+                                node-key="id"
+                                :props="props"
+                                :expand-on-click-node="false"
+                                :filter-node-method="filterNode"
+                                ref="tree"
+                            >
+                            <span class="custom-tree-node" slot-scope="{ node, data }">
+                                <span>{{ node.label }}</span>
+                                <span style="position: absolute;right:15px;">
+                                    
+                                    <el-dropdown trigger="click" placement="bottom">
+                                        
+                                        <span class="el-dropdown-link">
+                                            <i class="el-icon-arrow-down el-icon-more"></i>
+                                        </span>
+
+                                        <el-dropdown-menu slot="dropdown">
+                                            <el-dropdown-item > <span @click="dialogVisible=true;append_dept_pid=data.id;">添加子部门</span> </el-dropdown-item>
+                                            <el-dropdown-item >修改名称</el-dropdown-item>
+                                            <el-dropdown-item >设置上级</el-dropdown-item>
+                                            <el-dropdown-item > <span @click="remove(data.id)">删除&emsp;&emsp;&emsp;</span></el-dropdown-item>
+                                            <el-dropdown-item  :disabled='true'>部门ID：6</el-dropdown-item>
+                                        </el-dropdown-menu>
+                                    </el-dropdown>
+
+                                </span>
+                            </span>
+                            </el-tree>
+                        </div>
+                    </div>
+                </el-col>
+
+                <el-col :span="19">
+                    <div>
+
+                        <div class="main-right">
+                            <span>营销总部(144人)</span>    
+                            <p class="pull-right" style="margin:0;"><a href="">修改名称</a> | <a href="">添加子部门</a> | <a href="">设置上级部门</a></p>
+                        </div>
+
+                        <table class="table table-striped" style="text-align: center;margin-bottom: 0;border-bottom:1px solid #DADADA;">
+                            <thead>
+                                <tr>
+                                    <th>用户名</th>
+                                    <th>姓名</th>
+                                    <th>电话</th>
+                                    <th>岗位</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>ZhangSan</td><td>张三</td><td>18819471027</td><td>程序猿</td><td><span class="label label-danger">未验证</span></td><td><a href="">启用</a> | <a href="">拉黑</a> |  <a href="">删除</a> | <a href="">角色管理</a></td></tr>
+                                <tr><td>ZhangSan</td><td>张三</td><td>18819471027</td><td>程序猿</td><td><span class="label label-danger">未验证</span></td><td><a href="">启用</a> | <a href="">拉黑</a> |  <a href="">删除</a> | <a href="">角色管理</a></td></tr>
+                                <tr><td>ZhangSan</td><td>张三</td><td>18819471027</td><td>程序猿</td><td><span class="label label-danger">未验证</span></td><td><a href="">启用</a> | <a href="">拉黑</a> |  <a href="">删除</a> | <a href="">角色管理</a></td></tr>
+                                <tr><td>ZhangSan</td><td>张三</td><td>18819471027</td><td>程序猿</td><td><span class="label label-danger">未验证</span></td><td><a href="">启用</a> | <a href="">拉黑</a> |  <a href="">删除</a> | <a href="">角色管理</a></td></tr>
+                                <tr><td>ZhangSan</td><td>张三</td><td>18819471027</td><td>程序猿</td><td><span class="label label-danger">未验证</span></td><td><a href="">启用</a> | <a href="">拉黑</a> |  <a href="">删除</a> | <a href="">角色管理</a></td></tr>
+                                <tr><td>ZhangSan</td><td>张三</td><td>18819471027</td><td>程序猿</td><td><span class="label label-danger">未验证</span></td><td><a href="">启用</a> | <a href="">拉黑</a> |  <a href="">删除</a> | <a href="">角色管理</a></td></tr>
+                                <tr><td>ZhangSan</td><td>张三</td><td>18819471027</td><td>程序猿</td><td><span class="label label-danger">未验证</span></td><td><a href="">启用</a> | <a href="">拉黑</a> |  <a href="">删除</a> | <a href="">角色管理</a></td></tr>
+                                <tr><td>ZhangSan</td><td>张三</td><td>18819471027</td><td>程序猿</td><td><span class="label label-danger">未验证</span></td><td><a href="">启用</a> | <a href="">拉黑</a> |  <a href="">删除</a> | <a href="">角色管理</a></td></tr>
+                                <tr><td>ZhangSan</td><td>张三</td><td>18819471027</td><td>程序猿</td><td><span class="label label-danger">未验证</span></td><td><a href="">启用</a> | <a href="">拉黑</a> |  <a href="">删除</a> | <a href="">角色管理</a></td></tr>
+                                <tr><td>ZhangSan</td><td>张三</td><td>18819471027</td><td>程序猿</td><td><span class="label label-danger">未验证</span></td><td><a href="">启用</a> | <a href="">拉黑</a> |  <a href="">删除</a> | <a href="">角色管理</a></td></tr>
+                                <tr><td>ZhangSan</td><td>张三</td><td>18819471027</td><td>程序猿</td><td><span class="label label-danger">未验证</span></td><td><a href="">启用</a> | <a href="">拉黑</a> |  <a href="">删除</a> | <a href="">角色管理</a></td></tr>
+                                <tr><td>ZhangSan</td><td>张三</td><td>18819471027</td><td>程序猿</td><td><span class="label label-danger">未验证</span></td><td><a href="">启用</a> | <a href="">拉黑</a> |  <a href="">删除</a> | <a href="">角色管理</a></td></tr>
+                                <tr><td>ZhangSan</td><td>张三</td><td>18819471027</td><td>程序猿</td><td><span class="label label-danger">未验证</span></td><td><a href="">启用</a> | <a href="">拉黑</a> |  <a href="">删除</a> | <a href="">角色管理</a></td></tr>
+                                <tr><td>ZhangSan</td><td>张三</td><td>18819471027</td><td>程序猿</td><td><span class="label label-danger">未验证</span></td><td><a href="">启用</a> | <a href="">拉黑</a> |  <a href="">删除</a> | <a href="">角色管理</a></td></tr>
+                                <tr><td>ZhangSan</td><td>张三</td><td>18819471027</td><td>程序猿</td><td><span class="label label-danger">未验证</span></td><td><a href="">启用</a> | <a href="">拉黑</a> |  <a href="">删除</a> | <a href="">角色管理</a></td></tr>
+                                <tr><td>ZhangSan</td><td>张三</td><td>18819471027</td><td>程序猿</td><td><span class="label label-danger">未验证</span></td><td><a href="">启用</a> | <a href="">拉黑</a> |  <a href="">删除</a> | <a href="">角色管理</a></td></tr>
+                                <tr><td>ZhangSan</td><td>张三</td><td>18819471027</td><td>程序猿</td><td><span class="label label-danger">未验证</span></td><td><a href="">启用</a> | <a href="">拉黑</a> |  <a href="">删除</a> | <a href="">角色管理</a></td></tr>
+                            </tbody>
+                        </table>
+
+                        <div style="text-align: center;">
+                            <ul class="pagination" style="text-align: center;"><li class="page-item disabled"><span class="page-link">«</span></li> <li class="active page-item disabled"><span class="page-link">1</span></li><li class="page-item"><a class="page-link" href="/user/admin_index/index.html?page=2">2</a></li><li class="page-item"><a class="page-link" href="/user/admin_index/index.html?page=3">3</a></li><li class="page-item"><a class="page-link" href="/user/admin_index/index.html?page=4">4</a></li><li class="page-item"><a class="page-link" href="/user/admin_index/index.html?page=5">5</a></li><li class="page-item"><a class="page-link" href="/user/admin_index/index.html?page=6">6</a></li><li class="page-item"><a class="page-link" href="/user/admin_index/index.html?page=7">7</a></li> <li class="page-item"><a class="page-link" href="/user/admin_index/index.html?page=2">»</a></li></ul>
+                        </div>
+
+                    </div>
+                </el-col>
+
+            </el-row>
+
+    </div>
+    <el-dialog
+        title="提示"
+        :visible.sync="dialogVisible"
+        width="40%"
+    >
+            
+        <el-row :gutter="20" style="margin-bottom:10px;">
+            <el-col :span="8" style="text-align: right;">
+                <span style="line-height: 40px;">部门名称：</span>
+            </el-col>
+            <el-col :span="10">
+                <input type="text" ref="deptEle" class="form-control">
+            </el-col>
+        </el-row>
+        
+        <span slot="footer" class="dialog-footer">
+            <el-button @click="dialogVisible = false">取 消</el-button>
+            <el-button type="primary" @click="append">确 定</el-button>
+        </span>
+
+    </el-dialog>
+</div>
+
+<script>
+    let tree_data = JSON.parse('{$tree}');
+    var vue = {
+        
+        el:"#app",
+        data:{
+            dialogVisible:false,
+            filterText:'',
+            props:{ 
+                children: 'child',
+                label: 'name'
+            },
+            tree_data,
+            append_dept_pid:0
+        },
+        methods: {
+
+            append() {
+                axios.get("{:url('AdminOrganize/append')}",{
+                    params:{
+                        pid:this.append_dept_pid,
+                        name:this.$refs.deptEle.value
+                    }
+                }).then((res)=>{
+
+                    if(res.data){
+                        this.$message({
+                            showClose: true,
+                            message: '新增部门成功',
+                            type: 'success',
+                            duration:2000
+                        });
+                    }else{
+                        this.$message({
+                            showClose: true,
+                            message: '新增部门失败',
+                            type: 'error',
+                            duration:2000
+                        });
+                    }
+                    this.dialogVisible = false;
+                })
+            },
+
+            remove(id) {
+
+                this.$confirm('此操作将永久删除该部门, 是否继续?', '提示', {
+                    confirmButtonText: '继续',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+
+                        axios.get("{:url('AdminOrganize/remove')}",{
+                            params:{
+                                id
+                            }
+                        }).then((res)=>{
+
+
+                            if(res.data.code > 0){
+                                this.$message({
+                                    type: 'error',
+                                    message: res.data.msg
+                                });
+                            }else{
+                                this.$message({
+                                    type: 'success',
+                                    message: res.data.msg
+                                });
+                            }
+                        })
+
+                        
+
+                    })
+            },
+
+            filterNode(value, data) {
+                if (!value) return true;
+                return data.label.indexOf(value) !== -1;
+            }
+
+        },
+        watch: {
+            filterText(val) {
+                this.$refs.tree.filter(val);
+            }
+        },
+    };
+</script>
