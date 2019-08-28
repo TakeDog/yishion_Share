@@ -1,0 +1,82 @@
+<layout name="public@layout"/>
+<style>
+    [v-cloak]{display: none;}
+    .feedForm{
+        width: 40%;
+        margin: 2% auto 20% auto;
+    }
+</style>
+
+<div class="container" id="app" v-cloak>
+    <el-form class="feedForm" :rules="rules" ref="form" :model="form" label-width="90px" size="small">
+        <el-form-item label="店铺编号" prop="store_num">
+            <el-input v-model="form.store_num" placeholder="请输入店铺编号"></el-input>
+        </el-form-item>
+        <el-form-item label="店铺名称" prop="store_name">
+            <el-input v-model="form.store_name" placeholder="请输入店铺名称"></el-input>
+        </el-form-item>
+        <el-form-item label="需要的支持" prop="need_support">
+            <el-input type="textarea" v-model="form.need_support" placeholder="请输入需要的支持" :autosize="{minRows:4,maxRows:5}" resize="none"></el-input>
+        </el-form-item>
+        <el-form-item label="建议反馈" prop="feedback">
+            <el-input type="textarea" v-model="form.feedback" placeholder="请输入建议反馈" :autosize="{minRows:4,maxRows:5}" resize="none"></el-input>
+        </el-form-item>
+        <el-form-item>
+            <el-button type="primary" @click="submitForm('form')">提交</el-button>
+        </el-form-item>
+    </el-form>
+</div>
+<script>
+   
+    var vue = {
+        el:"#app",
+        data:{
+            form:{
+                store_num: '',
+                store_name: '',
+                need_support: '',
+                feedback: ''
+            },
+            rules: {
+                store_num: [
+                    { required: true,message: '请输入店铺编号',trigger: 'blur'}
+                ],
+                store_name: [
+                    { required: true,message: '请输入店铺名称',trigger: 'blur'}
+                ],
+                need_support: [
+                    {max: 255, message: '长度在 255 个字符内', trigger: 'blur' }
+                ],
+                feedback: [
+                    {max: 255, message: '长度在 255 个字符内', trigger: 'blur' }
+                ]
+            }
+        },
+        mounted () {
+        },
+        methods: {
+            submitForm(formName){
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        axios.post("{:url('submitStoreForm')}",this.form).then((res)=>{
+                            if(res.data.status === 1001){
+                                this.$message({
+                                    message: res.data.msg,
+                                    type: 'success'
+                                });
+                                this.$refs[formName].resetFields();
+                            }else{
+                                this.$message({
+                                    message: res.data.msg,
+                                    type: 'error'
+                                });
+                            }
+                        });
+                    } else {
+                        return false;
+                    }
+                });
+            }
+        }
+    }
+</script>
