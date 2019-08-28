@@ -266,8 +266,11 @@ class IndexController extends HomeBaseController
     }
 
     private function indexNews(){
-        $joinNews = intval(Db::name("CUser") -> where("user_status",2) -> count());
-
+        $joinNews = 0;
+        $user_info = session("user_info",'','portal');
+        if($user_info['super'] == 1){
+            $joinNews = intval(Db::name("CUser") -> where("user_status",2) -> count());
+        }
         $news['join_news'] = $joinNews;
         //$news['count'] = $joinNews + a +b +c;
         $news['count'] = $joinNews;
@@ -295,6 +298,6 @@ class IndexController extends HomeBaseController
         $article_id = $this -> request -> param('article_id',0,'intval');
         
         $res = Db::name('CArticle') -> WHERE('id',$article_id) -> setInc("view_count",1);
-
     }
+
 }

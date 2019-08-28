@@ -24,7 +24,7 @@ class InfoController extends HomeBaseController{
     public function getFiles(){
         $pid = $this -> request -> param("pid",0,"intval");
         $page = $this -> request -> param("page",1,"intval");
-        $size = $this -> request -> param("size",5,"intval");
+        $size = $this -> request -> param("size",3,"intval");
         
         $total = Db::name('WorkInfo') -> where('pid',$pid) -> count();
         $current = $page * $size;
@@ -35,5 +35,9 @@ class InfoController extends HomeBaseController{
         return json($res);
     }
 
-   
+   public function sell_index(){
+        return $this -> fetch();
+   }
+
+
 }
