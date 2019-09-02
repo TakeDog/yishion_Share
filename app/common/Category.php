@@ -19,7 +19,6 @@ class Category {
     private $childid;//栏目的所有子栏目id,id之间是用逗号隔开
 
     //组合一维数组
-
     Static Public function unlimitedForLevel($cate,$html='├',$reid=0,$level=0){
 
         $arr=array();

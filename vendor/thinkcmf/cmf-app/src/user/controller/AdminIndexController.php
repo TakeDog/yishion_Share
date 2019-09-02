@@ -180,6 +180,12 @@ class AdminIndexController extends AdminBaseController
         $current_roleId_list = Db::name('c_user_role') -> where('user_id',$input['u_id']) -> column('role_id');
 
         $u_id = $input['u_id'];
+
+        if(empty($input['role_id'])){
+            $this -> error("请至少选择一个角色");
+            exit;
+        }
+
         $input_role = $input['role_id'];
 
         foreach($input_role as $k => $v){
@@ -212,7 +218,13 @@ class AdminIndexController extends AdminBaseController
                 if($del){$del_num++;}
             }
         }
-        $this->success("更改成功", "adminIndex/index");
+        if(!empty($input['back']) && $input['back']=='og'){
+            $this->success("更改成功", "portalAdmin/AdminOrganize/index");
+        }else{
+            $this->success("更改成功", "adminIndex/index");
+        }
+        
+
     }
 
      /**
