@@ -14,6 +14,7 @@ class OperateBehavior extends Controller{
         'portal/index/regist',
         'portal/index/register',
         'portal/index/test',
+        'portal/index/getoption'
     ];
 
     // 定义未登陆需要排除的权限路由

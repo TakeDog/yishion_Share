@@ -66,6 +66,7 @@ class AdminIndexController extends AdminBaseController
         $list = Db::name('c_user')-> alias('u')
             -> join('c_user_role ur','u.id = ur.user_id','LEFT')
             -> join('c_role r','ur.role_id=r.id','LEFT')
+            -> join('dept d','u.dept_id = d.id')
             -> where(function (Query $query) {
                 $data = $this->request->param();
 
@@ -85,7 +86,7 @@ class AdminIndexController extends AdminBaseController
 
                 }
             })
-            -> field("u.*,GROUP_CONCAT(r.role_name separator ' | ') as role_name")
+            -> field("u.*,GROUP_CONCAT(r.role_name separator ' | ') as role_name,d.name as deptName")
             -> group('u.id')
             -> order("u.user_status desc,create_time DESC")
             -> paginate(10);
