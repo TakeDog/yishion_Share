@@ -27,7 +27,10 @@ class IndexController extends HomeBaseController
     }
 
     public function staff_index2(){
-
+        //公司资讯
+        $infoList = Db::name("WorkInfo") -> order("date desc") -> limit(0,5) -> select();
+        
+        $this -> assign('infoList',$infoList);
         $this -> assign('user_info',session("user_info",'','portal'));
         return $this -> fetch();
 
@@ -65,7 +68,7 @@ class IndexController extends HomeBaseController
 
         if(!$user['dept_id'])  return json(array('code'=>0,'msg'=>'部门不能为空'));
 
-        if(!$user['part'])  return json(array('code'=>0,'msg'=>'机构不能为空'));
+        if(!$user['mobile'])  return json(array('code'=>0,'msg'=>'手机号码不能为空'));
 
         if(!$user['jop'])  return json(array('code'=>0,'msg'=>'职位不能为空'));
 
