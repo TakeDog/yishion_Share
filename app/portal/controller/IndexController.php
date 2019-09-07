@@ -4,6 +4,7 @@ namespace app\portal\controller;
 use think\Controller;
 use think\Db;
 use cmf\controller\HomeBaseController;
+use app\common\Category;
 
 class IndexController extends HomeBaseController
 {
@@ -26,7 +27,10 @@ class IndexController extends HomeBaseController
     }
 
     public function staff_index2(){
-
+        //公司资讯
+        $infoList = Db::name("WorkInfo") -> order("date desc") -> limit(0,5) -> select();
+        
+        $this -> assign('infoList',$infoList);
         $this -> assign('user_info',session("user_info",'','portal'));
         return $this -> fetch();
 
@@ -41,6 +45,15 @@ class IndexController extends HomeBaseController
     }
 
     public function regist(){
+
+        $catetory = new Category();
+
+        $option_data = Db::name("dept") -> select();
+        $tree_data = Db::name("dept") -> order('id') ->select();
+        
+        
+        $this -> assign('tree',json_encode($catetory -> unlimitedForLayer($tree_data)));
+        $this -> assign('option',json_encode($catetory -> unlimitedForLevel($option_data,'|—')));
         return $this -> fetch();
     }
 
@@ -53,9 +66,9 @@ class IndexController extends HomeBaseController
 
         if(!$user['real_name'])  return json(array('code'=>0,'msg'=>'真实名字不能为空'));
 
-        if(!$user['dept'])  return json(array('code'=>0,'msg'=>'部门不能为空'));
+        if(!$user['dept_id'])  return json(array('code'=>0,'msg'=>'部门不能为空'));
 
-        if(!$user['part'])  return json(array('code'=>0,'msg'=>'机构不能为空'));
+        if(!$user['mobile'])  return json(array('code'=>0,'msg'=>'手机号码不能为空'));
 
         if(!$user['jop'])  return json(array('code'=>0,'msg'=>'职位不能为空'));
 
@@ -65,9 +78,9 @@ class IndexController extends HomeBaseController
             return json(array('code'=>1,'msg'=>'注册信息已发送至管理员，请静候审批。'));
         }else{
             if($res == -1){
-                return json(array('code'=>0,'msg'=>'注册失败，用户名已存在！！！'));
+                return json(array('code'=>0,'msg'=>'注册失败，用户名已存在'));
             }
-            return json(array('code'=>0,'msg'=>'注册失败！！！'));
+            return json(array('code'=>0,'msg'=>'注册失败'));
         }
     }
 
@@ -298,6 +311,12 @@ class IndexController extends HomeBaseController
         $article_id = $this -> request -> param('article_id',0,'intval');
         
         $res = Db::name('CArticle') -> WHERE('id',$article_id) -> setInc("view_count",1);
+    }
+
+    public function getOption(){
+        $tree_data = Db::name("dept") -> select();
+        $catetory = new Category();
+        echo json_encode($catetory -> unlimitedForLevel($tree_data,'|—'));
     }
 
 }

@@ -20,6 +20,10 @@
 .font18{font-size: 18px !important;}
 .font20{font-size: 20px !important;}
 
+.text-center{text-align: center;}
+
+.margin0{margin:0;}
+
 .a-black,.a-black:visited{color:#232323;}
 .a-black:hover{color:#00456f;}
 .a-white,.a-white:visited{color:#FFF;}

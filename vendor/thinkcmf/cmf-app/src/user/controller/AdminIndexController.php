@@ -66,6 +66,7 @@ class AdminIndexController extends AdminBaseController
         $list = Db::name('c_user')-> alias('u')
             -> join('c_user_role ur','u.id = ur.user_id','LEFT')
             -> join('c_role r','ur.role_id=r.id','LEFT')
+            -> join('dept d','u.dept_id = d.id')
             -> where(function (Query $query) {
                 $data = $this->request->param();
 
@@ -85,7 +86,7 @@ class AdminIndexController extends AdminBaseController
 
                 }
             })
-            -> field("u.*,GROUP_CONCAT(r.role_name separator ' | ') as role_name")
+            -> field("u.*,GROUP_CONCAT(r.role_name separator ' | ') as role_name,d.name as deptName")
             -> group('u.id')
             -> order("u.user_status desc,create_time DESC")
             -> paginate(10);
@@ -180,6 +181,12 @@ class AdminIndexController extends AdminBaseController
         $current_roleId_list = Db::name('c_user_role') -> where('user_id',$input['u_id']) -> column('role_id');
 
         $u_id = $input['u_id'];
+
+        if(empty($input['role_id'])){
+            $this -> error("请至少选择一个角色");
+            exit;
+        }
+
         $input_role = $input['role_id'];
 
         foreach($input_role as $k => $v){
@@ -212,7 +219,13 @@ class AdminIndexController extends AdminBaseController
                 if($del){$del_num++;}
             }
         }
-        $this->success("更改成功", "adminIndex/index");
+        if(!empty($input['back']) && $input['back']=='og'){
+            $this->success("更改成功", "portalAdmin/AdminOrganize/index");
+        }else{
+            $this->success("更改成功", "adminIndex/index");
+        }
+        
+
     }
 
      /**

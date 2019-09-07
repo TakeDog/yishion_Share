@@ -7,7 +7,7 @@ class CUserModel extends Model{
 
     public  function loginVerify($user,$pwd){
 
-        $userInfo = $this -> where("user_name",$user) -> find();
+        $userInfo = $this -> alias('u') -> join('share_dept d','u.dept_id = d.id','LEFT') -> where("user_name",$user) -> field("u.*,d.name as dept") -> find();
 
         if(!$userInfo) return 0;
 

@@ -1,0 +1,30 @@
+<layout name="public@layout" />
+<style>
+
+</style>
+
+<div id="app" class="container" style="min-height: 635px;">
+    <form action="{:url('Feedback/websiteHandle')}" method="POST">
+        <el-row :gutter="20">
+            <el-col :span="12">
+                <p>希望增加什么功能：</p>
+                <textarea class="form-control" rows="10" name="suggest" style="resize:none;"></textarea>
+            </el-col>
+            <el-col :span="12">
+                <p>使用中发现什么问题：</p>
+                <textarea class="form-control" rows="10" name="bug" style="resize:none;"></textarea>
+            </el-col>
+        </el-row>
+
+        <p class="text-center" style="margin:20px 0;">
+            <button type="submit" class="btn btn-primary">确认提交</button>
+        </p>
+        
+    </form>
+</div>
+
+<script>
+    var vue = {
+        el:"#app"
+    }
+</script>

@@ -91,6 +91,7 @@ class YsWorkManagerController extends AdminBaseController{
         $data['pid'] = $this -> request -> param("pid",0,"intval");
         $data['sort'] = $this -> request -> param("sort",0,"intval");
         $data['del'] = $this -> request -> param("del",1,"intval");
+        $data['date'] = date("Y-m-d H:i:s");
         foreach($files as $file){
             $in = $file -> getInfo();
             if($file){

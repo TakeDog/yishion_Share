@@ -33,7 +33,7 @@ el-icon-s-promotion -- 指引 -->
                                 <div v-if="ktem.children">
                                     <ul>
                                         <li v-for="(jtem,j) in ktem.children">
-                                            <a :href="'http://www.share.com/'+jtem.files" target="view_window">{{jtem.name}}</a>
+                                            <a :href="'/./'+jtem.files" target="view_window">{{jtem.name}}</a>
                                         </li>
                                     </ul>
                                     <span v-if="ktem.total > ktem.children.length" class="more_files" @click="getMoreFiles(ktem,i,k)">更多</span>
@@ -57,7 +57,6 @@ el-icon-s-promotion -- 指引 -->
         },
         mounted () {
             this.createTree();
-            console.log(this.infoTree);
         },
         methods: {
             getInfo(id,callback){

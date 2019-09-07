@@ -6,6 +6,61 @@ use think\Db;
 use cmf\controller\HomeBaseController;
 
 class FeedbackController extends HomeBaseController{
+
+   public function index(){
+        return $this -> fetch();
+   }
+
+   /**关于纯分享 */
+   public function website(){
+        return $this -> fetch();
+   }
+   public function websiteHandle(){
+       $form = $this -> request -> param();
+
+       if(!$form['bug'] && !$form['suggest']){
+            $this -> success('反馈成功，正在为您返回','Feedback/index');
+            exit;
+       }
+
+       $user_info = session('user_info','','portal');
+
+       $form['user_id'] = $user_info['id'];
+       $form['date'] = date("Y-m-d H:i:s");
+       $inserId = Db::name("CFeedbackWebsite") -> insert($form);
+
+       if($inserId){
+            $this -> success('反馈成功，正在为您返回','Feedback/index');
+       }else{
+            $this->error('反馈失败，正在为您返回');
+       }
+    }
+   /**其他问题反馈 */
+   public function other(){
+        return $this -> fetch();
+   }
+
+   public function otherHandle(){
+
+        $form = $this -> request -> param();
+
+       if(!$form['bug']){
+            $this -> success('反馈成功，正在为您返回','Feedback/index');
+            exit;
+       }
+
+       $user_info = session('user_info','','portal');
+
+       $form['user_id'] = $user_info['id'];
+       $form['date'] = date("Y-m-d H:i:s");
+       $inserId = Db::name("CFeedbackOther") -> insert($form);
+
+       if($inserId){
+            $this -> success('反馈成功，正在为您返回','Feedback/index');
+       }else{
+            $this->error('反馈失败，正在为您返回');
+       }
+   }
     public function productAbout(){
         return $this -> fetch();
     }
