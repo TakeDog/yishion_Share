@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="renderer" content="webkit">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>以纯 • 纯生活</title>
+<link rel="stylesheet" href="__STATIC__/lib/element-ui/lib/theme-chalk/index.css">
+<link rel="stylesheet" href="__STATIC__/css/live.css?v=1.4">
+<link rel="stylesheet" href="__STATIC__/lib/bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet" href="__STATIC__/css/index.css?v=3">
+<script src="__STATIC__/js/jquery.min.js"></script>
+<script src="__STATIC__/lib/bootstrap/js/bootstrap.min.js"></script>
+<script src="__STATIC__/js/vue.js"></script>
+<script src="__STATIC__/js/axios.min.js"></script>
+<script src="__STATIC__/lib/element-ui/lib/index.js"></script>
+<style>
+#app{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+</style>
+</head>
+<body>
+<div id="app">
+    <div class="header" style="height:170px;">
+        <div class="header_nav">
+            <ul>
+                <li>忘记密码</li>
+                <li>设置</li>
+                <li>帮助</li>
+                <li>在线人数</li>
+                <li>通知</li>
+                <li>历史</li>
+                <li>退出</li>
+            </ul>
+        </div>
+        <div class="header_logo">
+            <img alt="Brand" src="__STATIC__/images/chunShengHuo.png" class="logo">
+        </div>
+        <div class="header_title">
+            赋能前行，纯属你我
+        </div>
+    </div>
+    <div class="nav">
+        <!-- <nav class="navbar navbar-default">
+            <div class="container bgc-an">
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                        <li :class="activeNav==1?'active':''"><a href="#" @click="activeNav=1;activeHref='{:url('home')}';">首页</a></li>
+                        <li :class="activeNav==2?'active':''"><a href="#" @click="activeNav=2;activeHref='{:url('ysDynamic')}';">以纯动态</a></li>
+                        <li :class="activeNav==3?'active':''"><a href="#">时尚达人</a></li>
+                        <li :class="activeNav==4?'active':''"><a href="#">生活百科</a></li>
+                        <li :class="activeNav==5?'active':''"><a href="#">招兵买马</a></li>
+                        <li :class="activeNav==6?'active':''"><a href="#">小黑屋</a></li>
+                        <li :class="activeNav==7?'active':''"><a href="#">我要反馈</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav> -->
+        <el-tabs v-model="activeNav" type="card">
+            <el-tab-pane label="首页" name="{:url('home')}"></el-tab-pane>
+            <el-tab-pane label="以纯动态" name="{:url('ysDynamic')}"></el-tab-pane>
+            <el-tab-pane label="时尚达人" name="3"></el-tab-pane>
+            <el-tab-pane label="生活百科" name="4"></el-tab-pane>
+            <el-tab-pane label="招兵买马" name="5"></el-tab-pane>
+            <el-tab-pane label="小黑屋" name="6"></el-tab-pane>
+            <el-tab-pane label="我要反馈" name="7"></el-tab-pane>
+        </el-tabs>
+    </div>
+    <iframe :src="activeNav" frameborder="0" width="100%" frameborder="0" scrolling="yes" style="height:77%"></iframe>
+</div>
+
+<script>
+    var vm = new Vue({
+        el:"#app",
+        data:{
+            activeNav: "{:url('home')}"
+        },
+        created(){
+
+        },
+        mounted(){
+
+        },
+        methods: {
+            handleSelect(){
+
+            }
+        }
+    });
+</script>
+</body>
+</html>

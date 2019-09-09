@@ -353,10 +353,10 @@ ul,li{
                     this.fileList = fileList;
                 },
                 beforeUpload(file) {
-                    const isLt2M = file.size / 1024 / 1024 < 50     //这里做文件大小限制
+                    const isLt2M = file.size / 1024 / 1024 < 200     //这里做文件大小限制
                     if(!isLt2M) {
                         this.$message({
-                            message: '上传文件大小不能超过 50MB!',
+                            message: '上传文件大小不能超过 200MB!',
                             type: 'warning'
                         });
                     }

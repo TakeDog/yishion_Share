@@ -1,0 +1,171 @@
+<layout name="public@layout_live" />
+<style>
+.el-main{
+    padding: 0;
+}
+.main{
+    width: 65%;
+    margin: 20px auto 10px;
+}
+.main_list .tag_div{
+    background: #ffc7ba;
+    font-size: 17px;
+    font-weight: 700;
+    padding: 0 15px;
+}
+.filter{
+    display: flex;
+}
+.filter .filter_item{
+    margin: 0 2px;
+    cursor: pointer;
+}
+.filter .filter_item:hover{
+    color: #ffc7ba;
+}
+.post_item{
+    margin: 20px 0;
+}
+.post_item .post_content{
+    margin: 0 10px;
+    float:left;
+}
+.post_item .post_content .content_item {
+    margin-bottom: 4px;
+}
+.post_item .post_content .content_item .content {
+    width: 100%;
+
+}
+.post_item .status{
+    margin: 10px 20px;
+    clear: both;
+}
+</style>
+<div id="app">
+    <el-container>
+        <el-main>
+            <div class="main">
+                <video src="/static/video/train/1111.mp4" controls="controls" autoplay="autoplay" width="100%" muted>
+                    您的浏览器不支持 video 标签，请更换浏览器
+                </video>
+            </div>
+            <div class="main_list">
+                <div class="list_item">
+                    <div class="tag_div">
+                        <i class="fa fa-thumb-tack" aria-hidden="true" style="transform: rotate(45deg);"></i>
+                        <span style="padding-left: 10px;">以纯动态</span>
+                    </div>
+                    <el-card class="box-card" shadow="hover" style="width:50%;margin: 20px auto;">
+                        <div class="box_item">
+                            [置顶] xxxxx
+                        </div>
+                        <div class="box_item">
+                            xxxxx
+                        </div>
+                        <div class="box_item">
+                            xxxxx
+                        </div>
+                        <div class="box_item">
+                            xxxxx
+                        </div>
+                    </el-card>
+                </div>
+                <div class="list_item">
+                    <div class="tag_div">
+                        <i class="fa fa-pencil-square" aria-hidden="true"></i>
+                        <span style="padding-left: 10px;">时尚达人</span>
+                    </div>
+                    <div style="display: flex;">
+                        <div style="width:65%;">
+                            <el-card class="box-card" shadow="hover" style="width:80%;margin: 20px auto;">
+                                <div slot="header" class="clearfix">
+                                    <span>帖子</span>
+                                </div>
+                                <div class="filter">
+                                    <div class="filter_item">按时间</div>
+                                    <div class="filter_item">按热门</div>
+                                    <div class="filter_item">按关注</div>
+                                </div>
+                                <div class="post_item">
+                                    <el-avatar shape="square" :size="50" src="#" style="float:left;"></el-avatar>
+                                    <div class="post_content">
+                                        <div class="content_item userName">Xxx</div>
+                                        <div class="content_item time_address">今天23:59:59 广州</div>
+                                        <div class="content_item content">Xxxxxxxxxxxxxxxxxxxxx</div>
+                                    </div>
+                                    <div class="status">
+                                        <a href="#">阅读()</a>
+                                        <a href="#">点赞()</a>
+                                        <a href="#">评论()</a>
+                                    </div>
+                                </div>
+                            </el-card>
+                        </div>
+                        <div style="width:30%;">
+                            <el-card class="box-card" shadow="hover" style="width:80%;margin: 20px auto;">
+                                <div slot="header" class="clearfix">
+                                    <span>达人榜</span>
+                                </div>
+                                <div class="box_item">
+                                    xxxxx
+                                </div>
+                                <div class="box_item">
+                                    xxxxx
+                                </div>
+                                <div class="box_item">
+                                    xxxxx
+                                </div>
+                                <div class="box_item">
+                                    xxxxx
+                                </div>
+                            </el-card>
+                        </div>
+                    </div>
+                </div>
+                <div class="list_item">
+                    <div class="tag_div">
+                        <i class="fa fa-book" aria-hidden="true"></i>
+                        <span style="padding-left: 10px;">生活百科</span>
+                    </div>
+                    <el-card class="box-card" shadow="hover" style="width:50%;margin: 20px auto;">
+                        <div class="box_item">
+                            xxxxxxxxxxxxxxxxxxxx
+                        </div>
+                        <div class="box_item">
+                            xxxxxxxxxxxxxxxxxxxx
+                        </div>
+                        <div class="box_item">
+                            xxxxxxxxxxxxxxxxxxxx
+                        </div>
+                    </el-card>
+                </div>
+                <div class="list_item">
+                    <div class="tag_div">
+                        <i class="fa fa-search" aria-hidden="true"></i>
+                        <span style="padding-left: 10px;">招兵买马</span>
+                    </div>
+                    <el-table :data="inviteData" style="width: 50%;margin: 20px auto;" size="small" border>
+                        <el-table-column prop="position" label="职位" width="130"></el-table-column>
+                        <el-table-column prop="require" label="要求"></el-table-column>
+                        <el-table-column prop="treatment" label="待遇"></el-table-column>
+                    </el-table>
+                </div>
+            </div>
+        </el-main>
+    </el-container>
+</div>
+
+<script>
+    const vue = {
+        el: '#app',
+        data:{
+            inviteData:[
+                {position: '零售部经理',require:'1.有销售经验;2...',treatment:'....'}
+            ]
+        },
+        methods:{
+
+        }
+    }
+</script>
