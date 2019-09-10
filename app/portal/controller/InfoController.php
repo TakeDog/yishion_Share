@@ -23,13 +23,15 @@ class InfoController extends HomeBaseController{
 
     public function getFiles(){
         $pid = $this -> request -> param("pid",0,"intval");
+        $fileName = $this -> request -> param("fileName");
         $page = $this -> request -> param("page",1,"intval");
         $size = $this -> request -> param("size",3,"intval");
         
-        $total = Db::name('WorkInfo') -> where('pid',$pid) -> count();
+        $total = Db::name('WorkInfo') -> where('pid',$pid) ->where('name','like',"%$fileName%") -> count();
         $current = $page * $size;
 
-        $data = Db::name('WorkInfo') -> where('pid',$pid) -> order('sort') -> limit(0,$current) -> select();
+        $data = Db::name('WorkInfo') -> where('pid',$pid) ->where('name','like',"%$fileName%") -> order('sort') -> limit(0,$current) -> select();
+
         $res['files'] = $data;
         $res['total'] = $total;
         return json($res);
