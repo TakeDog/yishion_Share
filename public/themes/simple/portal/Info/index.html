@@ -26,6 +26,7 @@ el-icon-s-promotion -- 指引 -->
                     <div style="float:left;margin-right: 100px;">
                         <i :class="item.icon" class="font70 colorGrey"></i>
                         <button class="el-button el-button--info" style="vertical-align: text-bottom;">{{item.name}}</button>
+                        <el-input v-model="searchNameArr[i].fileName" style="display:block;width:160px;margin-left:12px;margin-top: 5px;" @input="searchFiles(item,i)" placeholder="搜索文件名" size="small"></el-input>
                     </div>
                     <div style="float:left;">
                         <el-tabs v-model="item.cActive" @tab-click="tabCut($event,i)">
@@ -53,9 +54,10 @@ el-icon-s-promotion -- 指引 -->
         el:"#app",
         data:{
             filesLimit: 5,
+            searchNameArr:[],
             infoTree: []
         },
-        mounted () {
+        mounted() {
             this.createTree();
         },
         methods: {
@@ -65,20 +67,29 @@ el-icon-s-promotion -- 指引 -->
                 });
             },
             getFiles(item,callback){
-                axios.post("{:url('getFiles')}",{pid:item.id,page:item.page,size:this.filesLimit}).then((res)=>{
+                axios.post("{:url('getFiles')}",{pid:item.id,fileName:item.fileName,page:item.page,size:this.filesLimit}).then((res)=>{
                     callback(res.data);
                 });
             },
             tabCut(tag, i) {
-                let item = {id:tag.name,page:tag.$attrs.page};
-                this.getFiles(item, res => {
+                Vue.set(this.searchNameArr,i,{fileName:'',index:tag.index,page:tag.$attrs.page});
+
+                this.getFiles({id:tag.name,fileName:this.searchNameArr[i].fileName,page:tag.$attrs.page}, res => {
                     this.infoTree[i].children[tag.index].children = res.files;
                     this.infoTree[i].children[tag.index].total = res.total;
                     Vue.set(this.infoTree,i,this.infoTree[i]);
                 });
             },
+            searchFiles(item,i){
+                this.getFiles({id:this.infoTree[i].children[this.searchNameArr[i].index].id,fileName:this.searchNameArr[i].fileName,page:this.searchNameArr[i].page}, res => {
+                    this.infoTree[i].children[this.searchNameArr[i].index].children = res.files;
+                    this.infoTree[i].children[this.searchNameArr[i].index].total = res.total;
+                    Vue.set(this.infoTree,i,this.infoTree[i]);
+                });
+            },
             getMoreFiles(ktem,i,k){
                 ktem.page += 1;
+                ktem.fileName = this.searchNameArr[i].fileName;
                 this.getFiles(ktem, res => {
                     this.infoTree[i].children[k].children = res.files;
                     this.infoTree[i].children[k].total = res.total;
@@ -89,8 +100,10 @@ el-icon-s-promotion -- 指引 -->
                 this.getInfo(-1,(res)=>{
                     this.infoTree = this.makeTree(res).children;
                     this.infoTree.forEach((item,i) => {
+                        this.searchNameArr.push({fileName:'',index:0,page:1});
                         item.children.forEach((ktem,k) => {
                             ktem.page = 1;
+                            ktem.fileName = this.searchNameArr[i].fileName;
                             if(k===0){
                                 this.getFiles(ktem, res2 => {
                                     this.infoTree[i].cActive = ktem.id+'';
@@ -118,7 +131,6 @@ el-icon-s-promotion -- 指引 -->
                 }
                 return nowdata;
             }
-        },
-      
+        }
     }
 </script>
