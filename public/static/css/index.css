@@ -92,6 +92,7 @@ aside.el-aside{width:350px;}
 
 /* 卡片选项为img items */
 .main-color-header .el-card__header{background: #717171;} 
+.red-color-header .el-card__header{background: #d44747;} 
 .el-card__body{padding:10px;}
 .card-img{display: block;width: 100%;height: 120px;}
 .img-hover{display: block;}

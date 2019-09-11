@@ -181,7 +181,7 @@ ul,li{
                             <span :style="{visibility:(item.children?'':'hidden')}" :class="item.active?'el-icon-arrow-down':'el-icon-arrow-right'"></span>
                             <span :class="item.icon" v-if="item.lev===1"></span>
                             <span :style="{fontWeight:(item.children?'800':'500'),fontSize:(item.children?'15px':'14px')}" :title="item.name" v-if="item.lev<3">{{item.name}}</span>
-                            <a :href="'http://www.share.com/'+item.files" target="view_window" v-else>{{item.name}}</a>
+                            <a :href="'/'+item.files" target="view_window" v-else>{{item.name}}</a>
                         </div>
                     </div>
                     <div class="col-sm-1">

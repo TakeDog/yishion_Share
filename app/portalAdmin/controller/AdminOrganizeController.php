@@ -250,6 +250,42 @@ class AdminOrganizeController extends AdminBaseController{
         $affect = Db::name("CUser") -> update(['id'=>$input['user_id'],'dept_id'=>$input['dept_id']]);
         echo $affect ? 1 : 0;
     }
+
+
+    /**
+     * @adminMenu(
+     *     'name'   => '上传测试',
+     *     'parent' => 'default',
+     *     'display'=> true,
+     *     'hasView'=> true,
+     *     'order'  => 1000,
+     *     'icon'   => '',
+     *     'remark' => '上传测试',
+     *     'param'  => ''
+     * )
+     */
+    public function testUpload(){
+        return $this -> fetch();
+    }
+    
+    public function handlePost(){
+        $files = request()->file('my_files');
+        foreach($files as $file){
+            // 移动到框架应用根目录/public/uploads/ 目录下
+            $info = $file->move('upload/portal/workInfo');
+            if($info){
+                // 成功上传后 获取上传信息
+                // 输出 jpg
+                echo $info->getExtension(); 
+                // 输出 42a79759f284b767dfcb2a0197904287.jpg
+                echo $info->getFilename(); 
+            }else{
+                // 上传失败获取错误信息
+                echo $file->getError();
+            }    
+        }
+    }
+
 }
 
 ?>
