@@ -158,8 +158,14 @@ ul,li{
             </span>
         </el-dialog>
 
-        <div style="text-align:right;margin: 10px 0;">
-            <el-button type="primary" @click="itemInfo={id:0,pid:0,icon:'',name:'',sort:0,del:1,lev:0};addModal=true;" size="mini" plain><span class="glyphicon glyphicon-plus"></span>增加项目</el-button>
+        <div style="display:flex;margin: 10px 0;">
+            <div style="flex:1;text-align:left;">
+                <el-button type="success" size="mini" v-if="sortArr.length>0" @click="updateSort" plain><i class="el-icon-sort"></i> 排序</el-button>
+                <el-button type="success" size="mini" v-else plain disabled><i class="el-icon-sort"></i> 排序</el-button>
+            </div>
+            <div style="flex:1;text-align:right;">
+                <el-button type="primary" @click="itemInfo={id:0,pid:0,icon:'',name:'',sort:0,del:1,lev:0};addModal=true;" size="mini" plain><span class="glyphicon glyphicon-plus"></span>增加项目</el-button>
+            </div>
         </div>
         <div class="content">
             <div class="header">
@@ -167,7 +173,7 @@ ul,li{
                 <div class="col-sm-1">排序</div>
                 <div class="col-sm-3">操作</div>
             </div>
-            <my-tree :data-tree='dataTree' @getsubitem="itemInfo=JSON.parse(JSON.stringify($event));updateModal=true;" @getsubid="itemInfo={id:0,pid:$event.id,name:'',sort:0,lev:$event.lev,del:1};addModal=true;" @delitem="delItem($event)" @updatedel="updateDel($event)"></my-tree>
+            <my-tree :data-tree='dataTree' @getsubitem="itemInfo=JSON.parse(JSON.stringify($event));updateModal=true;" @getsubid="itemInfo={id:0,pid:$event.id,name:'',sort:0,lev:$event.lev,del:1};addModal=true;" @delitem="delItem($event)" @updatedel="updateDel($event)" @setsort="sortChange($event)"></my-tree>
         </div>
     </div>
     <!-- 递归模板 -->
@@ -185,7 +191,9 @@ ul,li{
                         </div>
                     </div>
                     <div class="col-sm-1">
-                        <div class="treeText" style="text-align:center;">{{item.sort}}</div>
+                        <div class="treeText" style="text-align:center;">
+                            <el-input-number v-model="item.sort" @change="$emit('setsort',item)" :min="0" :max="99" size="mini" style="width: 110px;"></el-input-number>
+                        </div>
                     </div>
                     <div class="col-sm-3">
                         <div class="treeText operDiv">
@@ -197,7 +205,7 @@ ul,li{
                         </div>
                     </div>
                 </div>
-                <my-tree v-if="item.active && item.children" :data-tree="item.children" @getsubitem="$emit('getsubitem',$event)" @getsubid="$emit('getsubid',$event)" @delitem="$emit('delitem',$event)" @updatedel="$emit('updatedel',$event)"></my-tree>
+                <my-tree v-if="item.active && item.children" :data-tree="item.children" @getsubitem="$emit('getsubitem',$event)" @getsubid="$emit('getsubid',$event)" @delitem="$emit('delitem',$event)" @updatedel="$emit('updatedel',$event)" @setsort="$emit('setsort',$event)"></my-tree>
             </li>
         </ul>
     </template>
@@ -215,7 +223,8 @@ ul,li{
                 addModal: false,
                 updateModal: false,
                 itemInfo: {id:0,pid:0,icon:'',name:'',sort:0,del:1},
-                fileList:[]
+                fileList:[],
+                sortArr:[]
             },
             mounted () {
                 this.createTree();
@@ -382,7 +391,10 @@ ul,li{
                         if(data[i].pid == pid){
                             if(!nowdata['children']) nowdata['children'] = [];
                             data[i]['lev'] = lev;
-                            data[i]['active'] = false;
+                            if(!data[i]['active']){
+                                data[i]['active'] = false;
+                            }
+
                             nowdata['children'].push(this.makeTree(data,data[i],data[i].id,lev+1));
                         }
                     }
@@ -396,6 +408,51 @@ ul,li{
                     }
                     this.itemInfo = {id:0,pid:0,icon:'',name:'',sort:0,del:1};
                     this.fileList = [];
+                },
+                sortChange(event){
+                    let isNew = true;
+                    this.sortArr.forEach((item,i) => {
+                        if(event.id === item.id){
+                            if(item.sort == event.sort){
+                                this.sortArr.splice(i,1);
+                            }else{
+                                item.sort = event.sort;
+                            }
+                            isNew = false;
+                        }
+                    });
+                    if(isNew){
+                        this.sortArr.push(event);
+                    }
+                },
+                updateSort(){
+                    let status = true;
+                    let msg = '';
+                    console.log(this.sortArr);
+                    this.sortArr.forEach((item,i) => {
+                        axios.post("{:url('updateInfo')}",{id:item.id,pid:item.pid,icon:item.icon,name:item.name,sort:item.sort,del:item.del}).then((res)=>{
+                            if(res.data != 1001){
+                                status = false;
+                                msg += item.name+"项，排序修改失败！！！<br><br>";
+                            }
+                            if(i === this.sortArr.length-1){
+                                this.sortArr = [];
+                                if(status){
+                                    this.$message({
+                                        message: "修改排序成功！！！",
+                                        type: 'success'
+                                    });
+                                    this.createTree();
+                                }else{
+                                    this.$message({
+                                        dangerouslyUseHTMLString: true,
+                                        message: msg,
+                                        type: 'error'
+                                    });
+                                }
+                            }
+                        });
+                    });
                 }
             }
         })
