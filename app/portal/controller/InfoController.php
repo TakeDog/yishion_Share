@@ -16,7 +16,7 @@ class InfoController extends HomeBaseController{
         if($where['id'] == -1){
             $data = Db::name('WorkInfo') -> where('files','') -> order('sort') -> select();
         }else{
-            $data = Db::name('WorkInfo') -> where('id',$where['id']) -> order('sort') -> select();
+            $data = Db::name('WorkInfo') -> where('id',$where['id']) -> order('sort,date desc') -> select();
         }
         return json($data);
     }
@@ -30,7 +30,7 @@ class InfoController extends HomeBaseController{
         $total = Db::name('WorkInfo') -> where('pid',$pid) ->where('name','like',"%$fileName%") -> count();
         $current = $page * $size;
 
-        $data = Db::name('WorkInfo') -> where('pid',$pid) ->where('name','like',"%$fileName%") -> order('sort') -> limit(0,$current) -> select();
+        $data = Db::name('WorkInfo') -> where('pid',$pid) ->where('name','like',"%$fileName%") -> order('sort,date desc') -> limit(0,$current) -> select();
 
         $res['files'] = $data;
         $res['total'] = $total;
