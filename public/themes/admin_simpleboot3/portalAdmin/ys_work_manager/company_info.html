@@ -148,6 +148,13 @@ ul,li{
                     <el-input v-model="itemInfo.icon" size="small" placeholder="element-ui图标,输入图标下的代码即可,如:el-icon-s-promotion"></el-input>
                     <a style="float: right;" href="http://www.share.com/static/sundry/workInfo/element-ui图标.png" target="view_window">查看图标</a>
                 </el-form-item>
+                <el-form-item label="设置上级" v-if="itemInfo.files != ''">
+                    <el-cascader v-model="itemInfo.pid" :options="dataTree" :props="{expandTrigger:'hover',label:'name', checkStrictly: true,value:'id'}">
+                        <template slot-scope="{node,data}">
+                            <span>{{ data.name }}</span>
+                        </template>
+                    </el-cascader>
+                </el-form-item>
                 <el-form-item label="排序">
                     <el-input type="number" v-model="itemInfo.sort" size="small"></el-input>
                 </el-form-item>
@@ -299,6 +306,10 @@ ul,li{
                     }
                 },
                 updateItem(){
+                    if(this.itemInfo.pid.length > 0){
+                        this.itemInfo.pid = this.itemInfo.pid[this.itemInfo.pid.length-1];
+                    }
+
                     axios.post("{:url('updateInfo')}",this.itemInfo).then((res)=>{
                         if(res.data === 1001){
                             this.$message({
@@ -391,10 +402,11 @@ ul,li{
                         if(data[i].pid == pid){
                             if(!nowdata['children']) nowdata['children'] = [];
                             data[i]['lev'] = lev;
-                            if(!data[i]['active']){
-                                data[i]['active'] = false;
-                            }
+                            data[i]['active'] = false;
 
+                            if(data[i]['files'] != ''){
+                                data[i]['disabled'] = true;
+                            }
                             nowdata['children'].push(this.makeTree(data,data[i],data[i].id,lev+1));
                         }
                     }
@@ -428,7 +440,6 @@ ul,li{
                 updateSort(){
                     let status = true;
                     let msg = '';
-                    console.log(this.sortArr);
                     this.sortArr.forEach((item,i) => {
                         axios.post("{:url('updateInfo')}",{id:item.id,pid:item.pid,icon:item.icon,name:item.name,sort:item.sort,del:item.del}).then((res)=>{
                             if(res.data != 1001){
