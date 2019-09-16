@@ -101,19 +101,21 @@ el-icon-s-promotion -- 指引 -->
                     this.infoTree = this.makeTree(res).children;
                     this.infoTree.forEach((item,i) => {
                         this.searchNameArr.push({fileName:'',index:0,page:1});
-                        item.children.forEach((ktem,k) => {
-                            ktem.page = 1;
-                            ktem.fileName = this.searchNameArr[i].fileName;
-                            if(k===0){
-                                this.getFiles(ktem, res2 => {
-                                    this.infoTree[i].cActive = ktem.id+'';
-                                    ktem.children = res2.files;
-                                    ktem.total = res2.total;
-                                    this.infoTree[i].children[k] = ktem;
-                                    Vue.set(this.infoTree,i,this.infoTree[i]);
-                                });
-                            }
-                        });
+                        if(item.children){
+                            item.children.forEach((ktem,k) => {
+                                ktem.page = 1;
+                                ktem.fileName = this.searchNameArr[i].fileName;
+                                if(k===0){
+                                    this.getFiles(ktem, res2 => {
+                                        this.infoTree[i].cActive = ktem.id+'';
+                                        ktem.children = res2.files;
+                                        ktem.total = res2.total;
+                                        this.infoTree[i].children[k] = ktem;
+                                        Vue.set(this.infoTree,i,this.infoTree[i]);
+                                    });
+                                }
+                            });
+                        }
                     });
                 });
             },

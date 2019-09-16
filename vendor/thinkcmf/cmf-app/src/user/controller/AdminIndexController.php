@@ -66,6 +66,7 @@ class AdminIndexController extends AdminBaseController
         $list = Db::name('c_user')-> alias('u')
             -> join('c_user_role ur','u.id = ur.user_id','LEFT')
             -> join('c_role r','ur.role_id=r.id','LEFT')
+            -> join('job j','u.job_id = j.id','LEFT')
             -> join('dept d','u.dept_id = d.id')
             -> where(function (Query $query) {
                 $data = $this->request->param();
@@ -86,12 +87,23 @@ class AdminIndexController extends AdminBaseController
 
                 }
             })
-            -> field("u.*,GROUP_CONCAT(r.role_name separator ' | ') as role_name,d.name as deptName")
+            -> field("u.*,GROUP_CONCAT(r.role_name separator ' | ') as role_name,d.name as deptName,j.job as jobName")
             -> group('u.id')
             -> order("u.user_status desc,create_time DESC")
             -> paginate(10);
         // 获取分页显示
         $page = $list->render();
+
+        //$deptDb = new \app\portal\model\DeptModel();
+        
+        //var_dump($list);
+
+        // foreach($list as $k => $v){
+        //     $firstPID = $deptDb -> getFirstP($v['dept_id']);
+        //     $deptMsg = $deptDb -> find($firstPID);
+        //     $list[$k]['part'] = $deptMsg['name'];
+        // }
+
         $this->assign('list', $list);
         $this->assign('page', $page);
         // 渲染模板输出

@@ -76,6 +76,9 @@
                                             <el-dropdown-item ><span @click="setSupInit(data)">设置上级</span></el-dropdown-item>
                                             <el-dropdown-item > <span @click="remove(data.id)">删除&emsp;&emsp;&emsp;</span></el-dropdown-item>
                                             <el-dropdown-item  :disabled='true'>部门ID：{{curId}}</el-dropdown-item>
+                                            <el-dropdown-item  :disabled='true' v-if='data.type==1'>结构类型：普通</el-dropdown-item>
+                                            <el-dropdown-item  :disabled='true' v-if='data.type==2'>结构类型：营运支持</el-dropdown-item>
+                                            <el-dropdown-item  :disabled='true' v-if='data.type==3'>结构类型：店铺</el-dropdown-item>
                                         </el-dropdown-menu>
                                     </el-dropdown>
                                 </a>
@@ -134,7 +137,7 @@
                                         <span class="label label-danger" v-if="item.user_status == 2">拉黑</span>
                                     </td>
                                     <td>
-                                        <a href="#" @click.prevent="UserDeptInit(item.id)">调整部门</a> |
+                                        <a href="#" @click.prevent="UserDeptInit(item.id)">修改信息</a> |
                                         <a href="#" @click.prevent="delUser(item.id)" >删除</a> |
                                         <a :href="'/user/admin_index/roleedit/back/og/u_id/'+ item.id" >角色管理</a>
                                     </td>

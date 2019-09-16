@@ -79,8 +79,27 @@
 
                 </el-form-item>
 
-                <el-form-item label="岗位" prop="jop">
-                    <el-input v-model="form.jop" placeholder="请输入岗位名称" clearableprefix-icon="el-icon-user-solid"></el-input>
+                <el-form-item label="岗位" prop="job_id">
+                    <!-- <el-input v-model="form.jop" placeholder="请输入岗位名称" clearableprefix-icon="el-icon-user-solid"></el-input> -->
+                    <el-select v-model="form.job_id" placeholder="请选择岗位" filterable style="width:100%;" :disabled='!form.dept_id'>
+
+                        <el-option
+                            v-for="item in job_option"
+                            :key="item.id"
+                            :label="item.job"
+                            :value="item.id"
+                            v-if="job_option.length > 0"
+                        >
+                        </el-option>
+
+                        <el-option
+                            label="无"
+                            value="0"
+                            v-if="job_option.length == 0"
+                        >
+                        </el-option>
+
+                    </el-select>
                 </el-form-item>
 
                 <el-form-item label="密码" prop="pwd">
@@ -112,7 +131,7 @@
                 node-key="id"
                 :props="props"
                 @node-click="getDept"
-                :expand-on-click-node='false'
+                
             >
             </el-tree>
         </div>
@@ -143,7 +162,7 @@
                 real_name:'',
                 dept_id:'',
                 port:'',
-                jop:'',
+                job_id:'',
                 mobile:''
             },
             selectDept:'',
@@ -154,6 +173,7 @@
                 label: 'name'
             },
             option:option,
+            job_option:[],
             rules: {
                 user_nickname: [
                     { required: true, message: '请输入昵称', trigger: 'change' }
@@ -176,7 +196,7 @@
                 part:[
                     { required: true, message: '请输入机构', trigger: 'change' }
                 ],
-                jop:[
+                job_id:[
                     { required: true, message: '请输入职位', trigger: 'change' }
                 ],
                 mobile:[
@@ -257,6 +277,28 @@
             },
             toLogin(){
                 window.location.href="/portal/index/login"
+            }
+        },
+        computed: {
+            dept_id(){
+                return this.form.dept_id;
+            }
+        },
+        watch: {
+            dept_id(newV,oldV){
+                
+                if(newV){
+                    axios.get("{:url('getJob')}",{
+                        params:{
+                            dept_id:newV
+                        }
+                    }).then((res)=>{
+                        this.job_option = res.data;
+                    })
+                }else{
+                    this.form.job_id = '';
+                }
+
             }
         }
     });
