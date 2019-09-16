@@ -114,4 +114,5 @@ class YsWorkManagerController extends AdminBaseController{
         $res['msg'] = "上传成功！！！";
         return json($res);
     }
+
 }

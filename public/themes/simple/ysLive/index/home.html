@@ -8,10 +8,10 @@
     margin: 20px auto 10px;
 }
 .main_list .tag_div{
-    background: #ffc7ba;
+    background: #F5B6A7;
     font-size: 17px;
     font-weight: 700;
-    padding: 0 15px;
+    padding: 5px 15px;
 }
 .filter{
     display: flex;
@@ -21,7 +21,7 @@
     cursor: pointer;
 }
 .filter .filter_item:hover{
-    color: #ffc7ba;
+    color: #F5B6A7;
 }
 .post_item{
     margin: 20px 0;
@@ -41,8 +41,11 @@
     margin: 10px 20px;
     clear: both;
 }
+.list_item{min-height: 300px;}
+.live-container{background: #FFF;padding:0;}
+.el-main{margin:0;}
 </style>
-<div id="app">
+<div class="container live-container" id="app">
     <el-container>
         <el-main>
             <div class="main">
@@ -56,19 +59,15 @@
                         <i class="fa fa-thumb-tack" aria-hidden="true" style="transform: rotate(45deg);"></i>
                         <span style="padding-left: 10px;">以纯动态</span>
                     </div>
-                    <el-card class="box-card" shadow="hover" style="width:50%;margin: 20px auto;">
-                        <div class="box_item">
-                            [置顶] xxxxx
-                        </div>
-                        <div class="box_item">
-                            xxxxx
-                        </div>
-                        <div class="box_item">
-                            xxxxx
-                        </div>
-                        <div class="box_item">
-                            xxxxx
-                        </div>
+                    <el-card class="box-card" style="width:97%;margin: 20px auto;">
+                        <p class="box_item"> [置顶] xxxxx </p>
+                        <p class="box_item"> xxxxx </p>
+                        <p class="box_item"> xxxxx </p>
+                        <p class="box_item"> xxxxx </p>
+                        <p class="box_item"> xxxxx </p>
+                        <p class="box_item"> xxxxx </p>
+                        <p class="box_item"> xxxxx </p>
+                        <p class="box_item"> xxxxx </p>
                     </el-card>
                 </div>
                 <div class="list_item">
@@ -78,7 +77,7 @@
                     </div>
                     <div style="display: flex;">
                         <div style="width:65%;">
-                            <el-card class="box-card" shadow="hover" style="width:80%;margin: 20px auto;">
+                            <el-card class="box-card" style="width:80%;margin: 20px auto;min-height: 200px;">
                                 <div slot="header" class="clearfix">
                                     <span>帖子</span>
                                 </div>
@@ -90,20 +89,20 @@
                                 <div class="post_item">
                                     <el-avatar shape="square" :size="50" src="#" style="float:left;"></el-avatar>
                                     <div class="post_content">
-                                        <div class="content_item userName">Xxx</div>
+                                        <div class="content_item userName">用户名</div>
                                         <div class="content_item time_address">今天23:59:59 广州</div>
-                                        <div class="content_item content">Xxxxxxxxxxxxxxxxxxxxx</div>
+                                        <div class="content_item content">今天又是充满希望的一天</div>
                                     </div>
                                     <div class="status">
-                                        <a href="#">阅读()</a>
-                                        <a href="#">点赞()</a>
-                                        <a href="#">评论()</a>
+                                        <a href="#">阅读(10)</a>
+                                        <a href="#">点赞(20)</a>
+                                        <a href="#">评论(30)</a>
                                     </div>
                                 </div>
                             </el-card>
                         </div>
                         <div style="width:30%;">
-                            <el-card class="box-card" shadow="hover" style="width:80%;margin: 20px auto;">
+                            <el-card class="box-card" style="width:80%;margin: 20px auto;min-height: 200px;">
                                 <div slot="header" class="clearfix">
                                     <span>达人榜</span>
                                 </div>
@@ -128,16 +127,10 @@
                         <i class="fa fa-book" aria-hidden="true"></i>
                         <span style="padding-left: 10px;">生活百科</span>
                     </div>
-                    <el-card class="box-card" shadow="hover" style="width:50%;margin: 20px auto;">
-                        <div class="box_item">
-                            xxxxxxxxxxxxxxxxxxxx
-                        </div>
-                        <div class="box_item">
-                            xxxxxxxxxxxxxxxxxxxx
-                        </div>
-                        <div class="box_item">
-                            xxxxxxxxxxxxxxxxxxxx
-                        </div>
+                    <el-card class="box-card" style="width:97%;margin: 20px auto;min-height: 250px;">
+                        <p class="box_item">[科技] 去演唱会带什么相机拍得比较清楚？</p>
+                        <p class="box_item">[生活]《哪吒》观后感</p>
+                        <p class="box_item">[美妆] 美妆小白的入门必备</p>
                     </el-card>
                 </div>
                 <div class="list_item">
@@ -145,7 +138,7 @@
                         <i class="fa fa-search" aria-hidden="true"></i>
                         <span style="padding-left: 10px;">招兵买马</span>
                     </div>
-                    <el-table :data="inviteData" style="width: 50%;margin: 20px auto;" size="small" border>
+                    <el-table :data="inviteData" style="width: 97%;margin: 20px auto;" size="small" border>
                         <el-table-column prop="position" label="职位" width="130"></el-table-column>
                         <el-table-column prop="require" label="要求"></el-table-column>
                         <el-table-column prop="treatment" label="待遇"></el-table-column>
