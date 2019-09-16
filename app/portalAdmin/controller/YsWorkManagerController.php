@@ -53,7 +53,9 @@ class YsWorkManagerController extends AdminBaseController{
         // }else{
         //     $data = Db::name('WorkInfo') -> where('id',$id) -> order('sort') ->select();
         // }
-        if($res){
+        if($res == 0){
+            return 1003;
+        }elseif($res > 0){
             return 1001;
         }else{
             return 1002;
