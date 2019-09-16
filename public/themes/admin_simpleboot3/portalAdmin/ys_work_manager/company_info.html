@@ -16,6 +16,7 @@
     <script src="__STATIC__/js/vue.js"></script>
     <script src="__STATIC__/js/axios.min.js"></script>
     <script src="__STATIC__/lib/element-ui/lib/index.js"></script>
+    <link rel="stylesheet" href="__STATIC__/lib/font-awesome-4.7.0/css/font-awesome.min.css">
 </head>
 <style>
 [v-cloak]{
@@ -78,11 +79,13 @@ ul,li{
 }
 .dataTree li{
     /* margin: 5px 0; */
+    line-height: 0px;
 }
 .dataTree li .treeItem{
     border-bottom: 1px solid #ccc;
     padding: 5px 0;
     color: #444448;
+    line-height: 35px;
 }
 .dataTree li .treeItem:hover{
     background: #f7f7f7;
@@ -96,6 +99,14 @@ ul,li{
 }
 .dataTree li .treeItem .treeText span{
     padding: 0 3px;
+}
+.dataTree li .treeItem .treeText .file_edit{
+    color: #293c4c;
+    font-weight: 900;
+    margin-left: 5px;
+}
+.dataTree li .treeItem .treeText .file_edit:hover{
+    color: #337ab7;
 }
 .dataTree li .treeItem .treeText .del0{
     color: greenyellow; 
@@ -114,6 +125,10 @@ ul,li{
 </style>
 <body>
     <div id="app" class="container-fluid" v-cloak>
+        <!-- 文件上传模态框 -->
+        <el-dialog width="30%" :visible.sync="uploadModal" :show-close="false" :close-on-press-escape="false" :close-on-click-modal="false" append-to-body style="margin-top: 20vh;">
+            <el-progress :text-inside="true" :stroke-width="26" :percentage="uploadProgree.persent"></el-progress>
+        </el-dialog>
         <!-- 添加项目模态框 -->
         <el-dialog title="增加项目" :visible.sync="addModal" width="30%">
             <el-form ref="itemInfo" :model="itemInfo" label-width="80px">
@@ -180,7 +195,7 @@ ul,li{
                 <div class="col-sm-1">排序</div>
                 <div class="col-sm-3">操作</div>
             </div>
-            <my-tree :data-tree='dataTree' @getsubitem="itemInfo=JSON.parse(JSON.stringify($event));updateModal=true;" @getsubid="itemInfo={id:0,pid:$event.id,name:'',sort:0,lev:$event.lev,del:1};addModal=true;" @delitem="delItem($event)" @updatedel="updateDel($event)" @setsort="sortChange($event)"></my-tree>
+            <my-tree :data-tree='dataTree' @getsubitem="itemInfo=JSON.parse(JSON.stringify($event));updateModal=true;" @getsubid="itemInfo={id:0,pid:$event.id,name:'',sort:0,lev:$event.lev,del:1};addModal=true;" @delitem="delItem($event)" @updatedel="updateDel($event)" @setsort="sortChange($event)" @updatefile="updateFile($event)"></my-tree>
         </div>
     </div>
     <!-- 递归模板 -->
@@ -193,13 +208,16 @@ ul,li{
                             <span v-for="n in item.lev">&nbsp;</span>
                             <span :style="{visibility:(item.children?'':'hidden')}" :class="item.active?'el-icon-arrow-down':'el-icon-arrow-right'"></span>
                             <span :class="item.icon" v-if="item.lev===1"></span>
-                            <span :style="{fontWeight:(item.children?'800':'500'),fontSize:(item.children?'15px':'14px')}" :title="item.name" v-if="item.lev<3">{{item.name}}</span>
-                            <a :href="'http://www.share.com/'+item.files" target="view_window" v-else>{{item.name}}</a>
+                            <span :style="{fontWeight:(item.children?'800':'500'),fontSize:(item.children?'15px':'14px')}" :title="item.name" v-if="!item.files">{{item.name}}</span>
+                            <a :href="'http://www.share.com/'+item.files" target="view_window" v-if="item.files && !item.edit">{{item.name}}</a>
+                            <el-input v-model="item.name" size="small" placeholder="请输入文件名" v-if="item.files && item.edit" @blur="$emit('updatefile',item)" style="width: 500px;zoom: 0.8;"></el-input>
+                            <i class="el-icon-edit file_edit" v-if="item.files && !item.edit" @click="item.edit=true"></i>
+                            <i class="fa fa-reply file_edit" v-if="item.files && item.edit" aria-hidden="true" @click="item.edit=false"></i>
                         </div>
                     </div>
                     <div class="col-sm-1">
                         <div class="treeText" style="text-align:center;">
-                            <el-input-number v-model="item.sort" @change="$emit('setsort',item)" :min="0" :max="99" size="mini" style="width: 110px;"></el-input-number>
+                            <el-input-number v-model="item.sort" @change="$emit('setsort',item)" :min="0" :max="99" size="mini" style="width: 100px;"></el-input-number>
                         </div>
                     </div>
                     <div class="col-sm-3">
@@ -212,7 +230,7 @@ ul,li{
                         </div>
                     </div>
                 </div>
-                <my-tree v-if="item.active && item.children" :data-tree="item.children" @getsubitem="$emit('getsubitem',$event)" @getsubid="$emit('getsubid',$event)" @delitem="$emit('delitem',$event)" @updatedel="$emit('updatedel',$event)" @setsort="$emit('setsort',$event)"></my-tree>
+                <my-tree v-if="item.active && item.children" :data-tree="item.children" @getsubitem="$emit('getsubitem',$event)" @getsubid="$emit('getsubid',$event)" @delitem="$emit('delitem',$event)" @updatedel="$emit('updatedel',$event)" @setsort="$emit('setsort',$event)" @updatefile="$emit('updatefile',$event)"></my-tree>
             </li>
         </ul>
     </template>
@@ -229,9 +247,14 @@ ul,li{
                 dataTree: [],
                 addModal: false,
                 updateModal: false,
+                uploadModal: false,
                 itemInfo: {id:0,pid:0,icon:'',name:'',sort:0,del:1},
                 fileList:[],
-                sortArr:[]
+                sortArr:[],
+                uploadProgree: {
+                    persent: 0,
+                    color: ''
+                }
             },
             mounted () {
                 this.createTree();
@@ -263,6 +286,8 @@ ul,li{
                             }
                         });
                     }else{
+                        this.uploadModal = true;
+                        this.addModal = false;
                         if(this.fileList.length === 0){
                             this.$message({
                                 message: "请选择要上传的文件!!!",
@@ -270,12 +295,6 @@ ul,li{
                             });
                             return;
                         }
-                        const loading = this.$loading({
-                            lock: true,
-                            text: '上传中...',
-                            spinner: 'el-icon-loading',
-                            background: 'rgba(0, 0, 0, 0.7)'
-                        });
                         let formData = new FormData();
                         this.fileList.forEach(file=>{
                             formData.append("files[]",file,file.name);
@@ -284,19 +303,28 @@ ul,li{
                         formData.append("pid",this.itemInfo.pid);
                         formData.append("sort",this.itemInfo.sort);
                         formData.append("del",this.itemInfo.del);
-                        axios.post("{:url('uploadFile')}",formData,{ headers: {"Content-Type": "multipart/form-data"}}).then((res)=>{
-                            loading.close();
+                        axios.post("{:url('uploadFile')}",formData,
+                        {
+                            headers:{"Content-Type": "multipart/form-data"},
+                            onUploadProgress: (e)=>{
+                                // 对原生进度事件的处理
+                                if(e.lengthComputable){
+                                    this.uploadProgree.persent = parseInt((e.loaded/e.total)*100);
+                                }
+                            },
+                        }).then((res)=>{
                             if(res.data.status === 1001){
                                 this.$message({
                                     message: res.data.msg,
                                     type: 'success'
                                 });
-                                this.addModal = false;
+                                this.uploadModal = false;
                                 this.$refs.upload.clearFiles();
                                 this.fileList = [];
                                 this.itemInfo = {id:0,pid:0,icon:'',name:'',sort:0,del:1,lev:2};
                                 this.createTree();
                             }else{
+                                this.uploadModal = false;
                                 this.$message({
                                     message: res.data.msg,
                                     type: 'error'
@@ -403,6 +431,7 @@ ul,li{
                             if(!nowdata['children']) nowdata['children'] = [];
                             data[i]['lev'] = lev;
                             data[i]['active'] = false;
+                            data[i]['edit'] = false;
 
                             if(data[i]['files'] != ''){
                                 data[i]['disabled'] = true;
@@ -463,6 +492,22 @@ ul,li{
                                 }
                             }
                         });
+                    });
+                },
+                updateFile(item){
+                    axios.post("{:url('updateInfo')}",item).then((res)=>{
+                        if(res.data === 1001){
+                            this.$message({
+                                message: "修改文件名成功！！！",
+                                type: 'success'
+                            });
+                            item.edit = false;
+                        }else if(res.data === 1002){
+                            this.$message({
+                                message: "修改文件名失败！！！",
+                                type: 'error'
+                            });
+                        }
                     });
                 }
             }
