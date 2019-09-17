@@ -13,3 +13,7 @@ Vagrantfile
 /public/static/video
 /public/static/PDF
 _gsdata_
+/data/config/*
+!/data/config/ConfigUI.json
+/data/lang
+/data/route
