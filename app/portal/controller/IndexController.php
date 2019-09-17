@@ -5,6 +5,7 @@ use think\Controller;
 use think\Db;
 use cmf\controller\HomeBaseController;
 use app\common\Category;
+use app\common\OperateConfig;
 
 class IndexController extends HomeBaseController
 {
@@ -28,8 +29,10 @@ class IndexController extends HomeBaseController
 
     public function staff_index2(){
         //公司资讯
+        $operateConfig = new OperateConfig();
         $infoList = Db::name("WorkInfo") -> order("date desc") -> limit(0,5) -> select();
         
+        $this -> assign("ConfigUI",$operateConfig -> getConfig());
         $this -> assign('infoList',$infoList);
         $this -> assign('user_info',session("user_info",'','portal'));
         return $this -> fetch();
@@ -70,7 +73,11 @@ class IndexController extends HomeBaseController
 
         if(!$user['mobile'])  return json(array('code'=>0,'msg'=>'手机号码不能为空'));
 
-        if(!$user['jop'])  return json(array('code'=>0,'msg'=>'职位不能为空'));
+        $existedMb = Db::name('CUser') -> where('mobile',$user['mobile']) -> count();
+
+        if($existedMb) return json(array('code'=>0,'msg'=>'手机号已存在，请重新输入'));
+
+        if( !isset($user['job_id']) )  return json(array('code'=>0,'msg'=>'岗位不能为空'));
 
         $res = model('c_user') -> registVerify($user);
 
@@ -317,6 +324,16 @@ class IndexController extends HomeBaseController
         $tree_data = Db::name("dept") -> select();
         $catetory = new Category();
         echo json_encode($catetory -> unlimitedForLevel($tree_data,'|—'));
+    }
+
+    //获取岗位
+    public function getJob(){
+        
+        $dept_id = $this -> request -> param('dept_id');
+        $part = model("Dept") -> getFirstP($dept_id);
+        $deptMsg = model("Dept") -> find($dept_id);
+        echo json_encode( Db::name("Job") -> where(['ogn'=>$part,'dept_type'=>$deptMsg['type']]) -> select() );
+
     }
 
 }

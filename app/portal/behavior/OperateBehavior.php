@@ -13,7 +13,7 @@ class OperateBehavior extends Controller{
         'portal/index/verify',
         'portal/index/regist',
         'portal/index/register',
-        'portal/index/test',
+        'portal/index/getjob',  //获取岗位
         'portal/index/getoption'
     ];
 

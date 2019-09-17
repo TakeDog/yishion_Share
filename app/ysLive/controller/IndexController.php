@@ -5,6 +5,7 @@ use think\Controller;
 use think\Db;
 use cmf\controller\HomeBaseController;
 use app\common\Category;
+use app\common\OperateConfig;
 
 class IndexController extends HomeBaseController{
 
@@ -13,6 +14,9 @@ class IndexController extends HomeBaseController{
     }
 
     public function home(){
+        
+        $operateConfig = new OperateConfig();
+        $this -> assign("ConfigUI",$operateConfig -> getConfig());
         return $this->fetch();
     }
 
