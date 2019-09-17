@@ -5,6 +5,7 @@ use think\Controller;
 use think\Db;
 use cmf\controller\HomeBaseController;
 use app\common\Category;
+use app\common\OperateConfig;
 
 class IndexController extends HomeBaseController
 {
@@ -28,8 +29,10 @@ class IndexController extends HomeBaseController
 
     public function staff_index2(){
         //公司资讯
+        $operateConfig = new OperateConfig();
         $infoList = Db::name("WorkInfo") -> order("date desc") -> limit(0,5) -> select();
         
+        $this -> assign("ConfigUI",$operateConfig -> getConfig());
         $this -> assign('infoList',$infoList);
         $this -> assign('user_info',session("user_info",'','portal'));
         return $this -> fetch();

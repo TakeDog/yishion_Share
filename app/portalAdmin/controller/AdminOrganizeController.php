@@ -204,9 +204,9 @@ class AdminOrganizeController extends AdminBaseController{
             $where['u.dept_id'] = $input['dept_id'];
         }
 
-        $main = Db::name("CUser") -> alias('u') -> join("share_dept d","u.dept_id=d.id",'LEFT') -> where($where) -> whereLike($likeField,'%'.$keyword.'%')  -> field("u.id,u.user_name,u.user_nickname,u.avatar,u.user_status,u.super,u.user_email,u.mobile,u.create_time,u.real_name,u.jop,d.name as dept") -> limit(($page-1) * $num,$num) -> select();
+        $main = Db::name("CUser") -> alias('u') -> join("share_dept d","u.dept_id=d.id",'LEFT') -> join('share_job j','u.job_id = j.id','LEFT') -> where($where) -> whereLike($likeField,'%'.$keyword.'%')  -> field("u.id,u.user_name,u.user_nickname,u.avatar,u.user_status,u.super,u.user_email,u.mobile,u.create_time,u.real_name,u.dept_id,u.job_id,d.name as dept,j.job as job") -> limit(($page-1) * $num,$num) -> select();
 
-        $count = Db::name("CUser") -> alias('u') -> join("share_dept d","u.dept_id=d.id",'LEFT') -> where($where) -> whereLike($likeField,'%'.$keyword.'%')  -> count();
+        $count = Db::name("CUser") -> alias('u') -> join("share_dept d","u.dept_id=d.id",'LEFT') -> join('share_job j','u.job_id = j.id','LEFT') -> where($where) -> whereLike($likeField,'%'.$keyword.'%')  -> count();
 
         $data['main'] = $main;
         $data['total'] = $count;
@@ -247,7 +247,8 @@ class AdminOrganizeController extends AdminBaseController{
      */
     public function changeDept(){
         $input = $this -> request -> param();
-        $affect = Db::name("CUser") -> update(['id'=>$input['user_id'],'dept_id'=>$input['dept_id']]);
+
+        $affect = Db::name("CUser") -> update($input);
         echo $affect ? 1 : 0;
     }
 

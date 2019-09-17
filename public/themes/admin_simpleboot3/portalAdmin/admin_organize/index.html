@@ -130,14 +130,14 @@
                                     <td>{{item.real_name}}</td>
                                     <td>{{item.mobile}}</td>
                                     <td>{{item.dept}}</td>
-                                    <td>{{item.jop}}</td>
+                                    <td>{{item.job ? item.job : '无'}}</td>
                                     <td>
                                         <span class="label label-warning" v-if="item.user_status == 0">未验证</span>
                                         <span class="label label-success" v-if="item.user_status == 1">正常</span>
                                         <span class="label label-danger" v-if="item.user_status == 2">拉黑</span>
                                     </td>
                                     <td>
-                                        <a href="#" @click.prevent="UserDeptInit(item.id)">修改信息</a> |
+                                        <a href="#" @click.prevent="UserDeptInit(item)">修改信息</a> |
                                         <a href="#" @click.prevent="delUser(item.id)" >删除</a> |
                                         <a :href="'/user/admin_index/roleedit/back/og/u_id/'+ item.id" >角色管理</a>
                                     </td>
@@ -170,8 +170,58 @@
         :visible.sync="dialogVisible"
         width="40%"
     >
-            
-        <el-row :gutter="20" style="margin-bottom:10px;">
+        
+        <!-- 修改用户信息 -->
+        <div v-if="operate=='user_dept'">
+            <el-row>
+                <el-col :span="8" style="text-align: right;">
+                    <span style="line-height: 40px;">真实姓名：</span>
+                </el-col>
+                <el-col :span="10">
+                    <el-input v-model="user_form.real_name" placeholder="请输入内容"></el-input>
+                </el-col>
+            </el-row>
+            <el-row style="margin-top:10px;">
+                <el-col :span="8" style="text-align: right;">
+                    <span style="line-height: 40px;">部门名称：</span>
+                </el-col>
+                <el-col :span="10">
+
+                    <el-cascader
+                    v-model="user_form.dept_id"
+                    :options="user_dept_option"
+                    :props="{ checkStrictly: true ,label:'name',value:'id',children:'child'}"
+                    :show-all-levels='false'
+                    clearable
+                    style="width:100%;"></el-cascader>
+
+                </el-col>
+            </el-row>
+
+            <el-row style="margin-top:10px;">
+                <el-col :span="8" style="text-align: right;">
+                    <span style="line-height: 40px;">岗&nbsp;&nbsp;位：</span>
+                </el-col>
+                <el-col :span="10">
+
+                    <el-select v-model="user_form.job_id" placeholder="请选择" style="width:100%;">
+
+                        <el-option
+                            v-for="item in user_form.job_option"
+                            :key="item.id"
+                            :label="item.job"
+                            :value="item.id"
+                        ></el-option>
+
+                    </el-select>
+
+                </el-col>
+            </el-row>
+
+        </div>
+        
+
+        <el-row :gutter="20" style="margin-bottom:10px;" v-if="operate != 'user_dept'">
             <el-col :span="8" style="text-align: right;">
                 <span style="line-height: 40px;">部门名称：</span>
             </el-col>
@@ -191,19 +241,12 @@
                     </el-option>
                 </el-select>
 
-                <el-select v-model="user_dept" placeholder="请选择"  v-show="operate=='user_dept'">
-                    <el-option
-                        v-for="item in user_dept_option"
-                        :key="item.id"
-                        :label="item.html + item.name"
-                        :value="item.id"
-                        :disabled="item.disabled">
-                    </el-option>
-                </el-select>
-
             </el-col>
+
         </el-row>
         
+        
+
         <span slot="footer" class="dialog-footer">
             <el-button @click="dialogVisible = false">取消操作</el-button>
             
@@ -213,7 +256,7 @@
 
             <el-button type="primary" @click="setSup" v-show="operate=='setSup'">确定修改</el-button>
 
-            <el-button type="primary" @click="changeDept" v-show="operate=='user_dept'">修改部门</el-button>
+            <el-button type="primary" @click="changeDept" v-show="operate=='user_dept'">确定修改</el-button>
 
         </span>
 
@@ -247,7 +290,14 @@
             user_dept_option:'',
             user_dept:1,
             search:'',
-            searchAll:''
+            searchAll:'',
+            user_form:{
+                id:'',
+                real_name:'',
+                dept_id:'',
+                job_option:[],
+                job_id:''
+            }
         },
         methods: {
 
@@ -501,27 +551,47 @@
 
                 })
             },
-            UserDeptInit(user_id){
+            UserDeptInit(userInfo){
                 
-                
-                axios.get("{:url('AdminOrganize/getOption')}").then((res)=>{
+                axios.get("{:url('AdminOrganize/getTree')}").then((res)=>{
                     this.dialogVisible = true;
                     this.user_dept_option = res.data;
                 });
 
-                this.user_id = user_id;
-                this.user_dept = this.main_header.id;
-                this.operate = "user_dept";
+                axios.get("{:url('portal/index/getjob')}",{params:{
+                    dept_id:this.main_header.id
+                }}).then((res)=>{
 
+                    if(res.data.length > 0){
+                        this.user_form.job_option = res.data;
+                    }else{
+                        this.user_form.job_option = [{id:0,job:'无'}]
+                    }
+
+                    this.user_form.job_id = userInfo.job_id;
+
+                });
+
+                this.user_form.real_name = userInfo.real_name;
+                this.user_form.id = userInfo.id;
+                this.user_form.dept_id = userInfo.dept_id;
+                
+
+                this.operate = "user_dept";
             },
 
-            changeDept(){
-                axios.get("{:url('AdminOrganize/changeDept')}",{
-                    params:{
-                        user_id:this.user_id,
-                        dept_id:this.user_dept
-                    }
-                }).then((res)=>{
+            changeDept(){ 
+
+                var params = this.user_form;
+                delete params.job_option;
+
+                params.dept_id =  Array.isArray(params.dept_id) ? params.dept_id[params.dept_id.length - 1] :  params.dept_id;
+
+                if(!params['real_name']){ this.$message('真实姓名不能为空');return false; }
+                if(!params['dept_id']){ this.$message('部门不能为空');return false; }
+                if(!params['job_id']){ this.$message('岗位不能为空');return false; }
+
+                axios.post("{:url('AdminOrganize/changeDept')}",params).then((res)=>{
                     if(res.data){
                         this.$message({
                             type: 'success',
@@ -543,6 +613,11 @@
 
 
         },
+        computed: {
+            selDept(){
+                return  Array.isArray(this.user_form.dept_id) ? this.user_form.dept_id[this.user_form.dept_id.length - 1] :  this.user_form.dept_id;
+            }
+        },
         created() {
             this.getTree(0);
             this.getMain({
@@ -551,6 +626,34 @@
             },1);
         },
         watch: {
+            selDept(newV,oldV){
+
+                axios.get("{:url('portal/index/getJob')}",{
+                    params:{
+                        dept_id:newV
+                    }
+                }).then((res)=>{
+                    this.user_form.job_option= res.data;
+
+                    var changeFlag = true;
+
+                    for(var i=0;i<this.user_form.job_option.length;i++){
+
+                        if(this.user_form.job_option[i].id == this.user_form.job_id){
+                            changeFlag = false;
+                            break;
+                        }
+
+                    }
+
+                    if(changeFlag){
+                        this.user_form.job_id = '';
+                    }
+
+                })
+
+            },
+
             filterText(val) {
                 this.$refs.tree.filter(val);
             },
