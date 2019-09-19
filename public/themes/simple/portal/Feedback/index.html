@@ -39,10 +39,10 @@
                     <img src="__STATIC__/images/my_msg.jpg" alt="" class="part-img">
                 </p>
                 <div class="list">
-                    <php> $user_info = session('user_info','','portal');</php>
+                    <php>$user_info = session('user_info','','portal');</php>
                     <ul>
                         <li><a href="">姓名：{$user_info['user_nickname']}</a></li>
-                        <li><a href="">岗位：{$user_info['jop']}</a> </li>
+                        <li><a href="">岗位：{$user_info['jop'] ? $user_info['jop'] : '空'}</a> </li>
                         <li><a href="">机构：{$user_info['part']}</a> </li>
                         <li><a href="">店铺：{$user_info['dept']}</a> </li>
                     </ul>

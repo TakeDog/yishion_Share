@@ -32,9 +32,18 @@ class IndexController extends HomeBaseController
         $operateConfig = new OperateConfig();
         $infoList = Db::name("WorkInfo") -> order("date desc") -> limit(0,5) -> select();
         
+        //侧边栏信息
+        $asideData = array(
+            "culture"=>Db::name("IndexAside") -> where('block',1) -> order('sort,date desc') -> limit(0,5) -> select(), //企业文化
+            "notify"=>Db::name("IndexAside") -> where('block',2) -> order('sort,date desc') -> limit(0,5) -> select(),  //内部通知
+            "rank" => Db::name("IndexAside") -> where('block',3) -> order('sort,date desc') -> limit(0,5) -> select()  //内部通知
+        );
+
         $this -> assign("ConfigUI",$operateConfig -> getConfig());
         $this -> assign('infoList',$infoList);
+        $this -> assign("asideData",$asideData);
         $this -> assign('user_info',session("user_info",'','portal'));
+
         return $this -> fetch();
 
     }

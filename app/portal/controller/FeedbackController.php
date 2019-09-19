@@ -8,6 +8,7 @@ use cmf\controller\HomeBaseController;
 class FeedbackController extends HomeBaseController{
 
    public function index(){
+    
         return $this -> fetch();
    }
 

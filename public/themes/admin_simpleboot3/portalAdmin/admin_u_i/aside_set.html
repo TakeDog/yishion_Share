@@ -1,0 +1,190 @@
+<layout name="public@layout" />
+
+<style>
+    .el-upload__input{display: none !important;}
+    .table-striped tr th{width:100px;}
+    .table-striped>tbody>tr>td{vertical-align: middle;}
+    .el-upload-list{text-align: left;}
+    i.file_edit{cursor: pointer;margin-right: 20px;}
+    i.file_edit:hover{color:#409EFF;}
+</style>
+
+<div class="container-fluid" id="app">
+    <el-breadcrumb separator-class="el-icon-arrow-right" style="margin:30px;">
+        <el-breadcrumb-item>首页</el-breadcrumb-item>
+        <el-breadcrumb-item>界面设置</el-breadcrumb-item>
+        <el-breadcrumb-item>侧边栏设置</el-breadcrumb-item>
+    </el-breadcrumb>
+    <el-tabs tab-position="left" style="height: 750px;" v-model="block" >
+
+        <el-tab-pane label="企业文化" name="1">
+            <block-content :table-data="tableData" :block="block"  @p_data="getTableData" @del_file="deleteItem" @edt_item="edtData" ></block-content>
+        </el-tab-pane>
+
+        <el-tab-pane label="内部通知" name="2">
+            <block-content :table-data="tableData" :block="block"  @p_data="getTableData" @del_file="deleteItem" @edt_item="edtData" ></block-content>
+        </el-tab-pane>
+
+        <el-tab-pane label="龙虎榜单" name="3">
+            <block-content :table-data="tableData" :block="block"  @p_data="getTableData" @del_file="deleteItem" @edt_item="edtData"></block-content>
+        </el-tab-pane>
+
+    </el-tabs>
+
+    
+</div>
+<template id="block_content">
+    <div>
+        <el-row :gutter="10">
+            <el-col :span="18" style="min-height: 750px;">
+                <table class="table table-striped" style="border-bottom: 2px #E4E7ED solid;">
+                    <thead>
+                        <tr><th>ID</th><th>文件名</th><th>上传时间</th><th>排序</th><th>操作</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(item,index) in tableData" :key="item.id"> 
+                            <td>{{item.id}}</td>
+                            <td>
+                                <span v-if="!item.edit">{{item.file_name}}</span> 
+                                <el-input
+                                    ref="fileName_input"
+                                    v-if="item.edit"
+                                    size="mini"
+                                    v-model="item.file_name"
+                                    @focus="temp = item.file_name"
+                                    @blur="item.edit=false;"
+                                    @keyup.enter.native="item.edit=false;$emit('edt_item','file_name',item.id,item.file_name,temp);"
+                                ></el-input>
+                                <i class="el-icon-edit file_edit pull-right" v-if="!item.edit" @click="showInput(item)"></i>
+                            </td>
+                            <td>{{item.date}}</td>
+                            <td>
+
+                                <el-input
+                                    size="mini"
+                                    v-model="item.sort"
+                                    @focus="temp = item.sort"
+                                    @blur=" $emit('edt_item','sort',item.id,item.sort,temp)"
+                                    style="width:50px;"
+                                >
+                                </el-input>
+
+                            </td>
+                            <td><a href="javascript:;" @click="$emit('del_file',item.id);">删除</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </el-col>
+            <el-col :span="6" style="min-height: 750px;border-left: 2px #E4E7ED solid;">
+                <el-upload
+                    class="upload-demo"
+                    action="{:url('AsideSetHandle')}"
+                    multiple
+                    name="aside_file[]"
+                    :data="{'block':block}"
+                    style="text-align:center;"
+                    :on-success="function(){ $emit('p_data') }"
+                    >
+                    <el-button size="small" type="primary">点击上传</el-button>
+                    <!-- <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div> -->
+                </el-upload>
+            </el-col>
+        </el-row>
+    </div>
+</template>
+
+<script>
+    var vue = {
+        el: "#app",
+        data: {
+            block:"1",
+            tableData:[],
+
+        },
+        methods: {
+
+            getTableData(){
+                axios.get("{:url('getAsideData')}",{
+                    params:{
+                        block:this.block
+                    }
+                }).then((res)=>{
+                    this.tableData = res.data;
+                    this.tableData.forEach((el,index) => {
+                        this.$set(el,'edit',false);
+                    });
+                })
+            },
+
+            deleteItem(id){
+
+                this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+
+                    axios.get("{:url('delAsideData')}",{
+                        params:{
+                            id
+                        }
+                    }).then((res)=>{
+                        if(res.data){
+                            this.getTableData();
+                            this.$messagee.success("已成功删除该文件.");
+                        }else{
+                            this.$messagee.error("删除失败!");
+                        }
+                    })
+
+                }) 
+            },
+
+            edtData(field,id,newV,oldV){
+                if(newV != oldV){
+                    axios.get("{:url('editItem')}",{
+                        params:{field,id,newV}
+                    }).then((res)=>{
+
+                        res.data ? this.$message.success("修改成功") : this.$message.error("修改失败");
+                        
+                    })
+                }
+            },
+            hidInput(index){
+                this.tableData[index].edit = false;
+            }
+        },
+        created () {
+            this.getTableData();
+        },
+        watch: {
+            "block":function(newV,oldV){
+                this.getTableData();
+            }
+        },
+        components:{
+            "block-content":{
+                template:"#block_content",
+                props:['table-data','block'],
+                data:function(){
+                    return {
+                        temp:''
+                    }
+                },
+                methods: {
+                    showInput(item){
+
+                        item.edit = true;
+                        setTimeout(()=>{
+                            this.$refs.fileName_input[0].focus();
+                        },10)
+                        
+                    }
+                },
+            }
+        },
+
+
+    }
+</script>

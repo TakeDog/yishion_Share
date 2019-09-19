@@ -45,9 +45,9 @@ class AdminUIController extends AdminBaseController{
      * 上传视频
      * @adminMenu(
      *     'name'   => '上传视频',
-     *     'parent' => 'default',
-     *     'display'=> true,
-     *     'hasView'=> true,
+     *     'parent' => 'indexVideo',
+     *     'display'=> false,
+     *     'hasView'=> false,
      *     'order'  => 1,
      *     'icon'   => '',
      *     'remark' => '上传视频',
@@ -102,4 +102,133 @@ class AdminUIController extends AdminBaseController{
             }
         }
     }
+
+
+    /**
+     * 侧边栏设置
+     * @adminMenu(
+     *     'name'   => '侧边栏设置',
+     *     'parent' => 'default',
+     *     'display'=> true,
+     *     'hasView'=> true,
+     *     'order'  => 1,
+     *     'icon'   => '',
+     *     'remark' => '侧边栏设置',
+     *     'param'  => ''
+     * )
+     */
+    public function AsideSet(){
+        return $this -> fetch();
+    }
+
+    /**
+     * 侧边栏文件上传
+     * @adminMenu(
+     *     'name'   => '侧边栏文件上传',
+     *     'parent' => 'AsideSet',
+     *     'display'=> false,
+     *     'hasView'=> false,
+     *     'order'  => 1,
+     *     'icon'   => '',
+     *     'remark' => '侧边栏文件上传',
+     *     'param'  => ''
+     * )
+     */
+    public function AsideSetHandle(){
+
+        $files = request()->file('aside_file');
+        
+        $block = $this -> request -> param("block",0,'intval');
+        $path = "./static/upload/portal/aside";
+        foreach($files as $k => $v){
+            if($v){
+                $fileName = str_replace(strrchr( $v -> getInfo()['name'],"."),"", $v -> getInfo()['name']);
+                $info = $v->move($path);
+                if($info){
+
+                    $full_path = $path."/".str_replace('\\','/',$info->getSaveName());
+                    
+                    $affectRow = Db::name("IndexAside") -> insert(['file_name'=>$fileName,'path'=>$full_path,'date'=>date("Y-m-d H:i:s"),'block'=>$block]);
+
+                    echo $affectRow;
+
+                }else{
+                    // 上传失败获取错误信息
+                    echo $v->getError();
+                }
+            }
+        }
+
+
+        
+    }
+
+    /**
+     * 获取当前模块记录
+     * @adminMenu(
+     *     'name'   => '获取当前模块记录',
+     *     'parent' => 'AsideSet',
+     *     'display'=> false,
+     *     'hasView'=> false,
+     *     'order'  => 1,
+     *     'icon'   => '',
+     *     'remark' => '获取当前模块记录',
+     *     'param'  => ''
+     * )
+     */
+    public function getAsideData(){
+        echo json_encode(Db::name("IndexAside") -> where('block',$this -> request -> param('block',0,'intval')) -> order("sort,date desc") -> select());
+    }
+
+
+    /**
+     * 删除侧边栏的文件跟记录
+     * @adminMenu(
+     *     'name'   => '删除侧边栏的文件跟记录',
+     *     'parent' => 'AsideSet',
+     *     'display'=> false,
+     *     'hasView'=> false,
+     *     'order'  => 1,
+     *     'icon'   => '',
+     *     'remark' => '删除侧边栏的文件跟记录',
+     *     'param'  => ''
+     * )
+     */
+    public function delAsideData(){
+
+        $id = $this -> request -> param('id',0,'intval');
+        $info = Db::name("IndexAside") -> find($id);
+        $del_file_flag = unlink($info['path']);
+
+        if($del_file_flag){
+            $affectRow = Db::name("IndexAside") -> delete($id);
+            echo $affectRow;
+        }else{
+            echo 0;
+        }
+        
+    }
+
+    /**
+     * 修改记录
+     * @adminMenu(
+     *     'name'   => '修改记录',
+     *     'parent' => 'AsideSet',
+     *     'display'=> false,
+     *     'hasView'=> false,
+     *     'order'  => 1,
+     *     'icon'   => '',
+     *     'remark' => '修改记录',
+     *     'param'  => ''
+     * )
+     */
+    public function editItem(){
+
+        $params = $this -> request -> param();
+        $update_arr[$params['field']] = $params['newV'];
+        $update_arr['id'] = $params['id'];
+        $affect = Db::name("IndexAside") -> update($update_arr);
+        echo $affect;
+    }
+
 }

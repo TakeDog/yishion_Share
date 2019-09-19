@@ -7,13 +7,21 @@ class CUserModel extends Model{
 
     public  function loginVerify($user,$pwd){
 
-        $userInfo = $this -> alias('u') -> join('share_dept d','u.dept_id = d.id','LEFT') -> where("user_name",$user) -> field("u.*,d.name as dept") -> find();
+        $deptDb = model("Dept");
+
+        $userInfo = $this -> alias('u') -> join("share_dept d","u.dept_id=d.id",'LEFT') -> join('share_job j','u.job_id = j.id','LEFT') -> where("u.user_name",$user) -> field("u.*,d.name as dept,j.job as job") -> find();
+        
 
         if(!$userInfo) return 0;
 
         if($userInfo['pwd'] != MD5($pwd)) return -2;
 
         if($userInfo['user_status'] == 0) return -1;
+
+        //添加机构信息
+        $deptPID = $deptDb -> getFirstP($userInfo['dept_id']);
+        $partData = $deptDb -> find($deptPID);
+        $userInfo['part'] = $partData['name'];
 
         // 定义存session时 需要删除的个人信息
         $unField  = ['pwd','salt','last_login_ip','last_login_time','user_status'];
@@ -97,4 +105,29 @@ class CUserModel extends Model{
         return $action_list;
     }
    
+    public function getUserInfo($id=0){
+
+        $deptDb = new DeptModel();
+
+        if($id){
+
+            $main = $this -> alias('u') -> join("share_dept d","u.dept_id=d.id",'LEFT') -> join('share_job j','u.job_id = j.id','LEFT') -> field("u.id,u.user_name,u.user_nickname,u.avatar,u.user_status,u.super,u.user_email,u.mobile,u.create_time,u.real_name,u.dept_id,u.job_id,d.name as dept,j.job as job") -> find($id);
+            $deptPID = $deptDb -> getFirstP($main['dept_id']);
+            $partData = $deptDb -> find($deptPID);
+            $main['part'] = $partData['name'];
+
+        }else{
+
+            $main = $this -> alias('u') -> join("share_dept d","u.dept_id=d.id",'LEFT') -> join('share_job j','u.job_id = j.id','LEFT') -> where('u.id',$id) -> field("u.id,u.user_name,u.user_nickname,u.avatar,u.user_status,u.super,u.user_email,u.mobile,u.create_time,u.real_name,u.dept_id,u.job_id,d.name as dept,j.job as job") -> select();
+
+            foreach($main as $k => $v){
+                $deptPID = $deptDb -> getFirstP($v['dept_id']);
+                $partData = $deptDb -> find($deptPID);
+                $main[$k]['part'] = $partData['name'];
+            }
+
+        }
+        return $main;
+    }
+
 }
