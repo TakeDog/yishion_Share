@@ -286,6 +286,13 @@ ul,li{
                             }
                         });
                     }else{
+                        if(this.fileList.length > 10){                 //一次上传不能超过10个
+                            this.$message({
+                                message: "一次上传不能超过10个文件！！！",
+                                type: 'warning'
+                            });
+                            return false;
+                        }
                         this.uploadModal = true;
                         this.addModal = false;
                         if(this.fileList.length === 0){
@@ -401,14 +408,14 @@ ul,li{
                     this.fileList = fileList;
                 },
                 beforeUpload(file) {
-                    const isLt2M = file.size / 1024 / 1024 < 200     //这里做文件大小限制
-                    if(!isLt2M) {
+                    let isLt200M = file.size / 1024 / 1024 < 200     //这里做文件大小限制
+                    if(!isLt200M) {
                         this.$message({
                             message: '上传文件大小不能超过 200MB!',
                             type: 'warning'
                         });
+                        return false;
                     }
-                    return isLt2M;
                 },
                 // updateDel(item){
                 //     item.del = item.del==0?1:0;

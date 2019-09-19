@@ -9,6 +9,61 @@ use app\common\OperateConfig;
 
 class IndexController extends HomeBaseController
 {
+    
+    public function online(){
+        $login_id = session('login_id','','portal');
+        $operateConfig = new OperateConfig();
+        $config = $operateConfig -> getConfig();
+        $id = getUser('id');
+
+        $protalOnline = null;
+        try {
+            $protalOnline = $config -> protalOnline;
+        } finally{
+            if($protalOnline == null){
+                $protalOnline = [array('id'=>$id,'login_id'=>$login_id)];
+            }else{
+                $status = true;
+                foreach ($protalOnline as $k => $v) {
+                    if($v -> id == $id){
+                        $status = false;
+                    }
+                }
+                if($status){
+                    $protalOnline[] = array('id'=>$id,'login_id'=>$login_id);
+                }
+            }
+            $config -> protalOnline = $protalOnline;
+            $operateConfig -> setConfig($config);
+            return count($protalOnline);
+        }
+    }
+    
+    public function outline(){
+        $operateConfig = new OperateConfig();
+        $config = $operateConfig -> getConfig();
+        $id = getUser('id');
+
+        $protalOnline = null;
+        try {
+            $protalOnline = $config -> protalOnline;
+        } finally{
+            if($protalOnline != null){
+                foreach ($protalOnline as $k => $v) {
+                    if($v -> id == $id){
+                        Db::name("c_user_login_total")->where('id',$v -> login_id)->update(['last_logout_time'=>time()]);
+                        array_splice($protalOnline, $k, 1);
+                    }
+                }
+            }else{
+                $protalOnline = [];
+            }
+            $config -> protalOnline = $protalOnline;
+            $operateConfig -> setConfig($config);
+            return count($protalOnline);
+        }
+    }
+
     public function index(){
         return $this->fetch();
     }
@@ -105,12 +160,20 @@ class IndexController extends HomeBaseController
         if(-1 === $info)    return json(array('code'=>0,'msg'=>'账号被禁用'));
         if(-2 === $info)    return json(array('code'=>0,'msg'=>'密码不正确'));
 
-        if(1 == $info)      return json(array('code'=>1,'msg'=>'登录成功','url'=>'staff'));
-    
+        if(1 == $info){
+            $user['user_id'] = getUser('id');
+            $user['last_logout_time'] = null;
+            $user['login_time'] = date("Y-m-d H:i:s");
+            $login_id = Db::name("c_user_login_total") -> insertGetId($user);
+            session('login_id',$login_id,'portal');
+            $this -> online($login_id);
+            return json(array('code'=>1,'msg'=>'登录成功','url'=>'staff'));
+        }
 
     }
     //注销
     public function logout(){
+        $this -> outline();
         session(null,'portal');
         $this -> redirect("login");
     }

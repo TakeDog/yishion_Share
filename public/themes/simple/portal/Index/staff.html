@@ -42,7 +42,7 @@
                     <div class="full-head clearfix">
                         <p>
                             <a href="#" class="navbar-link color-b">帮助</a> |
-                            <a href="#" class="navbar-link color-b">在线人数:200</a> |
+                            <a href="#" class="navbar-link color-b">在线人数:{{num}}</a> |
                             <el-dropdown placement="bottom"> 
                                 <span class="el-dropdown-link" style="color:#fff;">
                                     消息
@@ -112,31 +112,42 @@
 
         </el-container>
     </div>
+    <script>
+
+        $(function(){
+           $(".heightfull").css("height",$(document).height());
+            $(".navbar-nav").children("li").click(function(){
+                $(this).siblings("li").removeClass("active");
+                $(this).addClass("active");
+            })
+        })
+        
+    
+        
+    
+        var vm = new Vue({
+            el: "#app",
+            data: {
+                num: 0
+            },
+            mounted() {
+                window.addEventListener('load', e => this.onload(e))
+                window.addEventListener('beforeunload', e => this.beforeunloadHandler(e))
+            },
+            methods: {
+                onload(e){
+                　　axios.post("{:url('online')}").then((res) => {
+                        this.num = res.data;
+                    });
+                },
+                beforeunloadHandler(e){
+                　　axios.post("{:url('outline')}").then((res) => {
+                    });
+                }
+            },
+        });
+    </script>
 </body>
 
 </html>
 
-<script>
-
-    $(function(){
-       $(".heightfull").css("height",$(document).height());
-        $(".navbar-nav").children("li").click(function(){
-            $(this).siblings("li").removeClass("active");
-            $(this).addClass("active");
-        })
-    })
-
-    
-
-    
-
-    var vm = new Vue({
-        el: "#app",
-        data: {
-
-        },
-        methods: {
-        
-        },
-    });
-</script>
