@@ -5,7 +5,7 @@ use think\Model;
 
 class DeptModel extends Model{
 
-    //获取所选部门对应的机构(pid=0);
+    //获取所选部门对应的机构id(pid=0);
     public function getFirstP($id){
         $data = $this -> find($id);
         if($data['pid'] == 0){
@@ -15,5 +15,18 @@ class DeptModel extends Model{
             return $this -> getFirstP($pData['id']);
         }
     }
+
+    //获取所选部门对应的机构(pid=0);
+    public function getFirstAllP($id){
+        $data = $this -> find($id);
+        if($data['pid'] == 0){
+            return $data;
+        }else{
+            $pData = $this -> where('id',$data['pid']) -> find();
+            return $this -> getFirstAllP($pData['id']);
+        }
+    }
+    
+
 
 }

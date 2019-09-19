@@ -10,10 +10,16 @@
 Vagrantfile
 .vagrant
 /data/runtime
+/data/route
+/data/lang
 /public/static/video
 /public/static/PDF
 _gsdata_
 /data/config/*
+<<<<<<< Updated upstream
 !/data/config/ConfigUI.json
 /data/lang
 /data/route
+=======
+!/data/config/ConfigUI.json
+>>>>>>> Stashed changes
