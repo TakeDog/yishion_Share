@@ -70,12 +70,21 @@ class AdminUIController extends AdminBaseController{
                 
                 switch($video_type){
                     case 1: //纯工作视频
+                        unlink($configObj -> IndexVideo -> work);
                         $configObj -> IndexVideo -> work = $filePath.'/'.$save_name;
                     break;
                     case 2: //纯生活视频
+                        unlink($configObj -> IndexVideo -> live);
                         $configObj -> IndexVideo -> live = $filePath.'/'.$save_name;
                     break;
                     case 3: //纯工作&纯生活
+                        if($configObj -> IndexVideo -> work == $configObj -> IndexVideo -> live){
+                            unlink($configObj -> IndexVideo -> work);
+                        }else{
+                            unlink($configObj -> IndexVideo -> work);
+                            unlink($configObj -> IndexVideo -> live);
+                        }
+                        
                         $configObj -> IndexVideo -> work = $filePath.'/'.$save_name;
                         $configObj -> IndexVideo -> live = $filePath.'/'.$save_name;
                     break;
