@@ -1,12 +1,41 @@
 <layout name="public@layout" />
+<link rel="stylesheet" href="__STATIC__/lib/font-awesome-4.7.0/css/font-awesome.min.css">
 <style>
     .part{margin:20px 0;}
     .part-img{width: 100%;max-width: 204px;}
     .list{border:1px dashed #CCC;padding:10px 20px;}
-    ul{padding:0;margin:0;list-style: none;min-height: 200px;font-size:16px;}    
+    ul{padding:0;margin:0;list-style: none;min-height: 200px;font-size:16px;}
+    .edit_btn:hover{cursor: pointer;color:#949494;}
 </style>
 
 <div class="container-fluid" id="app" style="background: #FFF;margin-bottom:120px;">
+    
+    <!-- <el-dialog title="修改个人信息" :visible.sync="editInfoModal" width="30%">
+        <el-form ref="editInfoForm" :rules="editInfoFormRules" :model="editInfoForm" label-width="80px">
+            <el-form-item label="昵称">
+                <el-input v-model="editInfoForm.user_nickname" size="small"></el-input>
+            </el-form-item>
+            <el-form-item label="手机号">
+                <el-input type="number" v-model="editInfoForm.mobile" size="small"></el-input>
+            </el-form-item>
+            <div style="text-align: right;" v-if="!editInfoForm.editPwd">
+                <el-link type="primary" :underline="false" @click="editInfoForm.editPwd=true">修改密码</el-link>
+            </div>
+            <el-form-item label="原密码" v-if="editInfoForm.editPwd">
+                <el-input v-model="editInfoForm.pwd" size="small"></el-input>
+            </el-form-item>
+            <transition name="el-fade-in">
+                <el-form-item label="新密码" v-if="editInfoForm.editPwd">
+                    <el-input v-model="editInfoForm.newPwd" size="small"></el-input>
+                </el-form-item>
+            </transition>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="editInfo" size="mini">确 定</el-button>
+            <el-button @click="editInfoModal=false;" size="mini">取 消</el-button>
+        </span>
+    </el-dialog> -->
+
     <el-row :gutter="20">
         <el-col :span="4" class="part" style="margin-left: 8.33%;">
             <h3 class="text-center margin0">我有话说</h3>
@@ -40,6 +69,11 @@
                 </p>
                 <div class="list">
                     <php>$user_info = session('user_info','','portal');</php>
+                    <div style="float: right;">
+                        <el-tooltip class="item" effect="dark" content="编辑个人信息" placement="top">
+                            <i class="fa fa-pencil-square-o edit_btn" style="font-size: 15px;" aria-hidden="true" @click="infoModal"></i>
+                        </el-tooltip>
+                    </div>
                     <ul>
                         <li><a href="">姓名：{$user_info['user_nickname']}</a></li>
                         <li><a href="">岗位：{$user_info['jop'] ? $user_info['jop'] : '空'}</a> </li>
@@ -79,10 +113,56 @@
     var vue = {
         el:"#app",
         data:{
-
+            editInfoModal: false,
+            editInfoForm:{
+                id: '',
+                user_nickname: "{$user_info['user_nickname']}",
+                editPwd: false,
+                pwd: "",
+                newPwd: "",
+                mobile: "{$user_info['mobile']}"
+            },
+            editInfoFormRules: {
+                pwd: [
+                    { required: true, message: '请输入原密码', trigger: 'blur' }
+                ],
+                newPwd: [
+                    { required: true, message: '请输入新密码', trigger: 'change' }
+                ]
+            }
         },
         methods: {
-            
+            infoModal(){
+                // this.editInfoModal = true;
+                // let user_info = JSON.parse('{$user_info|json_encode=true}');
+                // this.editInfoForm.id = user_info.id;
+                // this.editInfoForm.user_nickname = user_info.user_nickname;
+                // this.editInfoForm.mobile = user_info.mobile;
+                // this.editInfoForm.editPwd = false;
+                this.$confirm('即将跳转到个人信息页面', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    window.location.href = "{:url('editInfo')}";
+                }).catch(() => {
+                    
+                });
+            },
+            // editInfo(){
+            //     console.log(this.editInfoForm);
+            //     axios.post("{:url('editInfo')}",this.editInfoForm).then((res)=>{
+            //         console.log(res.data.msg);
+            //         if(res.data.code === 1001){
+            //             // location.reload();
+            //         }else if(res.data.code === 1002){
+            //             this.$message({
+            //                 message: res.data.msg,
+            //                 type: 'error'
+            //             });
+            //         }
+            //     });
+            // }
         },
     }
 </script>

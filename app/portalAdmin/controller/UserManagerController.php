@@ -37,7 +37,7 @@ class UserManagerController extends AdminBaseController{
         -> join('share_job j','u.job_id=j.id','left')
         -> field("t.id,t.last_logout_time,UNIX_TIMESTAMP(t.login_time) AS login_time_stamp,t.login_time,u.user_name,u.user_nickname,u.real_name,u.user_email,u.mobile,d.name,j.job,cr.role_name,d.id did")
         -> where($where)
-        -> order('id') -> select();
+        -> order('t.login_time desc') -> select();
         $PageHelper = new PageHelper($data,$param['index'],$param['size']);
         $res = $PageHelper -> pageInfo();
 
