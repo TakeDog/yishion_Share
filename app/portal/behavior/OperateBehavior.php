@@ -6,7 +6,7 @@ use think\Controller;
 
 class OperateBehavior extends Controller{
     
-    // 定义需要排除的权限路由
+    // 定义需要排除的权限路由,全部小写
     protected $exclude = [
         'portal/index/index',
         'portal/index/login',

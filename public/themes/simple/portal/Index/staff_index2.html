@@ -5,7 +5,7 @@
 .el-carousel__item h3 {color: #FFF;font-size: 16px;margin: 0;position: absolute;left: 45%;bottom:10%;}
 .carousel-img{width:100%;height: 100%;}
 .activity-item{min-height: 140px;}
-.pink-link{padding: 8px;background-color: #F5B6A7;color: #fff;text-align: center;border-radius: 3px;}
+.pink-link{padding: 8px;background-color: #d44747;color: #fff;text-align: center;border-radius: 3px;}
 .pink-link > a{color:#FFF;}
 </style>
 
@@ -31,9 +31,9 @@
                             <a href="#" class="a-white" style="float: right;">更多</a>
                         </div>
                         <div class="activity-item">
-                            <p><a href="__STATIC__/images/index_img/lh1.png" target="_blank">1.中秋业绩同比增加幅度休闲前十大店铺（含自营）</a></p>
-                            <p><a href="__STATIC__/images/index_img/lh2.png" target="_blank">2.中秋业绩同比增加幅度Y2前十大店铺</a></p>
-                            <p><a href="__STATIC__/images/index_img/lh3.png" target="_blank">3.中秋业绩同比增加幅度前十大客户</a></p>
+                            <foreach name="asideData['rank']" item="rank" key="k">
+                                <p><a href="/{$rank['path']}" target="_blank">{$k+1}.{$rank['file_name']}</a></p>
+                            </foreach>
                         </div>
                     </el-card>
                     
@@ -79,9 +79,9 @@
                             <a href="#"  class="a-white"  style="float: right;">更多</a>
                         </div>
                         <div class="activity-item">
-                            <p><a href="/static/video/index_alide/10a7286b0b29746bf0a49f3eb943b956.mp4" target="_blank">1.以纯广东办事处-深圳拓展</a></p>
-                            <p><a href="/static/video/index_alide/91867a53484cba6f11b66f7272100386.mp4" target="_blank">2.以纯广东办事处-深圳拓展</a></p>
-                            <p><a href="/static/video/index_alide/cf895b55e027c7be50d6aa2aa19155ee.mp4" target="_blank">3.以纯广东办事处-深圳拓展</a></p>
+                            <foreach name="asideData['culture']" item="culture" key="k">
+                                <p><a href="/{$culture['path']}" target="_blank">{$k+1}.{$culture['file_name']}</a></p>
+                            </foreach>
                         </div>
                     </el-card>
                     <el-card class="aside-item main-color-header" id="myMsg">
@@ -90,7 +90,9 @@
                             <a href="#"  class="a-white" style="float: right;">更多</a>
                         </div>
                         <div class="activity-item">
-                            <p><a href="#">1.无</a></p>
+                            <foreach name="asideData['notify']" item="notify" key="k">
+                                <p><a href="/{$notify['path']}" target="_blank">{$k+1}.{$notify['file_name']}</a></p>
+                            </foreach>
                         </div>
                     </el-card>
                 </el-aside>
