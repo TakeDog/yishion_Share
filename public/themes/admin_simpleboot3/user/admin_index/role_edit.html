@@ -1,0 +1,42 @@
+<include file="public@header"/>
+</head>
+<body>
+<div class="wrap js-check-wrap">
+    <ul class="nav nav-tabs">
+        <li><a href="{:url('adminIndex/index')}">{:lang('USER_INDEXADMIN_INDEX')}</a></li>
+        <li class="active"><a>角色管理</a></li>
+    </ul>
+    <form class="form-horizontal js-ajax-form margin-top-20" action="{:url('adminIndex/addRolesPost')}" method="post">
+        <div class="form-group">
+            <label class="col-sm-2 control-label"><span class="form-required">*</span>角色</label>
+            <div class="col-md-6 col-sm-10">
+                <foreach name="all_roleIds" item="vo">
+                    <label class="checkbox-inline">
+                        <php>$role_id_checked=in_array($vo['id'],$current_roleIds)?"checked":"";</php>
+                        <input value="{$vo.id}" type="checkbox" name="role_id[]" {$role_id_checked} >{$vo.role_name}
+                    </label>
+                </foreach>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <php> 
+                    $back= empty(input('back')) ? false : true;
+                    $url = $back ? url('portalAdmin/AdminOrganize/index') : url('adminIndex/index');
+                </php>
+
+                <if condition="$back"> 
+                    <input type="hidden" name="back" value="og"/>
+                </if>
+
+                <input type="hidden" name="u_id" value="{:input('param.u_id')}"/>
+                <button type="submit" class="btn btn-primary js-ajax-submit">{:lang('SAVE')}</button>
+                
+                <a class="btn btn-default" href="{$url}">{:lang('BACK')}</a>
+            </div>
+        </div>
+    </form>
+</div>
+<script src="__STATIC__/js/admin.js"></script>
+</body>
+</html>

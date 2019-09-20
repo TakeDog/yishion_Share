@@ -1,0 +1,694 @@
+<layout name="public@layout" />
+
+<style>
+    
+    body{background: #f6f6f6;}
+    .el-tree{font-size: 14px;}
+    .set_input{text-align: center;margin-top:10px;}
+    .el-tree-node__content{height:35px;position: relative;}
+    .set_input .el-input__inner{height: 32px;}
+    .set_input .el-input__icon{line-height: 32px;}
+    .main-right{padding:9px;border-bottom:1px solid #DADADA;display: flex;}
+    .main-right span{font-size: 18px;line-height: 32px;}
+
+    .table th{text-align: center;}
+
+    .search .el-input__inner{height:32px;}
+    .search .el-input__icon{line-height:32px;}
+    /*定义滚动条样式（高宽及背景）*/ 
+    ::-webkit-scrollbar { 
+        width: 6px;   /* 滚动条宽度， width：对应竖滚动条的宽度  height：对应横滚动条的高度*/
+        background: #f6f6f6;
+    } 
+    
+    /*定义滑块 样式*/ 
+    ::-webkit-scrollbar-thumb { 
+        border-radius: 3px; 
+        height: 100px;    /* 滚动条滑块长度 */
+        background-color: #ccc; 
+    }
+
+</style>
+
+<div class="container" id="app" >
+
+    <div class="custom-tree-container">
+
+            <el-row style="border:1px solid #DADADA;margin:30px 0;background: #FFF;">
+                <el-col :span="5" style="padding-top:10px;height: 800px;border-right: 1px solid #DADADA;overflow-y: auto;">
+                    <div class="grid-content bg-purple">
+                        <div class="block">
+                            
+                            <p style="font-size:16px;padding:0 0 10px 10px;line-height: 30px;border-bottom: 1px solid #DADADA;">
+                                组织架构
+                                <el-button type="primary" plain size="mini" class="pull-right" style="margin-right: 10px;" @click="dialogVisible=true;append_dept_pid=0;operate='add'">添加部门</el-button>
+                            </p>
+                            <div class="set_input">
+                                <el-input placeholder="输入关键字进行过滤" v-model="filterText" style="width: 95%;" >
+                                    <i slot="prefix" class="el-input__icon el-icon-search"></i>
+                                </el-input>
+                            </div>
+                
+                            <el-tree
+                                :data="tree_data"
+                                node-key="id"
+                                :props="props"
+                                :expand-on-click-node="false"
+                                :filter-node-method="filterNode"
+                                ref="tree"
+                                :default-expanded-keys="expandedKeys"
+                                @node-expand='pushKey'
+                                @node-collapse='removeKey'
+                                @node-click="getMain"
+                            >
+                            <span class="custom-tree-node" slot-scope="{ node, data }">
+                                <span>{{ node.label }}</span>
+                                <a href="#" @click.stop="return false;" style="position: absolute;right:15px;">
+                                    <el-dropdown trigger="click" placement="bottom"  @visible-change="curId =  data.id;">
+                                        
+                                        <div class="el-dropdown-link">
+                                            <i class="el-icon-arrow-down el-icon-more"></i>
+                                        </div>
+
+                                        <el-dropdown-menu slot="dropdown">
+                                            <el-dropdown-item > <span @click="dialogVisible=true;append_dept_pid=data.id;operate='add'">添加子部门</span> </el-dropdown-item>
+                                            <el-dropdown-item > <span @click="dialogVisible=true;editId=data.id;operate='edit';deptInput=data.name">修改名称</span></el-dropdown-item>
+                                            <el-dropdown-item ><span @click="setSupInit(data)">设置上级</span></el-dropdown-item>
+                                            <el-dropdown-item > <span @click="remove(data.id)">删除&emsp;&emsp;&emsp;</span></el-dropdown-item>
+                                            <el-dropdown-item  :disabled='true'>部门ID：{{curId}}</el-dropdown-item>
+                                            <el-dropdown-item  :disabled='true' v-if='data.type==1'>结构类型：普通</el-dropdown-item>
+                                            <el-dropdown-item  :disabled='true' v-if='data.type==2'>结构类型：营运支持</el-dropdown-item>
+                                            <el-dropdown-item  :disabled='true' v-if='data.type==3'>结构类型：店铺</el-dropdown-item>
+                                        </el-dropdown-menu>
+                                    </el-dropdown>
+                                </a>
+                            </span>
+                            </el-tree>
+                        </div>
+                    </div>
+                </el-col>
+
+                <el-col :span="19">
+                    <div>
+
+                        <div class="main-right">
+
+                            <span style="flex:1;" v-show="!searchAll">{{main_header ? main_header.name : ''}} {{'(' + pagination['total'] + '人)'}} </span> <span style="flex:1;" v-show="searchAll">全部 {{'(' + pagination['total'] + '人)'}} </span> 
+
+                            <div style="flex:2;text-align: center;">
+                                <el-input v-model="search" placeholder="在此部门搜索"  :clearable="true" class="search" style="width:133px;margin-right:20px;"></el-input>
+                                <el-input v-model="searchAll" placeholder="全局搜索"  :clearable="true" class="search" style="width:133px;"></el-input>
+                            </div>
+                            
+                            <div style="margin:0;line-height: 32px;flex:2;text-align: center;">
+                                <p style="margin:0;" v-show="!searchAll">
+                                    <a href="" @click.prevent="dialogVisible=true;editId=main_header.id;operate='edit';deptInput=main_header.name">修改名称</a> | 
+                                    <a href="" @click.prevent="dialogVisible=true;append_dept_pid=main_header.id;operate='add'">添加子部门</a> | 
+                                    <a href="" @click.prevent="setSupInit(main_header,'sup')">设置上级部门</a>
+                                </p>
+                            </div>
+                            
+                        </div>
+
+                        <table class="table table-striped" style="text-align: center;margin-bottom: 0;border-bottom:1px solid #DADADA;" v-show="pagination['total']">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>用户名</th>
+                                    <th>姓名</th>
+                                    <th>电话</th>
+                                    <th>部门</th>
+                                    <th>岗位</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="item in mainData" :key="item.id">
+                                    <td>{{item.id}}</td>
+                                    <td>{{item.user_name}}</td>
+                                    <td>{{item.real_name}}</td>
+                                    <td>{{item.mobile}}</td>
+                                    <td>{{item.dept}}</td>
+                                    <td>{{item.job ? item.job : '无'}}</td>
+                                    <td>
+                                        <span class="label label-warning" v-if="item.user_status == 0">未验证</span>
+                                        <span class="label label-success" v-if="item.user_status == 1">正常</span>
+                                        <span class="label label-danger" v-if="item.user_status == 2">拉黑</span>
+                                    </td>
+                                    <td>
+                                        <a href="#" @click.prevent="UserDeptInit(item)">修改信息</a> |
+                                        <a href="#" @click.prevent="delUser(item.id)" >删除</a> |
+                                        <a :href="'/user/admin_index/roleedit/back/og/u_id/'+ item.id" >角色管理</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div style="text-align: center;margin:25px 0 10px;" v-show="pagination['total']">
+                            <el-pagination
+                                background
+                                layout="prev, pager, next"
+                                :page-size="pagination['size']"
+                                :total="pagination['total']"
+                                :current-page="pagination['current']"
+                                @current-change = "changePage"
+                            >
+                            </el-pagination>
+                        </div>
+                        
+                        <p style="text-align:center;color:#ccc;margin-top:100px;" v-show="!pagination['total']">暂无数据</p>
+
+                    </div>
+                </el-col>
+
+            </el-row>
+
+    </div>
+    <el-dialog
+        title="提示"
+        :visible.sync="dialogVisible"
+        width="40%"
+    >
+        
+        <!-- 修改用户信息 -->
+        <div v-if="operate=='user_dept'">
+            <el-row>
+                <el-col :span="8" style="text-align: right;">
+                    <span style="line-height: 40px;">真实姓名：</span>
+                </el-col>
+                <el-col :span="10">
+                    <el-input v-model="user_form.real_name" placeholder="请输入内容"></el-input>
+                </el-col>
+            </el-row>
+            <el-row style="margin-top:10px;">
+                <el-col :span="8" style="text-align: right;">
+                    <span style="line-height: 40px;">部门名称：</span>
+                </el-col>
+                <el-col :span="10">
+
+                    <el-cascader
+                    v-model="user_form.dept_id"
+                    :options="user_dept_option"
+                    :props="{ checkStrictly: true ,label:'name',value:'id',children:'child'}"
+                    :show-all-levels='false'
+                    clearable
+                    style="width:100%;"></el-cascader>
+
+                </el-col>
+            </el-row>
+
+            <el-row style="margin-top:10px;">
+                <el-col :span="8" style="text-align: right;">
+                    <span style="line-height: 40px;">岗&nbsp;&nbsp;位：</span>
+                </el-col>
+                <el-col :span="10">
+
+                    <el-select v-model="user_form.job_id" placeholder="请选择" style="width:100%;">
+
+                        <el-option
+                            v-for="item in user_form.job_option"
+                            :key="item.id"
+                            :label="item.job"
+                            :value="item.id"
+                        ></el-option>
+
+                    </el-select>
+
+                </el-col>
+            </el-row>
+
+        </div>
+        
+
+        <el-row :gutter="20" style="margin-bottom:10px;" v-if="operate != 'user_dept'">
+            <el-col :span="8" style="text-align: right;">
+                <span style="line-height: 40px;">部门名称：</span>
+            </el-col>
+            <el-col :span="10">
+
+                <input type="text" ref="deptEle" class="form-control" v-show="operate=='add'">
+
+                <input type="text" v-model="deptInput" class="form-control" v-show="operate=='edit'">
+
+                <el-select v-model="supDept" placeholder="请选择" filterable v-show="operate=='setSup'">
+                    <el-option
+                        v-for="item in option"
+                        :key="item.id"
+                        :label="item.html + item.name"
+                        :value="item.id"
+                        :disabled="item.disabled">
+                    </el-option>
+                </el-select>
+
+            </el-col>
+
+        </el-row>
+        
+        
+
+        <span slot="footer" class="dialog-footer">
+            <el-button @click="dialogVisible = false">取消操作</el-button>
+            
+            <el-button type="primary" @click="append" v-show="operate=='add'">确定增加</el-button>
+
+            <el-button type="primary" @click="edit" v-show="operate=='edit'">确定修改</el-button>
+
+            <el-button type="primary" @click="setSup" v-show="operate=='setSup'">确定修改</el-button>
+
+            <el-button type="primary" @click="changeDept" v-show="operate=='user_dept'">确定修改</el-button>
+
+        </span>
+
+    </el-dialog>
+</div>
+
+<script>
+    var vue = {
+        
+        el:"#app",
+        data:{
+            dialogVisible:false,
+            filterText:'',
+            props:{ 
+                children: 'child',
+                label: 'name'
+            },
+            tree_data:[],
+            append_dept_pid:0,
+            expandedKeys:[],
+            editId:null,
+            operate:'',
+            deptInput:'',
+            option:'',
+            supDept:0,
+            curId:'',
+            main_header:null,
+            mainData:[],
+            pagination:[],
+            user_id:0,
+            user_dept_option:'',
+            user_dept:1,
+            search:'',
+            searchAll:'',
+            user_form:{
+                id:'',
+                real_name:'',
+                dept_id:'',
+                job_option:[],
+                job_id:''
+            }
+        },
+        methods: {
+
+            getTree(id){
+
+                    axios.get("{:url('AdminOrganize/getTree')}").then((res)=>{
+                        this.tree_data = res.data;
+                        if(id){
+                            this.expandedKeys.push(id);
+                        }
+                    })
+                
+            },
+
+            append() {
+                axios.get("{:url('AdminOrganize/append')}",{
+                    params:{
+                        pid:this.append_dept_pid,
+                        name:this.$refs.deptEle.value
+                    }
+                }).then((res)=>{
+
+                    if(res.data){
+                        this.$message({
+                            showClose: true,
+                            message: '新增部门成功',
+                            type: 'success',
+                            duration:2000
+                        });
+                        this.getTree(false);
+                    }else{
+                        this.$message({
+                            showClose: true,
+                            message: '新增部门失败',
+                            type: 'error',
+                            duration:2000
+                        });
+                    }
+                    this.dialogVisible = false;
+                })
+            },
+
+            edit(){
+                axios.get("{:url('AdminOrganize/edit')}",{
+                    params:{
+                        id:this.editId,
+                        name:this.deptInput
+                    }
+                }).then((res)=>{
+                    if(res.data){
+
+                        this.$message({
+                            showClose: true,
+                            message: '部门修改成功',
+                            type: 'success',
+                            duration:2000
+                        });
+
+                        if(this.main_header['id'] == this.editId) { this.main_header['name'] = this.deptInput }
+
+                        this.getTree(false);
+
+                    }else{
+                        this.$message({
+                            showClose: true,
+                            message: '部门修改失败',
+                            type: 'error',
+                            duration:2000
+                        });
+                    }
+                    this.dialogVisible = false;
+                }) 
+            },
+
+            remove(id) {
+
+                this.$confirm('此操作将永久删除该部门, 是否继续?', '提示', {
+                    confirmButtonText: '继续',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+
+                        axios.get("{:url('AdminOrganize/remove')}",{
+                            params:{
+                                id
+                            }
+                        }).then((res)=>{
+
+
+                            if(res.data.code > 0){
+                                this.$message({
+                                    type: 'error',
+                                    message: res.data.msg
+                                });
+                            }else{
+                                this.$message({
+                                    type: 'success',
+                                    message: res.data.msg
+                                });
+                                this.getTree(false);
+                            }
+                        })
+
+                        
+
+                    })
+            },
+
+            filterNode(value, data) {
+                if (!value) return true;
+                return data.name.indexOf(value) !== -1;
+            },
+
+            pushKey(data){
+                this.expandedKeys.push(data.id);
+            },
+
+            removeKey(data){
+                for(var i=0;i<this.expandedKeys.length;i++){
+                    if(data.id == this.expandedKeys[i]){
+                        this.expandedKeys.splice(i,1);
+                    }
+                }
+
+            },
+
+            setSupInit(data){
+
+                let cur_id = data.id;
+
+                axios.get("{:url('AdminOrganize/getOption')}").then((res)=>{
+                    
+                    this.setOptDis(res.data,cur_id);
+
+                    res.data.forEach( (item,index) => {
+
+                        if(item.id == cur_id) {
+
+                            if(item.pid){
+                                this.supDept = item.pid;
+                            }else{
+                                this.supDept = 0;
+                            }
+                        }
+
+                    });
+
+                    this.option = res.data;
+                    this.option.unshift({id:0,name:'作为一级部门',html:''});
+                    this.operate = 'setSup';
+                    this.editId = cur_id;
+                    this.dialogVisible = true;
+                })
+
+            },
+
+            setOptDis(arr,id){
+
+                for(let i=0;i<arr.length;i++){
+
+                    if(arr[i].id == id){
+                        arr[i].disabled = true;
+                    }
+
+                    if(arr[i].pid == id){
+                        arr[i].disabled = true;
+                        this.setOptDis(arr,arr[i].id);
+                    }
+                }
+                return arr;
+
+            },
+
+            setSup(){
+                axios.get("{:url('AdminOrganize/setSup')}",{
+                    params:{
+                        edit_id : this.editId,
+                        sup_id : this.supDept
+                    }
+                }).then((res)=>{
+                    if(res.data){
+
+                        this.$message({
+                            type: 'success',
+                            message: "设置成功"
+                        });
+                        this.getTree(0);
+
+                    }else{
+
+                        this.$message({
+                            type: 'error',
+                            message: "设置失败"
+                        });
+
+                    }
+                    this.dialogVisible = false;
+                })
+            },
+
+            getMain(data,page){
+                this.main_header = data;
+                var page = typeof page == 'number' ? page : 1;
+
+                axios.get("{:url('AdminOrganize/getMain')}",{
+                    params:{
+                        dept_id : data.id,
+                        page
+                    }
+                }).then((res)=>{
+                    this.mainData = res.data.main;
+                    this.pagination['total'] = res.data.total;
+                    this.pagination['size'] = res.data.size;
+                    this.pagination['current'] = page;
+                })
+            },
+
+            changePage(cur_page){
+               this.getMain(this.main_header,cur_page);
+               
+            },
+            delUser(user_id){
+                this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
+                    confirmButtonText: '确定删除',
+                    cancelButtonText: '取消操作',
+                    type: 'warning'
+                }).then(() => {
+
+                    axios.get("{:url('AdminOrganize/delUser')}",{
+                        params:{
+                            user_id
+                        }
+                    }).then((res)=>{
+                        if(res.data){
+                            this.$message({
+                                type: 'success',
+                                message: '删除成功!'
+                            });
+
+                            this.getMain(this.main_header,this.pagination['current']);
+
+                        }else{
+                            this.$message({
+                                type: 'error',
+                                message: '删除失败!'
+                            });
+                        }
+                    })
+
+                    
+
+                })
+            },
+            UserDeptInit(userInfo){
+                
+                axios.get("{:url('AdminOrganize/getTree')}").then((res)=>{
+                    this.dialogVisible = true;
+                    this.user_dept_option = res.data;
+                });
+
+                axios.get("{:url('portal/index/getjob')}",{params:{
+                    dept_id:this.main_header.id
+                }}).then((res)=>{
+
+                    if(res.data.length > 0){
+                        this.user_form.job_option = res.data;
+                    }else{
+                        this.user_form.job_option = [{id:0,job:'无'}]
+                    }
+
+                    this.user_form.job_id = userInfo.job_id;
+
+                });
+
+                this.user_form.real_name = userInfo.real_name;
+                this.user_form.id = userInfo.id;
+                this.user_form.dept_id = userInfo.dept_id;
+                
+
+                this.operate = "user_dept";
+            },
+
+            changeDept(){ 
+
+                var params = this.user_form;
+                delete params.job_option;
+
+                params.dept_id =  Array.isArray(params.dept_id) ? params.dept_id[params.dept_id.length - 1] :  params.dept_id;
+
+                if(!params['real_name']){ this.$message('真实姓名不能为空');return false; }
+                if(!params['dept_id']){ this.$message('部门不能为空');return false; }
+                if(!params['job_id']){ this.$message('岗位不能为空');return false; }
+
+                axios.post("{:url('AdminOrganize/changeDept')}",params).then((res)=>{
+                    if(res.data){
+                        this.$message({
+                            type: 'success',
+                            message: '修改成功!'
+                        });
+
+                        this.getMain(this.main_header,this.pagination['current']);
+
+                        this.dialogVisible = false;
+
+                    }else{
+                        this.$message({
+                            type: 'error',
+                            message: '修改失败!'
+                        });
+                    }
+                })
+            }
+
+
+        },
+        computed: {
+            selDept(){
+                return  Array.isArray(this.user_form.dept_id) ? this.user_form.dept_id[this.user_form.dept_id.length - 1] :  this.user_form.dept_id;
+            }
+        },
+        created() {
+            this.getTree(0);
+            this.getMain({
+                   id:1,
+                   name:"营销总部"
+            },1);
+        },
+        watch: {
+            selDept(newV,oldV){
+
+                axios.get("{:url('portal/index/getJob')}",{
+                    params:{
+                        dept_id:newV
+                    }
+                }).then((res)=>{
+                    this.user_form.job_option= res.data;
+
+                    var changeFlag = true;
+
+                    for(var i=0;i<this.user_form.job_option.length;i++){
+
+                        if(this.user_form.job_option[i].id == this.user_form.job_id){
+                            changeFlag = false;
+                            break;
+                        }
+
+                    }
+
+                    if(changeFlag){
+                        this.user_form.job_id = '';
+                    }
+
+                })
+
+            },
+
+            filterText(val) {
+                this.$refs.tree.filter(val);
+            },
+            search(newV,oldV){
+
+                axios.get("{:url('AdminOrganize/getMain')}",{
+                    params:{
+                        dept_id : this.main_header.id,
+                        page : 1,
+                        keyword : newV
+                    }
+                }).then((res)=>{
+                    this.mainData = res.data.main;
+                    this.pagination['total'] = res.data.total;
+                    this.pagination['size'] = res.data.size;
+                    this.pagination['current'] = 1;
+                })
+
+            },
+            searchAll(newV,oldV){
+
+                axios.get("{:url('AdminOrganize/getMain')}",{
+                    params:{
+                        page : 1,
+                        keyword : newV
+                    }
+                }).then((res)=>{
+                    this.mainData = res.data.main;
+                    this.pagination['total'] = res.data.total;
+                    this.pagination['size'] = res.data.size;
+                    this.pagination['current'] = 1;
+                })
+
+            }
+
+        },
+    };
+</script>

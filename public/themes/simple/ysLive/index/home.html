@@ -1,0 +1,216 @@
+<layout name="public@layout_live" />
+<style>
+.el-main{padding: 0;}
+.main_list .tag_div{background: #F5B6A7;font-size: 17px;font-weight: 700;padding: 5px 15px;}
+.filter{display: flex;}
+.filter .filter_item{margin: 0 2px;cursor: pointer;}
+.filter .filter_item:hover{color: #F5B6A7;}
+.post_item{margin: 20px 0;}
+.post_item .post_content{margin: 0 10px;float:left;}
+.post_item .post_content .content_item {margin-bottom: 4px;}
+.post_item .post_content .content_item .content {width: 100%;}
+.post_item .status{margin: 10px 20px;clear: both;}
+.list_item{min-height: 300px;}
+.live-container{background: #FFF;padding:0;}
+.el-main{margin:0;}
+.no-padding-card .el-card__body{padding: 0;}
+.no-padding-card .el-table__header th,.no-padding-card .el-table__header tr.el-table__row td{text-align: center;padding:5px 0;}
+.el-table__row td .cell{text-align: center;}
+.el-table__row td{padding:5px 0;}
+</style>
+<div class="container live-container" id="app">
+    <el-container>
+        <el-main>
+            <div class="main">
+                <video src="/{$ConfigUI -> IndexVideo -> live}" controls="controls" autoplay="autoplay" width="100%" muted loop="loop">
+                    您的浏览器不支持 video 标签，请更换浏览器
+                </video>
+            </div>
+            <div class="main_list">
+                <div class="list_item">
+                    <div class="tag_div">
+                        <i class="fa fa-thumb-tack" aria-hidden="true" style="transform: rotate(45deg);"></i>
+                        <span style="padding-left: 10px;">以纯动态</span>
+                    </div>
+                    <el-card class="box-card" style="width:97%;margin: 20px auto;">
+                        <p class="box_item">
+                            <a href="./static/PDF/（9.1-9.15）店铺新增会员完成保底目标前20大店铺.pdf">1.（9.1-9.15）店铺新增会员完成保底目标前20大店铺</a>
+                        </p>
+                        <p class="box_item">
+                                <a href="./static/PDF/9月21日以纯江门高新店盛大开业，正价货品两件8.8折！.pdf">2.9月21日以纯江门高新店盛大开业，正价货品两件8.8折！</a>
+                            </p>
+                        <p class="box_item"> xxxxx </p>
+                        <p class="box_item"> xxxxx </p>
+                        <p class="box_item"> xxxxx </p>
+                        <p class="box_item"> xxxxx </p>
+                        <p class="box_item"> xxxxx </p>
+                        <p class="box_item"> xxxxx </p>
+                    </el-card>
+                </div>
+                <div class="list_item">
+                    <div class="tag_div">
+                        <i class="fa fa-pencil-square" aria-hidden="true"></i>
+                        <span style="padding-left: 10px;">时尚达人</span>
+                    </div>
+                    <div style="display: flex;">
+                        <div style="width:65%;">
+                            <el-card class="box-card" style="width:80%;margin: 20px auto;min-height: 200px;">
+                                <div slot="header" class="clearfix">
+                                    <span>帖子</span>
+                                </div>
+                                <div class="filter">
+                                    <div class="filter_item">按时间</div>
+                                    <div class="filter_item">按热门</div>
+                                    <div class="filter_item">按关注</div>
+                                </div>
+                                <div class="main_wrap">
+                                    <ul class="main_list">
+                                        <li class="main-row" v-for="item in articleList" :key="item.id">
+                                            <div class="avatar">
+                                                <a href="#">
+                                                    <img src="__STATIC__/images/avatar.jpg" alt="">
+                                                </a>
+                                            </div>
+                                            <div class="list-content">
+                                                <p class="title" style="margin-left:10px;">
+                                                    <a :href="'/{$Request.module}/{$Request.controller}/articleDet/id/' + item.id">{{item.title}}</a>
+                                                    <!-- <span class="label label-danger" style="padding-top:0.3em;">精</span> -->
+                                                </p>
+                                                <div class="auth_msg">
+                                                    <a href="#" style="color:#000;">{{item.user_nickname}}</a>
+                                                    <span>{{item.offsetTime}}</span>
+                                                    <!-- <span>置顶</span> -->
+                                                    <p class="pull-right">
+                                                        <span>
+                                                            <span class="glyphicon glyphicon-eye-open"></span>&nbsp;{{item.view_count>999?"999+":item.view_count}}
+                                                        </span>
+                                                        &nbsp;&nbsp;
+                                                        <span>
+                                                            <span class="glyphicon glyphicon-comment"></span>&nbsp;{{item.comment_count>999?"999+":item.comment_count}}
+                                                        </span>   
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </li>
+    
+                                    </ul>
+                                    <div class="pagination" v-if="total">
+                                        <el-pagination
+                                            background
+                                            layout="prev, pager, next"
+                                            :page-size="page_size"
+                                            :total="total"
+                                            @current-change="toPage"
+                                            @prev-click="toPage"
+                                            @next-click="toPage">
+                                        </el-pagination>
+                                    </div>
+                                </div>
+                            </el-card>
+                        </div>
+                        <div style="width:30%;margin:20px auto;">
+                            <el-card class="aside-item no-padding-card" shadow="hover" style="min-height: 383px;">
+                                <div slot="header">
+                                    <span>达人榜</span>
+                                </div>
+                                <el-table
+                                    :data="UserScore"
+                                    style="width: 100%"
+                                    stripe
+                                    style="text-align: center;"
+                                    >
+                                    <el-table-column
+                                        prop="sort"
+                                        label="排名"
+                                    ></el-table-column>
+                                    <el-table-column
+                                        prop="user_name"
+                                        label="用户"
+                                    >
+                                    </el-table-column>
+                                    <el-table-column
+                                        prop="score"
+                                        label="积分">
+                                    </el-table-column>
+                                </el-table>
+                            </el-card>
+                        </div>
+                    </div>
+                </div>
+                <div class="list_item">
+                    <div class="tag_div">
+                        <i class="fa fa-book" aria-hidden="true"></i>
+                        <span style="padding-left: 10px;">生活百科</span>
+                    </div>
+                    <el-card class="box-card" style="width:97%;margin: 20px auto;min-height: 250px;">
+                        <p class="box_item">[科技] 去演唱会带什么相机拍得比较清楚？</p>
+                        <p class="box_item">[生活]《哪吒》观后感</p>
+                        <p class="box_item">[美妆] 美妆小白的入门必备</p>
+                    </el-card>
+                </div>
+                <div class="list_item">
+                    <div class="tag_div">
+                        <i class="fa fa-search" aria-hidden="true"></i>
+                        <span style="padding-left: 10px;">招兵买马</span>
+                    </div>
+                    <el-table :data="inviteData" style="width: 97%;margin: 20px auto;" size="small" border>
+                        <el-table-column prop="position" label="职位" width="130"></el-table-column>
+                        <el-table-column prop="require" label="要求"></el-table-column>
+                        <el-table-column prop="treatment" label="待遇"></el-table-column>
+                    </el-table>
+                </div>
+            </div>
+        </el-main>
+    </el-container>
+
+</div>
+
+<script>
+    const vue = {
+        el: '#app',
+        data:{
+            inviteData:[
+                {position: '零售部经理',require:'1.有销售经验;2...',treatment:'....'}
+            ],
+            UserScore:[
+                {sort:1, user_name:'周杰伦',score:100000},
+                {sort:2, user_name:'蔡徐坤',score:11},
+                {sort:3, user_name:'周杰伦',score:100000},
+                {sort:4, user_name:'蔡徐坤',score:11},
+                {sort:5, user_name:'周杰伦',score:100000},
+                {sort:6, user_name:'蔡徐坤',score:11},
+                {sort:7, user_name:'蔡徐坤',score:11},
+                {sort:8, user_name:'周杰伦',score:100000},
+                {sort:9, user_name:'蔡徐坤',score:11}
+            ],
+            articleList:[],
+            total:0,
+            page_size:0,
+        },
+        methods:{
+
+            getArticle(page){
+                axios.get("{:url('getArticle')}",{
+                    params:{
+                        page,
+                        keyword:this.keyword
+                    }
+                }).then((res) => {
+                    var data = res.data;
+                    this.articleList = data['list'];
+                    this.total = data['total'];
+                    this.page_size = data['page_size'];
+                })
+            },
+
+            toPage(page){
+                this.getArticle(page);
+            },
+
+
+        },
+        created () {
+            this.getArticle(1);
+        }
+    }
+</script>

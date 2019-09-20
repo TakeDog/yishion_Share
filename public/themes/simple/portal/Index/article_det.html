@@ -1,0 +1,334 @@
+<layout name="public@layout" />
+<style>
+.article_wrap{background-color: #fff;padding:15px 20px;margin-bottom: 10px;font-size: 16px;}
+.article_wrap p{margin-bottom: 0;}
+.article_wrap .auth_avator{width:170px;height:30px;margin:12px 0;font-size:14px;font-weight:900;}
+.article_wrap .auth_avator img{width:30px;height:30px;object-fit:cover;}
+.article_wrap .article_msg{display:flex;justify-content:space-between;color:#94979e;font-size:10px;margin-top:10px;}
+/* 评论，分页 */
+.comment_wrap{background-color: #fff;}
+.comment_list{padding:0;list-style: none;margin:20px 0;}
+.comment_list.flist{margin: 0 0 0 4%;zoom: .8;}
+.avatar{float: left;}
+.avatar>a>img{float: left;width:50px;height: 50px;border-radius: 50%;object-fit:cover;}
+.title > a{font-size:16px;color:#333;}
+.title > a:hover{color:#337ab7;}
+.auth_msg{color:#000;overflow: hidden;margin-left: 10px;font-size:12px;}
+.auth_msg a:hover{color:#337ab7;}
+.comment_oper{visibility:hidden;text-align:right;}
+.comment_item:hover>.comment_oper{visibility:visible;}
+.comment_reply{margin: 0 10px 20px 50px;}
+.comment-row{overflow: hidden;margin-bottom:10px;border-bottom:1px solid #e6e6e6;}
+.comment-row.fRow{border-top:1px solid #e6e6e6;border-bottom:0px;padding-top:10px;margin-bottom:0px;}
+.pagination{width:100%;text-align: center;}
+
+.comment .el-tabs__content{padding:0 20px;}
+.comment .el-tabs__header{padding:5px 20px;margin:0;}
+.comment .el-tabs{background-color: #fff;border: 1px solid #d2d2d2;margin-bottom:20px;}
+.comment .el-tabs__item{font-size:16px;font-weight: bold;}
+.el-dialog{overflow-y: scroll !important;height: 92% !important;}
+
+</style>
+<div class="container" id="app">
+    <el-dialog title="查看对话" :visible.sync="allReplyModal.visible" width="50%" top="2vh">
+        <div class="comment_wrap">
+            <div class="comment_item">
+                <div class="avatar">
+                    <a href="#">
+                        <img src="__STATIC__/images/avatar.jpg" alt="">
+                    </a>
+                </div>
+                <div class="comment_content">
+                    <p class="title" style="margin:0 0 5px 10px;" >
+                        <a href="#" class="font-c-blue font14">{{allReplyModal.comment.hname}}</a>&nbsp; 
+                        <span style="font-size: 12px;color:#8c8c8c;">发表于{{allReplyModal.comment.date}}</span>
+                    </p>
+                    <div class="auth_msg" style="font-size: 16px;margin-bottom:10px;">
+                        <span>{{allReplyModal.comment.comment}}</span>
+                    </div>
+                </div>
+                <div class="comment_oper">
+                    <el-link type="primary" :underline="false" style="text-decoration:none;" @click="modalToReply(true)" v-if="!allReplyModal.comment.in_reply">
+                        <i class="el-icon-chat-dot-round"></i>回复
+                    </el-link>
+                    <el-link type="primary" :underline="false" style="text-decoration:none;visibility:visible;" @click="modalToReply(false)" v-else>
+                        <i class="el-icon-chat-dot-round"></i>取消回复
+                    </el-link>
+                </div>
+                <div class="comment_reply" v-if="allReplyModal.comment.in_reply">
+                    <el-input type="textarea" v-model="allReplyModal.comment.subComment" :placeholder="'回复'+allReplyModal.comment.hname" style="width:91%;" size="small" maxlength="255" show-word-limit resize="none" autosize></el-input>
+                    <el-button type="primary" style="margin-left:15px;" @click="addComment(allReplyModal.comment,allReplyModal.index)" size="small">发布</el-button>
+                </div>
+            </div>
+            <ul class="comment_list flist" v-if="allReplyModal.comment.ctree">
+                <li class="comment-row fRow" v-for="(ktem,k) in allReplyModal.comment.ctree" :key="ktem.id">
+                    <div class="comment_item">
+                        <div class="avatar">
+                            <a href="#">
+                                <img src="__STATIC__/images/avatar.jpg" alt="">
+                            </a>
+                        </div>
+                        <div class="comment_content">
+                            <p class="title" style="margin:0 0 5px 10px;" >
+                                <a href="#" class="font-c-blue font14">
+                                    {{ktem.hname}}
+                                </a>
+                                <span style="margin:0 5px;color:#ccc;">回复</span>
+                                <a href="#" class="font-c-blue font14">
+                                    {{ktem.fname}}
+                                </a>&nbsp;
+                                <span style="font-size: 12px;color:#8c8c8c;">发表于{{ktem.date}}</span>
+                            </p>
+                            <div class="auth_msg" style="font-size: 16px;margin-bottom:10px;">
+                                <span>{{ktem.comment}}</span>
+                            </div>
+                        </div>
+                        <div class="comment_oper">
+                            <el-link type="primary" :underline="false" style="text-decoration:none;" @click="modalToReply(true,k)" v-if="!ktem.in_reply">
+                                <i class="el-icon-chat-dot-round"></i>回复
+                            </el-link>
+                            <el-link type="primary" :underline="false" style="text-decoration:none;visibility:visible;" @click="modalToReply(false,k)" v-else>
+                                <i class="el-icon-chat-dot-round"></i>取消回复
+                            </el-link>
+                        </div>
+                        <div class="comment_reply" v-if="ktem.in_reply">
+                            <el-input type="textarea" v-model="ktem.subComment" :placeholder="'回复'+ktem.hname" style="width:91%;" maxlength="255" show-word-limit resize="none" autosize></el-input>
+                            <el-button type="primary" style="margin-left:15px;" @click="addComment(ktem,allReplyModal.index)">发布</el-button>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </el-dialog>
+    <div class="article_wrap">
+        <h3 style="text-align: center;margin-top:0;padding:10px 0;">{$data['title']}</h3>
+        <div class="auth_avator">
+            <a href="#">
+                <img src="__STATIC__/images/avatar.jpg" alt="">
+            </a>
+            <span style="line-height:30px;">{$data['user_nickname']}</span>
+        </div>
+        <div>{$data['content']|raw}</div>
+        <div class="article_msg">
+            <div>编辑于&nbsp;{$data['offsetTime']}</div>
+            <div>
+                <!-- <span class="glyphicon glyphicon-share"></span>&nbsp;分享
+                &nbsp;&nbsp; -->
+                <span class="glyphicon glyphicon-eye-open"></span>&nbsp;{$data['view_count']>999?"999+":$data['view_count']}
+                &nbsp;&nbsp;
+                <span class="glyphicon glyphicon-comment"></span>&nbsp;{$data['comment_count']>999?"999+":$data['comment_count']}
+            </div>
+            
+        </div>
+    </div>
+
+    <div class="input-group" style="margin-bottom:10px;">
+        <input type="text" class="form-control" placeholder="说说你的看法" style="height: 43px;" v-model="comment">
+        <span class="input-group-btn">
+            <button class="btn btn-light-blue" type="button" style="line-height: 29px;" @click="addComment()">
+                <span class="glyphicon glyphicon-search"></span>
+                发表
+            </button>
+        </span>
+    </div>
+    
+    <div class="comment">
+        <el-tabs >
+            <el-tab-pane label="最新评论" name="first">
+                <span slot="label"><i class="el-icon-sunny"></i> 最新评论</span>
+            </el-tab-pane>
+
+            <div class="comment_wrap">
+                <ul class="comment_list">
+                    <li class="comment-row" v-for="(item,i) in comment_list.list":key="item.id">
+                        <div class="comment_item">
+                            <div class="avatar">
+                                <a href="#">
+                                    <img src="__STATIC__/images/avatar.jpg" alt="">
+                                </a>
+                            </div>
+                            <div class="comment_content">
+                                <p class="title" style="margin:0 0 5px 10px;" >
+                                    <a href="#" class="font-c-blue font14">{{item.hname}}</a>&nbsp; 
+                                    <span style="font-size: 12px;color:#8c8c8c;">发表于{{item.date}}</span>
+                                </p>
+                                <div class="auth_msg" style="font-size: 16px;margin-bottom:10px;">
+                                    <span>{{item.comment}}</span>
+                                </div>
+                            </div>
+                            <div class="comment_oper">
+                                <el-link type="primary" :underline="false" style="text-decoration:none;" @click="toReply(true,i)" v-if="!item.in_reply">
+                                    <i class="el-icon-chat-dot-round"></i>回复
+                                </el-link>
+                                <el-link type="primary" :underline="false" style="text-decoration:none;visibility:visible;" @click="toReply(false,i)" v-else>
+                                    <i class="el-icon-chat-dot-round"></i>取消回复
+                                </el-link>
+                            </div>
+                            <div class="comment_reply" v-if="item.in_reply">
+                                <el-input type="textarea" v-model="item.subComment" :placeholder="'回复'+item.hname" style="width:91%;" size="small" maxlength="255" show-word-limit resize="none" autosize></el-input>
+                                <el-button type="primary" style="margin-left:15px;" @click="addComment(item)" size="small">发布</el-button>
+                            </div>
+                        </div>
+                        <ul class="comment_list flist" v-if="item.ctree">
+                            <li class="comment-row fRow" v-for="(ktem,k) in item.ctree" v-if="3>k"  :key="ktem.id">
+                                <div class="comment_item">
+                                    <div class="avatar">
+                                        <a href="#">
+                                            <img src="__STATIC__/images/avatar.jpg" alt="">
+                                        </a>
+                                    </div>
+                                    <div class="comment_content">
+                                        <p class="title" style="margin:0 0 5px 10px;" >
+                                            <a href="#" class="font-c-blue font14">
+                                                {{ktem.hname}}
+                                            </a>
+                                            <span style="margin:0 5px;color:#ccc;">回复</span>
+                                            <a href="#" class="font-c-blue font14">
+                                                {{ktem.fname}}
+                                            </a>&nbsp;
+                                            <span style="font-size: 12px;color:#8c8c8c;">发表于{{ktem.date}}</span>
+                                        </p>
+                                        <div class="auth_msg" style="font-size: 16px;margin-bottom:10px;">
+                                            <span>{{ktem.comment}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="comment_oper">
+                                        <el-link type="primary" :underline="false" style="text-decoration:none;" @click="toReply(true,i,k)" v-if="!ktem.in_reply">
+                                            <i class="el-icon-chat-dot-round"></i>回复
+                                        </el-link>
+                                        <el-link type="primary" :underline="false" style="text-decoration:none;visibility:visible;" @click="toReply(false,i,k)" v-else>
+                                            <i class="el-icon-chat-dot-round"></i>取消回复
+                                        </el-link>
+                                    </div>
+                                    <div class="comment_reply" v-if="ktem.in_reply">
+                                        <el-input type="textarea" v-model="ktem.subComment" :placeholder="'回复'+ktem.hname" style="width:91%;" maxlength="255" show-word-limit resize="none" autosize></el-input>
+                                        <el-button type="primary" style="margin-left:15px;" @click="addComment(ktem)">发布</el-button>
+                                    </div>
+                                </div>
+                            </li>
+                            <el-button type="text" @click="allReply(item.id,i)" v-if="item.total>3">查看全部回复</el-button>
+                        </ul>
+                    </li>
+                </ul>
+                <div class="pagination" style="margin-top:0;">
+                    <!-- <el-pagination
+                        background
+                        layout="prev, pager, next"
+                        :page-size="page_size"
+                        :total="total"
+                        @current-change="toPage"
+                        @prev-click="toPage"
+                        @next-click="toPage">
+                    </el-pagination> -->
+                    
+                    <el-pagination
+                        background
+                        layout="prev, pager, next"
+                        :page-size="comment_list.page_size"
+                        :total="comment_list.total"
+                        @current-change="toPage"
+                        @prev-click="toPage"
+                        @next-click="toPage"
+                        v-if="comment_list.total > 0">
+                    </el-pagination>
+                    <p style="margin:0;color:#ab1515;" v-else> 还没有人评论，赶紧来抢沙发吧！ </p>
+                </div>
+            </div> 
+        </el-tabs>
+    </div>
+    
+</div>
+<script>
+    var vue = {
+        el:"#app",
+        data:{
+            comment:'',
+            page: 1,
+            article_id:"{$data['id']}",
+            comment_list:{},
+            allReplyModal: {
+                index: 0,
+                comment:'',
+                visible: false
+            }
+        },
+        methods: {
+            addViewCount(){
+                // if(this.$cookies.get("VIEWED_ARTICLE_ID"+this.article_id) !== this.article_id){
+                //     this.$cookies.set("VIEWED_ARTICLE_ID"+this.article_id,this.article_id,"1d");
+                axios.post("{:url('Index/addViewCount')}",{article_id:this.article_id}).then((res)=>{})
+                // }
+            },
+            addComment(item,index){
+                let data = {};
+                if(item !== undefined){
+                    data = {
+                        comment:item.subComment,
+                        article_id:this.article_id,
+                        parent_id: item.id,
+                        top_id: item.top_id===0?item.id:item.top_id, 
+                        fuser_id: item.user_id
+                    }
+                }else{
+                    data = {
+                        comment:this.comment,
+                        article_id:this.article_id,
+                        parent_id: 0,
+                        top_id: 0,
+                        fuser_id: 0
+                    }
+                }
+                axios.post("{:url('Index/addComment')}",data).then((res)=>{
+                    if(res.data.error > 1000){
+                        this.$message("评论出错了，错误码：" + res.data.error + ",错误信息：" + res.data.msg);
+                    }else{
+                        this.comment = '';
+                        this.$message("评论成功");
+                        this.getComList(this.page,index);
+                    }
+                })
+            },
+            getComList(page,index){
+                //getComList
+                axios.get("/{$Request.module}/{$Request.controller}/getComList?article_id={$data['id']}&page=" + page).then((res)=>{
+                    this.comment_list = res.data;
+                    if(index)
+                        this.allReplyModal.comment = JSON.parse(JSON.stringify(this.comment_list.list[index]));
+                })
+            },
+            toReply(status,i,k){
+                var arr = this.comment_list.list[i];
+                if(k !== undefined){
+                    arr.ctree[k].in_reply = status;
+                }else{
+                    arr.in_reply = status;
+                }
+                Vue.set(this.comment_list.list,i,arr);
+            },
+            modalToReply(status,k){
+                if(k !== undefined){
+                    var arr = this.allReplyModal.comment.ctree[k];
+                    arr.in_reply = status;
+                    Vue.set(this.allReplyModal.comment.ctree,k,arr);
+                }else{
+                    Vue.set(this.allReplyModal.comment,"in_reply",status);
+                }
+            },
+            allReply(id,i){
+                axios.post("{:url('Index/getComListById')}",{comment_id:id}).then((res)=>{
+                    this.allReplyModal.index = i;
+                    this.allReplyModal.visible = true;
+                    this.allReplyModal.comment = res.data;
+                })
+            },
+            toPage(page){
+                this.page = page;
+                this.getComList(this.page);
+            }
+        },
+        mounted () {
+            this.getComList(this.page);
+            this.addViewCount();
+        }
+    }
+</script>

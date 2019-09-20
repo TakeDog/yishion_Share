@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>以纯 • 纯分享 -- 员工入口</title>
+    <meta name="description" content="以纯社区官方论坛是以纯工作人员与粉丝的大本营，在这里可以交流以纯的第一手资讯，了解以纯的最新动态，参与活动互动，为员工与粉丝打造一个良好的互动交流平台" />
+    <meta name="keywords" content="以纯社区,纯分享,以纯论坛" />
+    <link rel="stylesheet" href="__STATIC__/lib/element-ui/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="__STATIC__/css/main.css">
+    <link rel="stylesheet" href="__STATIC__/lib/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="__STATIC__/css/index.css?v=3">
+    <script src="__STATIC__/js/jquery.min.js"></script>
+    <script src="__STATIC__/lib/bootstrap/js/bootstrap.min.js"></script>
+    <script src="__STATIC__/js/vue.js"></script>
+    <script src="__STATIC__/js/axios.min.js"></script>
+    <script src="__STATIC__/lib/element-ui/lib/index.js"></script>
+
+    <base target="main">
+</head>
+<style>
+    .head_top{background: #FADAD3;padding:20px;overflow: hidden;position: relative;}
+    .head_top img{width:200px;float: left;}
+    p.header_title{float: left;line-height:100px;color:#000;font-size: 80px;margin:0 0 0 168px;}
+    .full-head .el-badge{background-color: #FADAD3;}
+    .el-dropdown-menu__item .el-badge{background-color: #FFF;}
+    .el-dropdown-menu__item:focus .el-badge,.el-dropdown-menu__item:not(.is-disabled):hover .el-badge{background-color:#ecf5ff;}
+    .el-dropdown-menu__item a{color:#FADAD3 ;}
+    .el-dropdown-menu__item a:hover{color:#66b1ff;text-decoration: none;}
+
+    .full-head p, .full-head p>a{color:#000;}
+
+    .navbar-default{background: #F5B6A7;}
+    .bgc-an{background: #F5B6A7;}
+    .navbar-default .navbar-nav>li>a{color:#000;}
+    .navbar-default .navbar-nav>.active>a{background: #FFF;}
+</style>
+<body style="background-color: #f3f3f3;">
+    <div id="app">
+        <el-container class="heightfull">
+            <el-header height="auto">
+                <div class="head_top">
+                    <img alt="Brand" src="__STATIC__/images/chunShengHuo.png" width="100px">
+                    <p class="header_title bold">赋能前行，纯属你我</p>
+                    <div class="full-head clearfix" style="background-color:#FADAD3;">
+                        <p>
+                            <a href="#" class="navbar-link color-b">忘记密码</a> |
+                            <a href="#" class="navbar-link color-b">设置</a> |
+                            <a href="#" class="navbar-link color-b">帮助</a> |
+                            <a href="#" class="navbar-link color-b">在线人数：20</a> | 
+                            <a href="#" class="navbar-link color-b">通知</a> | 
+                            <a href="#" class="navbar-link color-b">历史</a> | 
+                            <a href="#" class="navbar-link color-b">退出</a>
+                        </p>
+                    </div>
+                </div>
+                
+
+                <nav class="navbar navbar-default">
+                    <div class="container bgc-an">
+                        <div class="navbar-header ">
+                            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                                data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                                <span class="sr-only">Toggle navigation</span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                            </button>
+                            <a class="navbar-brand" href="{:url('staff_index2')}">
+                                <img alt="Brand" src="__STATIC__/images/logo.png" width="100px">
+                            </a>
+                        </div>
+
+                       
+                        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                            <ul class="nav navbar-nav">
+                                <li class="active"><a href="{:url('home')}" id="test">以纯动态</a></li>
+                                <li><a href="{:url('bbs')}">时尚达人</a></li>
+                                <li><a href="{:url('home')}">生活百科</a></li>
+                                <li><a href="{:url('home')}">招兵买马</a></li>
+                                <li><a href="{:url('home')}">小黑屋</a></li>
+                                <li><a href="{:url('home')}">我要反馈</a></li>
+                            </ul>
+
+                            <ul class="nav navbar-nav navbar-right">
+                                <li><a href="{:url('portal/index/staff')}" target="_blank">纯工作</a></li>
+                            </ul>
+                        </div>
+                       
+                    </div>
+                </nav>
+            </el-header>
+
+            <iframe src="{:url('home')}" frameborder="0" name="main" width="100%" height="100%" frameborder="0" scrolling="yes" id="main"></iframe>
+
+
+        </el-container>
+    </div>
+</body>
+
+</html>
+
+<script>
+
+    $(function(){
+       $(".heightfull").css("height",$(document).height());
+        $(".navbar-nav").children("li").click(function(){
+            $(this).siblings("li").removeClass("active");
+            $(this).addClass("active");
+        })
+    })
+
+    
+
+    
+
+    var vm = new Vue({
+        el: "#app",
+        data: {
+
+        },
+        methods: {
+        
+        },
+    });
+</script>
