@@ -16,6 +16,6 @@ Vagrantfile
 /public/static/video
 /public/static/PDF
 _gsdata_
+/public/static/*
 
 
-data/config/ConfigUI.json
