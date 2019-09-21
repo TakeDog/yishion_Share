@@ -9,6 +9,13 @@ function getUser($field){
     $data = session('user_info','','portal');
     return $data[$field];
 }
+
+function setUser($field,$data){
+    $user_info = session('user_info','','portal');
+    $user_info[$field] = $data;
+    session('user_info',$user_info,'portal');
+}
+
 //生成num位随机字符;
 function getRandomStr($num){
     $str = []; 
