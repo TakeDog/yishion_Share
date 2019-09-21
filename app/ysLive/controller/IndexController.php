@@ -81,7 +81,7 @@ class IndexController extends HomeBaseController{
 
         // $query = Db::name("CArticle") -> alias('at') -> join("CUser u","at.user_id = u.id","LEFT") -> where('at.title','like','%'.$keyword.'%') -> order("date desc");
         $list = Db::query("SELECT at.*,u.user_name,u.avatar,u.user_nickname,(SELECT COUNT(id) FROM share_c_article_comment scac WHERE scac.article_id=at.id) AS comment_count FROM share_c_article AT LEFT JOIN share_c_user u ON at.user_id=u.id
-        WHERE at.title LIKE '%$keyword%' ORDER BY DATE DESC limit ".($cur_page-1)*$num .", $num");
+        WHERE at.title LIKE '%$keyword%' AND at.status=1 ORDER BY DATE DESC limit ".($cur_page-1)*$num .", $num");
 
         // $list = $query -> limit(($cur_page-1)*$num , $num) -> field("at.*,u.user_name,u.avatar,u.user_nickname") -> select() -> toArray();
 

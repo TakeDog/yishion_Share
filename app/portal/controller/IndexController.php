@@ -408,4 +408,32 @@ class IndexController extends HomeBaseController
 
     }
 
+    //更多
+    public function showMore(){
+        
+        $this -> assign("block",$this -> request -> param('block',1,'intval'));
+        return $this -> fetch();
+    }
+
+    public function get_more_data(){
+        $page_size = 11;
+        $page = $this -> request -> param("page",1,'intval');
+
+        $tableData = Db::name("IndexAside") 
+        -> where("block",$this -> request -> param('block'))
+        -> whereLike("file_name","%".$this -> request -> param('search_key')."%")
+        -> limit(($page-1)*$page_size,$page_size)
+        -> order("sort")
+        -> select();
+
+        $total = Db::name("IndexAside")
+        -> where("block",$this -> request -> param('block'))
+        -> whereLike("file_name","%".$this -> request -> param('search_key')."%")
+        -> count();
+
+        $data['page_size'] = $page_size;
+        $data['total'] = $total;
+        $data['tableData'] = $tableData;
+        echo json_encode($data);
+    }
 }

@@ -2,10 +2,10 @@
 namespace app\portalAdmin\controller;
 use think\Controller;
 use think\Db;
-use cmf\controller\HomeBaseController;
+use cmf\controller\AdminBaseController;
 
 
-class BbsManagerController extends HomeBaseController{
+class BbsManagerController extends AdminBaseController{
     
     public function articleManager(){
         return $this->fetch();

@@ -308,7 +308,7 @@
                 </a>
             </if>
 
-            <if condition="APP_DEBUG">
+            <if condition="cmf_auth_check(cmf_get_current_admin_id(),'user/Menu/index')">
                 <a class="btn btn-sm btn-default"
                    href="javascript:openapp('{:url('admin/Menu/index')}','index_menu','{:lang('ADMIN_MENU_INDEX')}',true);"
                    title="{:lang('ADMIN_MENU_INDEX')}"
