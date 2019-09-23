@@ -1,6 +1,7 @@
 <?php
 namespace app\portal\controller;
 use think\Db;
+use think\Controller;
 use cmf\controller\HomeBaseController;
 
 class InfoController extends HomeBaseController{
@@ -37,9 +38,14 @@ class InfoController extends HomeBaseController{
         return json($res);
     }
 
-   public function sell_index(){
+    public function sell_index(){
         return $this -> fetch();
-   }
+    }
 
 
+    public function openFile(){
+        $path = $this -> request -> param("path");
+
+        return redirect(redirectFile($path));
+    }
 }

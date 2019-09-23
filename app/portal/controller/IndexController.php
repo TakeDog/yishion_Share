@@ -409,5 +409,11 @@ class IndexController extends HomeBaseController
         echo json_encode( Db::name("Job") -> where(['ogn'=>$part,'dept_type'=>$deptMsg['type']]) -> select() );
 
     }
+    
+    public function openFile(){
+        $path = $this -> request -> param("path");
+
+        return redirect(redirectFile($path));
+    }
 
 }
