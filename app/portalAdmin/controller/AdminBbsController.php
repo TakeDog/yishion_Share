@@ -4,9 +4,37 @@ use think\Controller;
 use think\Db;
 use cmf\controller\AdminBaseController;
 
+/**
+ * Class AdminBbsController
+ * @package app\portalAdmin\controller
+ *
+ * @adminMenuRoot(
+ *     'name'   =>'论坛管理',
+ *     'action' =>'default',
+ *     'parent' =>'',
+ *     'display'=> true,
+ *     'order'  => 1,
+ *     'icon'   =>'code-fork',
+ *     'remark' =>'论坛管理'
+ * )
+ *
+ */
 
-class BbsManagerController extends AdminBaseController{
+class AdminBbsController extends AdminBaseController{
     
+    /**
+     * 文章管理
+     * @adminMenu(
+     *     'name'   => '文章管理',
+     *     'parent' => 'default',
+     *     'display'=> true,
+     *     'hasView'=> true,
+     *     'order'  => 1,
+     *     'icon'   => '',
+     *     'remark' => '文章管理',
+     *     'param'  => ''
+     * )
+     */
     public function articleManager(){
         return $this->fetch();
     }
@@ -15,6 +43,19 @@ class BbsManagerController extends AdminBaseController{
         return $this->fetch();
     }
 
+     /**
+     * 获取文章列表
+     * @adminMenu(
+     *     'name'   => '获取文章列表',
+     *     'parent' => 'articleManager',
+     *     'display'=> false,
+     *     'hasView'=> false,
+     *     'order'  => 1,
+     *     'icon'   => '',
+     *     'remark' => '获取文章列表',
+     *     'param'  => ''
+     * )
+     */
     public function getAllArticleData(){
         $data = $this -> request -> param();
 
@@ -30,7 +71,19 @@ class BbsManagerController extends AdminBaseController{
         $res['total'] =  count($list);
         return json($res);
     }
-
+    /**
+     * 获取评论列表
+     * @adminMenu(
+     *     'name'   => '获取评论列表',
+     *     'parent' => 'articleManager',
+     *     'display'=> false,
+     *     'hasView'=> false,
+     *     'order'  => 1,
+     *     'icon'   => '',
+     *     'remark' => '获取评论列表',
+     *     'param'  => ''
+     * )
+     */
     public function getAllCommentData(){
         $data = $this -> request -> param();
 
@@ -42,6 +95,19 @@ class BbsManagerController extends AdminBaseController{
         return json($res);
     }
 
+    /**
+     * 获取特定文章
+     * @adminMenu(
+     *     'name'   => '获取特定文章',
+     *     'parent' => 'articleManager',
+     *     'display'=> false,
+     *     'hasView'=> false,
+     *     'order'  => 1,
+     *     'icon'   => '',
+     *     'remark' => '获取特定文章',
+     *     'param'  => ''
+     * )
+     */
     public function getArtilceById(){
         $id = $this -> request -> param('id',0,'intval');
         $data = Db::name('CArticle') -> alias('a') -> join('CUser u','a.user_id = u.id','LEFT') -> where('a.id',$id) -> field('a.*,u.user_name,u.user_nickname') -> find();
@@ -51,6 +117,19 @@ class BbsManagerController extends AdminBaseController{
         return json($data);
     }
 
+    /**
+     * 更改文章显示状态
+     * @adminMenu(
+     *     'name'   => '更改文章显示状态',
+     *     'parent' => 'articleManager',
+     *     'display'=> false,
+     *     'hasView'=> false,
+     *     'order'  => 1,
+     *     'icon'   => '',
+     *     'remark' => '更改文章显示状态',
+     *     'param'  => ''
+     * )
+     */
     public function changeStatus(){
         $id = $this -> request -> param('id',0,'intval');
         $status = $this -> request -> param('status',0,'intval');

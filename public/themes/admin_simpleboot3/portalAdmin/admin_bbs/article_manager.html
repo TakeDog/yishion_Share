@@ -165,18 +165,18 @@
         },
         methods:{
             getAllArticleData(){
-                axios.post("{:url('BbsManager/getAllArticleData')}",this.form).then((res)=>{
+                axios.post("{:url('AdminBbs/getAllArticleData')}",this.form).then((res)=>{
                     this.articleData = res.data;
                 });
             },
             checkArticle(id){
-                axios.post("{:url('BbsManager/getArtilceById')}",{id:id}).then((res)=>{
+                axios.post("{:url('AdminBbs/getArtilceById')}",{id:id}).then((res)=>{
                     this.articleModal.visible = true;
                     this.articleModal.data = res.data;
                 });
             },
             changeStatus(row,id){
-                axios.post("{:url('BbsManager/changeStatus')}",{id:id,status:row.status}).then((res)=>{
+                axios.post("{:url('AdminBbs/changeStatus')}",{id:id,status:row.status}).then((res)=>{
                     if(res.data === 1001){
                         this.$notify({
                             title: '成功',
