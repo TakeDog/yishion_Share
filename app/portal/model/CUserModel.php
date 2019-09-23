@@ -130,4 +130,28 @@ class CUserModel extends Model{
         return $main;
     }
 
+    public function setUserSessionById($id){
+        $userInfo = $this -> alias('u') -> join("share_dept d","u.dept_id=d.id",'LEFT') -> join('share_job j','u.job_id = j.id','LEFT') -> where("u.id",$id) -> field("u.*,d.name as dept,j.job as job") -> find();
+
+        $deptDb = model("Dept");
+        //添加机构信息
+        $deptPID = $deptDb -> getFirstP($userInfo['dept_id']);
+        $partData = $deptDb -> find($deptPID);
+        $userInfo['part'] = $partData['name'];
+
+        // 定义存session时 需要删除的个人信息
+        $unField  = ['pwd','salt','last_login_ip','last_login_time','user_status'];
+        
+        // 删除部分个人信息
+        foreach ($unField as $fKey => $fVal){
+            unset($userInfo[$fVal]);
+        }
+
+        // 获取用户管理员角色名称
+        $roleName = $this->getUserRoleName($userInfo->id);
+        $userInfo['role'] = $roleName;
+
+        // session存储个人信息
+        session('user_info', $userInfo->toArray(),'portal');
+    }
 }

@@ -1,4 +1,5 @@
 <?php
+use think\Controller;
 // 应用公共文件
 function getClientIp(){
     $request = request();
@@ -9,6 +10,13 @@ function getUser($field){
     $data = session('user_info','','portal');
     return $data[$field];
 }
+
+function setUser($field,$data){
+    $user_info = session('user_info','','portal');
+    $user_info[$field] = $data;
+    session('user_info',$user_info,'portal');
+}
+
 //生成num位随机字符;
 function getRandomStr($num){
     $str = []; 
@@ -103,5 +111,16 @@ function base64_image_content($base64_image_content,$path){
     }else{
         return false;
     }
+}
+
+
+function redirectFile($path){
+    $extensionArr = explode(".",$path);
+    $extension = array_pop($extensionArr);
+    
+    if($extension == 'pdf'){
+        return "/static/lib/pdf.js/web/viewer.html?file=$path";
+    }
+    return $path;
 }
 

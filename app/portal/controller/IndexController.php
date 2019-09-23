@@ -11,11 +11,12 @@ class IndexController extends HomeBaseController
 {
     
     public function online(){
-        $login_id = session('login_id','','portal');
+        $id = getUser('id');
+        $login_id = (int)getUser("login_id");
+
         $operateConfig = new OperateConfig();
         $config = $operateConfig -> getConfig();
-        $id = getUser('id');
-
+        
         $protalOnline = null;
         try {
             $protalOnline = $config -> protalOnline;
@@ -174,8 +175,9 @@ class IndexController extends HomeBaseController
             $user['last_logout_time'] = null;
             $user['login_time'] = date("Y-m-d H:i:s");
             $login_id = Db::name("c_user_login_total") -> insertGetId($user);
-            session('login_id',$login_id,'portal');
-            $this -> online($login_id);
+
+            setUser('login_id',$login_id);
+            $this -> online();
             return json(array('code'=>1,'msg'=>'登录成功','url'=>'staff'));
         }
 
@@ -406,6 +408,12 @@ class IndexController extends HomeBaseController
         $deptMsg = model("Dept") -> find($dept_id);
         echo json_encode( Db::name("Job") -> where(['ogn'=>$part,'dept_type'=>$deptMsg['type']]) -> select() );
 
+    }
+    
+    public function openFile(){
+        $path = $this -> request -> param("path");
+
+        return redirect(redirectFile($path));
     }
 
     //更多

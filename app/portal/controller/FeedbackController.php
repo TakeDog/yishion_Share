@@ -4,6 +4,8 @@ namespace app\portal\controller;
 use think\Controller;
 use think\Db;
 use cmf\controller\HomeBaseController;
+use app\common\Category;
+use app\common\OperateConfig;
 
 class FeedbackController extends HomeBaseController{
 
@@ -116,6 +118,51 @@ class FeedbackController extends HomeBaseController{
             $res['msg'] = "提交失败！！！";
             $res['status'] = 1002;
             return json($res);
+        }
+    }
+
+    public function editInfo(){
+
+        $catetory = new Category();
+
+        $option_data = Db::name("dept") -> select();
+        $tree_data = Db::name("dept") -> order('id') ->select();
+        
+        
+        $this -> assign('tree',json_encode($catetory -> unlimitedForLayer($tree_data)));
+        $this -> assign('option',json_encode($catetory -> unlimitedForLevel($option_data,'|—')));
+        return $this -> fetch();
+    }
+
+    //获取岗位
+    public function getJob(){
+        
+        $dept_id = $this -> request -> param('dept_id');
+        $part = model("Dept") -> getFirstP($dept_id);
+        $deptMsg = model("Dept") -> find($dept_id);
+        echo json_encode( Db::name("Job") -> where(['ogn'=>$part,'dept_type'=>$deptMsg['type']]) -> select() );
+
+    }
+
+    public function edit(){
+        $param = $this -> request -> param();
+        if($param['editPwd']){
+            $param['pwd'] = MD5($param['pwd']);
+        }
+        unset($param['editPwd']);
+        
+        $res = Db::name("c_user") -> update($param);
+
+        if($res){
+            model("CUser") -> setUserSessionById($param['id']);
+
+            $message['msg'] = "修改个人信息成功！！！";
+            $message['status'] = 1001;
+            return json($message);
+        }else{
+            $message['msg'] = "修改个人信息失败！！！";
+            $message['status'] = 1002;
+            return json($message);
         }
     }
 }
