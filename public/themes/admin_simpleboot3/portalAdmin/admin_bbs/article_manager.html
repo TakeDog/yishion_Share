@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>以纯 • 纯分享</title>
+    <meta name="description" content="以纯社区官方论坛是以纯工作人员与粉丝的大本营，在这里可以交流以纯的第一手资讯，了解以纯的最新动态，参与活动互动，为员工与粉丝打造一个良好的互动交流平台" />
+    <meta name="keywords" content="以纯社区,纯分享,以纯论坛" />
+    <link rel="stylesheet" href="__STATIC__/lib/element-ui/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="__STATIC__/css/main.css">
+    <link rel="stylesheet" href="__STATIC__/lib/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="__STATIC__/css/index.css?v=1.02">
+    <script src="__STATIC__/js/jquery.min.js"></script>
+    <script src="__STATIC__/lib/bootstrap/js/bootstrap.min.js"></script>
+    <script src="__STATIC__/js/vue.js"></script>
+    <script src="__STATIC__/js/axios.min.js"></script>
+    <script src="__STATIC__/lib/element-ui/lib/index.js"></script>
+</head>
+<style>
+[v-cloak]{
+    display: none;
+}
+.container-fluid{
+    margin: 0;
+    padding: 20px 20px 70px;
+}
+.search_form{
+    min-height: 20px;
+    padding: 19px 19px 0 19px;
+    margin-bottom: 20px;
+    background-color: #f7f7f7;
+    border: 1px solid #e5e5e5;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,0.05);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,0.05);
+}
+.content_list{
+    text-align: center;
+}
+.content_list .has-gutter{
+    color: #303133;
+    font-size: 14px;
+}
+/* ======================== */
+.content_list .status0{
+    color: #fff;
+    background: #F56C6C;
+    border-radius: 8px;
+    padding: 5px;
+}
+.content_list .status1{
+    color: #fff;
+    background: #67C23A;
+    border-radius: 8px;
+    padding: 5px;
+}
+.el-dialog{
+    overflow-y: scroll !important;
+    max-height: 92% !important;
+}
+.el-dialog .auth_avator{
+    width:170px;
+    height:30px;
+    margin:12px 0;
+    font-size:14px;
+    font-weight:900;
+}
+.el-dialog .auth_avator img{
+    width:30px;
+    height:30px;
+    object-fit:cover;
+}
+.switchStyle .el-switch__label {
+  position: absolute;
+  display: none;
+  color: #fff;
+}
+.switchStyle .el-switch__label--left {
+  z-index: 9;
+  left: 6px;
+}
+.switchStyle .el-switch__label--right {
+  z-index: 9;
+  left: -14px;
+}
+.switchStyle .el-switch__label.is-active {
+  display: block;
+}
+.switchStyle.el-switch .el-switch__core,
+.el-switch .el-switch__label {
+  width: 50px !important;
+  user-select: none;
+}
+</style>
+<body>
+<div id="app" class="container-fluid" v-cloak>
+    <el-dialog title="查看文章" :visible.sync="articleModal.visible" width="60%" top="2vh">
+        <h3 style="text-align: center;margin-top:0;padding:10px 0;">{{articleModal.data.title}}</h3>
+        <div class="auth_avator">
+            <a href="#">
+                <img src="__STATIC__/images/avatar.jpg" alt="">
+            </a>
+            <span style="line-height:30px;">{{articleModal.data.user_nickname}}</span>
+        </div>
+        <div v-html="articleModal.data.content"></div>
+
+    </el-dialog>
+    <el-tabs v-model="activeName" type="card" @tab-click="">
+        <el-tab-pane label="文章列表" name="first"></el-tab-pane>
+    </el-tabs>
+    <div class="search_form">
+        <el-form :inline="true" :model="form" class="demo-form-inline" size="small">
+            <el-form-item label="文章标题">
+                <el-input v-model="form.title" placeholder="文章标题"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="getAllArticleData" size="small">查询</el-button>
+            </el-form-item>
+        </el-form>
+    </div>
+    <div class="content_list">
+        <el-table :data="articleData.list" style="width:100%;margin-bottom:20px;" size="small" border>
+            <el-table-column prop="id" label="序号" align="center" width="100px"></el-table-column>
+            <el-table-column prop="user_nickname" label="文章作者" align="center"></el-table-column>
+            <el-table-column prop="title" label="文章标题" align="center"></el-table-column>
+            <el-table-column prop="date" label="创建时间" align="center" width="140px"></el-table-column>
+            <el-table-column prop="view_count" label="阅读量" align="center" width="100px"></el-table-column>
+            <el-table-column prop="status" label="是否展示" align="center" width="100px">
+                <template slot-scope="scope">
+                    <el-switch class="switchStyle" v-model="scope.row.status" active-color="#67C23A" active-text="是" active-value="1" 
+                inactive-color="#F56C6C" inactive-text="否" inactive-value="0" @change="changeStatus(scope.row,scope.row.id)">
+                </template>
+            </el-table-column>
+            <el-table-column label="操作" align="center" width="290px">
+                <template slot-scope="scope">
+                    <el-button size="mini" @click="checkArticle(scope.row.id)">查看</el-button>
+                    <el-button type="warning" size="mini">置顶</el-button>
+                    <el-button size="mini" type="danger">删除</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-pagination :page-size="form.pageSize" layout="total, prev, pager, next, jumper" :total="articleData.total" background></el-pagination>
+    </div>
+</div>
+
+<script>
+    const vm = new Vue({
+        el: '#app',
+        data:{
+            activeName: 'first',
+            form:{
+                title: '',
+                page: 1,
+                pageSize: 10,
+            },
+            articleData:{},
+            articleModal:{
+                visible: false,
+                data:{}
+            }
+        },
+        mounted(){
+            this.getAllArticleData();
+        },
+        methods:{
+            getAllArticleData(){
+                axios.post("{:url('AdminBbs/getAllArticleData')}",this.form).then((res)=>{
+                    this.articleData = res.data;
+                });
+            },
+            checkArticle(id){
+                axios.post("{:url('AdminBbs/getArtilceById')}",{id:id}).then((res)=>{
+                    this.articleModal.visible = true;
+                    this.articleModal.data = res.data;
+                });
+            },
+            changeStatus(row,id){
+                axios.post("{:url('AdminBbs/changeStatus')}",{id:id,status:row.status}).then((res)=>{
+                    if(res.data === 1001){
+                        this.$notify({
+                            title: '成功',
+                            message: '修改文章状态成功！！！',
+                            type: 'success'
+                        });
+                    }else{
+                        this.$notify.error({
+                            title: '错误',
+                            message: '修改文章状态失败！！！'
+                        });
+                        row.status == '0'? row.status='1':row.status='0';
+                    }
+                }).catch((err)=>{
+                    this.$notify.error({
+                        title: '错误',
+                        message: '修改文章状态失败！！！'
+                    });
+                    row.status == '0'? row.status='1':row.status='0';
+
+                });
+            }
+        }
+    })
+</script>
+</body>
+</html>

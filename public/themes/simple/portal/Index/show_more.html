@@ -1,0 +1,134 @@
+<layout name="public@layout" />
+
+<style>
+    .el-tabs__content{height: 700px;}
+    .pagination-box{text-align: center;margin-top: 8px;position: absolute;bottom: 10px;width: 100%;}
+</style>
+
+<div id="app" class="container" style="background: #FFF;border-radius: 3px;">
+
+    <el-tabs tab-position="left" style="height: 700px;"  v-model="block">
+
+        <el-tab-pane label="企业文化" name="1">
+            
+           <data-main :block="block"></data-main>
+
+        </el-tab-pane>
+        <el-tab-pane label="内部通知" name="2">
+            <data-main :block="block"></data-main>
+        </el-tab-pane>
+
+        <el-tab-pane label="龙虎榜单" name="3">
+            <data-main :block="block"></data-main>
+        </el-tab-pane>
+
+    </el-tabs>
+
+</div>
+
+<template id="data-main">
+    <div>
+
+        <el-input
+            placeholder="输入文件名进行搜索"
+            suffix-icon="el-icon-search"
+            v-model="search"
+            @input="getTableData"
+            style="margin-top:8px;"
+        >
+        </el-input>
+
+        <el-table
+        :data="tableData"
+        stripe
+        border
+        style="width: 100%;margin-top:8px;">
+
+            <el-table-column prop="id" label="ID" width="100"></el-table-column>
+
+            <el-table-column label="文件名">
+                <template slot-scope="scope">
+                    <a :href="'/' + scope.row.path" target="_blank">{{scope.row.file_name}}</a>
+                </template>
+            </el-table-column>
+
+            <el-table-column prop="date" label="上传时间"></el-table-column>
+
+        </el-table>
+
+        <div class="pagination-box">
+            <el-pagination
+                background
+                layout="prev, pager, next"
+                :current-page.sync="pagination.page"
+                :page-size="pagination.page_size"
+                :total="pagination.total"
+                @current-change="changePage"
+            >
+            </el-pagination>
+        </div>
+
+    </div>
+</template>
+
+<script>
+    var block = "{$block}";
+
+    Vue.component('data-main', {
+                template:"#data-main",
+                props:['block'],
+                data:function(){
+                    return {
+                        tableData:null,
+                        search:'',
+                        pagination:{
+                            page:1,
+                            page_size:0,
+                            total:0
+                        }
+                    }
+                },
+                methods: {
+
+                    getTableData(){
+                        axios.get("{:url('get_more_data')}",{
+                            params:{
+                                block:this.block,
+                                search_key:this.search,
+                                page:this.pagination.page
+                            }
+                        }).then(res=>{
+
+                            this.tableData = res.data.tableData;
+                            this.pagination.page_size = res.data.page_size;
+                            this.pagination.total = res.data.total;
+                            
+                        })
+                    },
+
+                    changePage(page){
+                        this.pagination.page = page;
+                        this.getTableData();
+                    }
+
+                },
+
+                created () {
+                    this.getTableData();
+                },
+
+                watch: {
+                    "block":function(newV,oldV){
+                        this.getTableData();
+                    }
+                }
+            })
+
+    var vue = {
+        el:"#app",
+        data:{
+            block
+        },
+
+    };
+</script>

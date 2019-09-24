@@ -549,6 +549,7 @@ class AdminIndexController extends AdminBaseController
        
         $result     = Db::name('CAction') -> select() -> toArray();
         $tree       = new Tree();
+        
         $tree->icon = ['&nbsp;&nbsp;&nbsp;│ ', '&nbsp;&nbsp;&nbsp;├─', '&nbsp;&nbsp;&nbsp;└─ '];
         $tree->nbsp = '&nbsp;&nbsp;&nbsp;';
 
@@ -556,6 +557,7 @@ class AdminIndexController extends AdminBaseController
         foreach ($result as $m) {
             $newMenus[$m['id']] = $m;
         }
+        
         foreach ($result as $key => $value) {
 
             $result[$key]['parent_id_node'] = ($value['parent_id']) ? ' class="child-of-node-' . $value['parent_id'] . '"' : '';
@@ -564,24 +566,25 @@ class AdminIndexController extends AdminBaseController
                                                <a class="btn btn-xs btn-primary" href="' . url("adminIndex/actionEdit", ["id" => $value['id']]) . '">' . lang('EDIT') . '</a>  
                                                <a class="btn btn-xs btn-danger js-ajax-delete" href="' . url("adminIndex/actionDelete", ["id" => $value['id']]) . '">' . lang('DELETE') . '</a> ';
             $result[$key]['status']         = $value['status'] ? '<span class="label label-success">' . lang('DISPLAY') . '</span>' : '<span class="label label-warning">' . lang('HIDDEN') . '</span>';
-            if (APP_DEBUG) {
-                $result[$key]['app'] =  $value['url'];
-            }
+            
+            $result[$key]['app'] =  $value['url'];
+            
         }
-
+        
         $tree->init($result);
-        $str      = "<tr id='node-\$id' \$parent_id_node style='\$style'>
-                        <td style='padding-left:20px;'>\$id</td>
-                        <td>\$spacer\$name</td>
-                        <td>\$app</td>
-                        <td>\$status</td>
-                        <td>\$str_manage</td>
-                    </tr>";
+
+        $str = "<tr id='node-\$id' \$parent_id_node style='\$style'>
+                    <td style='padding-left:20px;'>\$id</td>
+                    <td>\$spacer\$name</td>
+                    <td>\$app</td>
+                    <td>\$status</td>
+                    <td>\$str_manage</td>
+                </tr>";
+
         $category = $tree->getTree(0, $str);
+
         $this->assign("category", $category);
         return $this->fetch();
-        
-
     }
 
     /**

@@ -177,7 +177,27 @@ class AdminUIController extends AdminBaseController{
      * )
      */
     public function getAsideData(){
-        echo json_encode(Db::name("IndexAside") -> where('block',$this -> request -> param('block',0,'intval')) -> order("sort,date desc") -> select());
+        $page_size = 13;
+        $search = $this -> request -> param('search');
+        $page = $this -> request -> param('page',1,'intval');
+
+        $tableData = Db::name("IndexAside") 
+        -> where('block',$this -> request -> param('block',0,'intval'))
+        -> whereLike("file_name","%".$search."%")
+        -> limit(($page-1)*$page_size,$page_size)
+        -> order("sort,date desc")
+        -> select();
+
+        $total =  Db::name("IndexAside") 
+        -> where('block',$this -> request -> param('block',0,'intval'))
+        -> whereLike("file_name","%".$search."%")
+        -> count();
+
+        $data['tableData'] = $tableData;
+        $data['page_size'] = $page_size;
+        $data['total'] = $total;
+
+        echo json_encode($data);
     }
 
 

@@ -251,23 +251,6 @@ class AdminOrganizeController extends AdminBaseController{
         $affect = Db::name("CUser") -> update($input);
         echo $affect ? 1 : 0;
     }
-
-
-    /**
-     * @adminMenu(
-     *     'name'   => '上传测试',
-     *     'parent' => 'default',
-     *     'display'=> true,
-     *     'hasView'=> true,
-     *     'order'  => 1000,
-     *     'icon'   => '',
-     *     'remark' => '上传测试',
-     *     'param'  => ''
-     * )
-     */
-    public function testUpload(){
-        return $this -> fetch();
-    }
     
     public function handlePost(){
         $files = request()->file('my_files');

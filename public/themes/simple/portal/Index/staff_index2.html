@@ -21,18 +21,18 @@
                         </div>
                         <div class="activity-item">
                             <foreach name="infoList" item="info">
-                                <p class="color-dark"><a href="{:url('openFile')}?path=/{$info['files']}" target="_blank">{$info['name']}</a></p>
+                                <p class="color-dark"><a href="{:url('Info/openFile')}?path=/{$info['files']}&file_name={$info['name']}" target="_blank">{$info['name']}</a></p>
                             </foreach>
                         </div> 
                     </el-card>
                     <el-card class="aside-item red-color-header">
                         <div slot="header">
                             <span class="font-white" style="font-size: 16px;font-weight: bold;">龙虎榜单</span>
-                            <a href="#" class="a-white" style="float: right;">更多</a>
+                            <a href="{:url('showMore',['block'=>3])}" class="a-white" style="float: right;">更多</a>
                         </div>
                         <div class="activity-item">
                             <foreach name="asideData['rank']" item="rank" key="k">
-                                <a><a href="{:url('openFile')}?path=/{$rank['path']}" target="_blank">{$k+1}.{$rank['file_name']}</a></p>
+                                <p><a href="{:url('openFile')}?path=/{$rank['path']}&file_name={$rank['file_name']}" target="_blank">{$k+1}.{$rank['file_name']}</a></p>
                             </foreach>
                         </div>
                     </el-card>
@@ -66,7 +66,7 @@
                     <el-card class="aside-item main-color-header" id="shopMsg">
                         <div slot="header">
                             <span class="font-white">招聘板块</span>
-                            <a href="#"  class="a-white" style="float: right;">更多</a>
+                            <a href="#"  class="a-white" style="float: right;">更多</p>
                         </div>
                         <div class="activity-item">
                             <p><a href="/static/PDF/招聘文件.pdf" target="_blank">招聘文件</a></p>
@@ -76,22 +76,22 @@
                     <el-card class="aside-item main-color-header" id="myMsg">
                         <div slot="header">
                             <span class="font-white">企业文化</span>
-                            <a href="#"  class="a-white"  style="float: right;">更多</a>
+                            <a href="{:url('showMore',['block'=>1])}"  class="a-white"  style="float: right;">更多</a>
                         </div>
                         <div class="activity-item">
                             <foreach name="asideData['culture']" item="culture" key="k">
-                                <p><a href="/{$culture['path']}" target="_blank">{$k+1}.{$culture['file_name']}</a></p>
+                                <p><a href="{:url('openFile')}?path=/{$culture['path']}&file_name={$culture['file_name']}" target="_blank">{$k+1}.{$culture['file_name']}</a></p>
                             </foreach>
                         </div>
                     </el-card>
                     <el-card class="aside-item main-color-header" id="myMsg">
                         <div slot="header">
                             <span class="font-white">内部通知</span>
-                            <a href="#"  class="a-white" style="float: right;">更多</a>
+                            <a href="{:url('showMore',['block'=>2])}"  class="a-white" style="float: right;">更多</a>
                         </div>
                         <div class="activity-item">
                             <foreach name="asideData['notify']" item="notify" key="k">
-                                <p><a href="/{$notify['path']}" target="_blank">{$k+1}.{$notify['file_name']}</a></p>
+                                <p><a href="{:url('openFile')}?path=/{$notify['path']}&file_name={$notify['file_name']}" target="_blank">{$k+1}.{$notify['file_name']}</a></p>
                             </foreach>
                         </div>
                     </el-card>

@@ -3,6 +3,7 @@ namespace app\portal\controller;
 use think\Db;
 use think\Controller;
 use cmf\controller\HomeBaseController;
+use app\common\AppLog;
 
 class InfoController extends HomeBaseController{
 
@@ -45,7 +46,7 @@ class InfoController extends HomeBaseController{
 
     public function openFile(){
         $path = $this -> request -> param("path");
-
-        return redirect(redirectFile($path));
+        AppLog::addLog($this -> request -> param("file_name"));
+        redirectFile($path);
     }
 }

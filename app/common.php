@@ -118,9 +118,7 @@ function redirectFile($path){
     $extensionArr = explode(".",$path);
     $extension = array_pop($extensionArr);
     
-    if($extension == 'pdf'){
-        return "/static/lib/pdf.js/web/viewer.html?file=$path";
-    }
-    return $path;
+    echo $extension == 'pdf' ? "<script>window.location.href='/static/lib/pdf.js/web/viewer.html?file=".$path."';</script>" : "<script>window.location.href='".$path."';</script>";
+    
 }
 

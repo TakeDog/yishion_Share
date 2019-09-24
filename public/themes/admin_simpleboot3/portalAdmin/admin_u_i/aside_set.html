@@ -7,6 +7,8 @@
     .el-upload-list{text-align: left;}
     i.file_edit{cursor: pointer;margin-right: 20px;}
     i.file_edit:hover{color:#409EFF;}
+    .pagination-box{text-align: center;margin-top: 8px;}
+    /* position: absolute;bottom: 10px;width: 100%; */
 </style>
 
 <div class="container-fluid" id="app">
@@ -15,28 +17,54 @@
         <el-breadcrumb-item>界面设置</el-breadcrumb-item>
         <el-breadcrumb-item>侧边栏设置</el-breadcrumb-item>
     </el-breadcrumb>
-    <el-tabs tab-position="left" style="height: 750px;" v-model="block" >
+    
 
+    <el-tabs tab-position="left" style="height: 700px;" v-model="block" >
+            <el-row :gutter="10">
+                    <el-col :span="18">
+                        <el-input placeholder="输入文件名进行搜索" suffix-icon="el-icon-search" v-model="search" @input="getTableData" style="margin-bottom: 8px;"></el-input>
+                    </el-col>
+            </el-row>
+            
         <el-tab-pane label="企业文化" name="1">
-            <block-content :table-data="tableData" :block="block"  @p_data="getTableData" @del_file="deleteItem" @edt_item="edtData" ></block-content>
+            <block-content :table-data="tableData" :block="block" :search1="search"  @p_data="getTableData" @del_file="deleteItem" @edt_item="edtData" ></block-content>
         </el-tab-pane>
 
         <el-tab-pane label="内部通知" name="2">
-            <block-content :table-data="tableData" :block="block"  @p_data="getTableData" @del_file="deleteItem" @edt_item="edtData" ></block-content>
+            <block-content :table-data="tableData" :block="block" :search1="search"  @p_data="getTableData" @del_file="deleteItem" @edt_item="edtData" ></block-content>
         </el-tab-pane>
 
         <el-tab-pane label="龙虎榜单" name="3">
-            <block-content :table-data="tableData" :block="block"  @p_data="getTableData" @del_file="deleteItem" @edt_item="edtData"></block-content>
+            <block-content :table-data="tableData" :block="block" :search1="search"  @p_data="getTableData" @del_file="deleteItem" @edt_item="edtData"></block-content>
         </el-tab-pane>
-
+        
+        
     </el-tabs>
+
+    <el-row :gutter="10" style="margin-left:100px;">
+        <el-col :span="18">
+            <div class="pagination-box">
+                <el-pagination
+                    background
+                    layout="prev, pager, next"
+                    :total="pagination.total"
+                    :page-size="pagination.page_size"
+                    :current-page="pagination.page"
+                    @current-change="changePage"
+                >
+                </el-pagination>
+            </div>
+        </el-col>
+    </el-row>
+    
 
     
 </div>
 <template id="block_content">
     <div>
         <el-row :gutter="10">
-            <el-col :span="18" style="min-height: 750px;">
+            <el-col :span="18" style="min-height: 700px;">
+
                 <table class="table table-striped" style="border-bottom: 2px #E4E7ED solid;">
                     <thead>
                         <tr><th>ID</th><th>文件名</th><th>上传时间</th><th>排序</th><th>操作</th></tr>
@@ -75,7 +103,7 @@
                     </tbody>
                 </table>
             </el-col>
-            <el-col :span="6" style="min-height: 750px;border-left: 2px #E4E7ED solid;">
+            <el-col :span="6" style="min-height: 700px;border-left: 2px #E4E7ED solid;">
                 <el-upload
                     class="upload-demo"
                     action="{:url('AsideSetHandle')}"
@@ -99,21 +127,35 @@
         data: {
             block:"1",
             tableData:[],
-
+            search:'',
+            pagination:{
+                page:1,
+                total:0,
+                page_size:0
+            }
         },
         methods: {
 
             getTableData(){
+
                 axios.get("{:url('getAsideData')}",{
                     params:{
-                        block:this.block
+                        block:this.block,
+                        search:this.search,
+                        page:this.pagination.page
                     }
                 }).then((res)=>{
-                    this.tableData = res.data;
+
+                    this.tableData = res.data.tableData;
+                    
+                    this.pagination.total = res.data.total;
+                    this.pagination.page_size = res.data.page_size;
+
                     this.tableData.forEach((el,index) => {
                         this.$set(el,'edit',false);
                     });
                 })
+
             },
 
             deleteItem(id){
@@ -151,8 +193,10 @@
                     })
                 }
             },
-            hidInput(index){
-                this.tableData[index].edit = false;
+            
+            changePage(num){
+                this.pagination.page = num;
+                this.getTableData();
             }
         },
         created () {
@@ -160,16 +204,18 @@
         },
         watch: {
             "block":function(newV,oldV){
+                this.search = '';
+                this.pagination.page = 1;
                 this.getTableData();
             }
         },
         components:{
             "block-content":{
                 template:"#block_content",
-                props:['table-data','block'],
+                props:['table-data','block','search1'],
                 data:function(){
                     return {
-                        temp:''
+                        temp:'',
                     }
                 },
                 methods: {
