@@ -13,7 +13,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use app\portal\model\DeptModel;
 
-class UserManagerController extends AdminBaseController{
+class AdminUserController extends AdminBaseController{
 
     public function loginTotal(){
         return $this->fetch();

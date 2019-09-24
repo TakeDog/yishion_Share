@@ -6,6 +6,7 @@ use think\Db;
 use cmf\controller\HomeBaseController;
 use app\common\Category;
 use app\common\OperateConfig;
+use app\common\AppLog;
 
 class IndexController extends HomeBaseController
 {
@@ -412,8 +413,8 @@ class IndexController extends HomeBaseController
     
     public function openFile(){
         $path = $this -> request -> param("path");
-
-        return redirect(redirectFile($path));
+        AppLog::addLog($this -> request -> param("file_name"));
+        redirectFile($path);
     }
 
     //更多
