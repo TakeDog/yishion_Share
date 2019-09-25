@@ -186,6 +186,7 @@ ul,li{
                 <el-button type="success" size="mini" v-else plain disabled><i class="el-icon-sort"></i> 排序</el-button>
             </div>
             <div style="flex:1;text-align:right;">
+                <el-button type="success" @click="exportLog" size="mini" icon="el-icon-upload" plain>导出Excel</el-button>
                 <el-button type="primary" @click="itemInfo={id:0,pid:0,icon:'',name:'',sort:0,del:1,lev:0};addModal=true;" size="mini" plain><span class="glyphicon glyphicon-plus"></span>增加项目</el-button>
             </div>
         </div>
@@ -516,6 +517,9 @@ ul,li{
                             });
                         }
                     });
+                },
+                exportLog(){
+                    location.href = "{:url('exportLog')}";
                 }
             }
         })

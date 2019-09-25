@@ -9,7 +9,7 @@ class AppLog {
         $user_info = session('user_info','','portal');
         $param = $request->param();
         $paramStr = count($param) > 0 ? json_encode($param) : '';
-        $action_id = self::getActionId( strtolower( $request->module()."/".$request->controller()."/".$request->action()) );
+        $action_id = self::getActionId(strtolower( $request->module()."/".$request->controller()."/".$request->action()));
         
         $affectRow = Db::name("CLog") -> insert([
             "action_id" => $action_id,

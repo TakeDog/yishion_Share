@@ -103,7 +103,8 @@
                     </tbody>
                 </table>
             </el-col>
-            <el-col :span="6" style="min-height: 700px;border-left: 2px #E4E7ED solid;">
+            <el-col :span="6" style="min-height: 700px;border-left: 2px #E4E7ED solid;text-align: center;">
+                <el-button size="small" type="success" @click="exportAside" style="margin-bottom: 10px;">导出Excel</el-button>
                 <el-upload
                     class="upload-demo"
                     action="{:url('AsideSetHandle')}"
@@ -226,6 +227,9 @@
                             this.$refs.fileName_input[0].focus();
                         },10)
                         
+                    },
+                    exportAside(){
+                        location.href = "{:url('exportAside')}";
                     }
                 },
             }

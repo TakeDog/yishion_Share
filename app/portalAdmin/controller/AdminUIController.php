@@ -251,4 +251,9 @@ class AdminUIController extends AdminBaseController{
         echo $affect;
     }
 
+    public function exportAside(){
+        $CLogModel = model('CLog');
+        $CLogModel -> exportFileLog(36,'share_index_aside','file_name');
+    }
+
 }

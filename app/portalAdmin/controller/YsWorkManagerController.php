@@ -115,4 +115,10 @@ class YsWorkManagerController extends AdminBaseController{
         return json($res);
     }
 
+    public function exportLog(){
+
+        $CLogModel = model('Clog');
+        $CLogModel -> exportFileLog(37,'share_work_info','name');
+
+    }
 }
