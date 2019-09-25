@@ -49,4 +49,41 @@ class InfoController extends HomeBaseController{
         AppLog::addLog($this -> request -> param("file_name"));
         redirectFile($path);
     }
+
+    public function fileList(){
+        $root = "./static/PDF/运营指南/";
+        $dir = $this -> request -> param('dir');
+        $path =$root.$dir;
+        
+        $dirArr = explode('/',$dir);
+        if( strpos(end($dirArr),'.') !== false ){
+            AppLog::addLog(end($dirArr));
+            redirectFile('/'.$path);
+        }
+
+        $path = iconv("utf-8","gbk",$path);
+        $fileList = scandir($path);
+        unset($fileList[0]);
+        unset($fileList[1]);
+        
+        foreach($fileList as $k => $v){
+            $data[] = ['file'=>iconv("gbk","utf-8",$v),'date'=>date("Y-m-d H:i:s", filemtime($path.'/'.$v))];
+
+        }
+        
+        foreach($dirArr as $k => $v){
+            $nav[$k]['name'] = $v;
+            $navPath = '';
+            for($i=0;$i<($k+1);$i++){
+                $navPath.= '/'.$dirArr[$i];
+            }
+            $nav[$k]['link'] =  ltrim($navPath,'/');
+        }
+
+        $this -> assign('nav', json_encode($nav));
+        $this -> assign('fileList', json_encode($data));
+        return $this -> fetch();
+    }
+
+
 }
