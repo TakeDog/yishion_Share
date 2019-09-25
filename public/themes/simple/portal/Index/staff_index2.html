@@ -21,7 +21,7 @@
                         </div>
                         <div class="activity-item">
                             <foreach name="infoList" item="info">
-                                <p class="color-dark"><a href="{:url('Info/openFile')}?path=/{$info['files']}&file_name={$info['name']}" target="_blank">{$info['name']}</a></p>
+                                <p class="color-dark"><a href="{:url('Info/openFile')}?path=/{$info['files']}&file_name={$info['name']}&id={$info['id']}" target="_blank">{$info['name']}</a></p>
                             </foreach>
                         </div> 
                     </el-card>
@@ -32,7 +32,7 @@
                         </div>
                         <div class="activity-item">
                             <foreach name="asideData['rank']" item="rank" key="k">
-                                <p><a href="{:url('openFile')}?path=/{$rank['path']}&file_name={$rank['file_name']}" target="_blank">{$k+1}.{$rank['file_name']}</a></p>
+                                <p><a href="{:url('openFile')}?path=/{$rank['path']}&file_name={$rank['file_name']}&id={$rank['id']}" target="_blank">{$k+1}.{$rank['file_name']}</a></p>
                             </foreach>
                         </div>
                     </el-card>
