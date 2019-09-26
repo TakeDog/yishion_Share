@@ -91,7 +91,7 @@ class YsWorkManagerController extends AdminBaseController{
     public function uploadFile(){
         $files = $this -> request -> file("files");
         $data['pid'] = $this -> request -> param("pid",0,"intval");
-        $data['sort'] = $this -> request -> param("sort",0,"intval");
+        $data['sort'] = $this -> request -> param("sort",1000,"intval");
         $data['del'] = $this -> request -> param("del",1,"intval");
         $data['date'] = date("Y-m-d H:i:s");
         foreach($files as $file){
