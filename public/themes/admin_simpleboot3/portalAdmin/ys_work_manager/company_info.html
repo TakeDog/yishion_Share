@@ -176,7 +176,7 @@ ul,li{
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button type="primary" @click="updateItem" size="mini">确 定</el-button>
-                <el-button @click="itemInfo={id:0,pid:0,icon:'',name:'',sort:0,del:1};updateModal=false" size="mini">取 消</el-button>
+                <el-button @click="itemInfo={id:0,pid:0,icon:'',name:'',sort:999,del:1};updateModal=false" size="mini">取 消</el-button>
             </span>
         </el-dialog>
 
@@ -187,7 +187,7 @@ ul,li{
             </div>
             <div style="flex:1;text-align:right;">
                 <el-button type="success" @click="exportLog" size="mini" icon="el-icon-upload" plain>导出Excel</el-button>
-                <el-button type="primary" @click="itemInfo={id:0,pid:0,icon:'',name:'',sort:0,del:1,lev:0};addModal=true;" size="mini" plain><span class="glyphicon glyphicon-plus"></span>增加项目</el-button>
+                <el-button type="primary" @click="itemInfo={id:0,pid:0,icon:'',name:'',sort:999,del:1,lev:0};addModal=true;" size="mini" plain><span class="glyphicon glyphicon-plus"></span>增加项目</el-button>
             </div>
         </div>
         <div class="content">
@@ -196,7 +196,7 @@ ul,li{
                 <div class="col-sm-1">排序</div>
                 <div class="col-sm-3">操作</div>
             </div>
-            <my-tree :data-tree='dataTree' @getsubitem="itemInfo=JSON.parse(JSON.stringify($event));updateModal=true;" @getsubid="itemInfo={id:0,pid:$event.id,name:'',sort:0,lev:$event.lev,del:1};addModal=true;" @delitem="delItem($event)" @updatedel="updateDel($event)" @setsort="sortChange($event)" @updatefile="updateFile($event)"></my-tree>
+            <my-tree :data-tree='dataTree' @getsubitem="itemInfo=JSON.parse(JSON.stringify($event));updateModal=true;" @getsubid="itemInfo={id:0,pid:$event.id,name:'',sort:999,lev:$event.lev,del:1};addModal=true;" @delitem="delItem($event)" @updatedel="updateDel($event)" @setsort="sortChange($event)" @updatefile="updateFile($event)"></my-tree>
         </div>
     </div>
     <!-- 递归模板 -->
@@ -218,7 +218,7 @@ ul,li{
                     </div>
                     <div class="col-sm-1">
                         <div class="treeText" style="text-align:center;">
-                            <el-input-number v-model="item.sort" @change="$emit('setsort',item)" :min="0" :max="99" size="mini" style="width: 100px;"></el-input-number>
+                            <el-input-number v-model="item.sort" @change="$emit('setsort',item)" :min="0" :max="999" size="mini" style="width: 100px;"></el-input-number>
                         </div>
                     </div>
                     <div class="col-sm-3">
@@ -249,7 +249,7 @@ ul,li{
                 addModal: false,
                 updateModal: false,
                 uploadModal: false,
-                itemInfo: {id:0,pid:0,icon:'',name:'',sort:0,del:1},
+                itemInfo: {id:0,pid:0,icon:'',name:'',sort:999,del:1},
                 fileList:[],
                 sortArr:[],
                 uploadProgree: {
@@ -278,7 +278,7 @@ ul,li{
                                 });
                                 this.createTree();
                                 this.addModal = false;
-                                this.itemInfo = {id:0,pid:0,icon:'',name:'',sort:0,del:1};
+                                this.itemInfo = {id:0,pid:0,icon:'',name:'',sort:999,del:1};
                             }else{
                                 this.$message({
                                     message: "添加项目失败！！！",
@@ -353,7 +353,7 @@ ul,li{
                                 type: 'success'
                             });
                             this.updateModal = false;
-                            this.itemInfo = {id:0,pid:0,icon:'',name:'',sort:0,del:1};
+                            this.itemInfo = {id:0,pid:0,icon:'',name:'',sort:999,del:1};
                             this.createTree();
                         }else{
                             this.$message({
@@ -455,14 +455,14 @@ ul,li{
                         this.$refs.upload.clearFiles();
                         this.itemInfo = {id:0,pid:0,icon:'',name:'',sort:0,del:1,lev:2};
                     }
-                    this.itemInfo = {id:0,pid:0,icon:'',name:'',sort:0,del:1};
+                    this.itemInfo = {id:0,pid:0,icon:'',name:'',sort:999,del:1};
                     this.fileList = [];
                 },
                 sortChange(event){
                     let isNew = true;
                     this.sortArr.forEach((item,i) => {
                         if(event.id === item.id){
-                            if(item.sort == event.sort){
+                            if(item.sort === event.sort){
                                 this.sortArr.splice(i,1);
                             }else{
                                 item.sort = event.sort;
@@ -471,7 +471,7 @@ ul,li{
                         }
                     });
                     if(isNew){
-                        this.sortArr.push(event);
+                        this.sortArr.push(JSON.parse(JSON.stringify(event)));
                     }
                 },
                 updateSort(){
