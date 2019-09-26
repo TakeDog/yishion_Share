@@ -251,6 +251,19 @@ class AdminUIController extends AdminBaseController{
         echo $affect;
     }
 
+    /**
+     * 导出阅读记录
+     * @adminMenu(
+     *     'name'   => '导出阅读记录',
+     *     'parent' => 'AsideSet',
+     *     'display'=> false,
+     *     'hasView'=> false,
+     *     'order'  => 1,
+     *     'icon'   => '',
+     *     'remark' => '导出阅读记录',
+     *     'param'  => ''
+     * )
+     */
     public function exportAside(){
         $CLogModel = model('CLog');
         $CLogModel -> exportFileLog(36,'share_index_aside','file_name');
