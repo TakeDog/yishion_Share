@@ -125,6 +125,53 @@ ul,li{
 </style>
 <body>
     <div id="app" class="container-fluid" v-cloak>
+
+        <!-- 设置可见范围模态框 -->
+        <el-dialog width="35%" :visible.sync="fileAuthModal" :show-close="true" :close-on-press-escape="false" :close-on-click-modal="false" append-to-body>
+
+            <div style="text-align:center;">
+                <span>部门：</span>
+                <el-cascader
+                    v-model="authDept"
+                    :options="deptoption"
+                    :props="{ label:'name',value:'id',children:'child',expandTrigger:'hover',multiple: true}"
+                    :show-all-levels='false'
+                    collapse-tags
+                    style="margin-right:121px;"
+                >
+                </el-cascader>
+            </div>
+
+            <div style="margin-top:20px;text-align:center;">
+                <span>岗位：</span>
+                <el-select v-model="authJob" placeholder="请选择" collapse-tags multiple :disabled="alljobFlag">
+                    <el-option-group
+                        v-for="group in joboptions"
+                        :key="group.dept_type_id"
+                        :label="group.name">
+                        <el-option
+                            v-for="item in group.options"
+                            :key="item.id"
+                            :label="item.job"
+                            :value="item.id">
+                        </el-option>
+                    </el-option-group>
+                </el-select>
+                全部岗位：
+                <el-switch
+                    v-model="alljobFlag"
+                    active-color="#13ce66"
+                    inactive-color="#ccc">
+                </el-switch>
+
+            </div>
+
+            <span slot="footer" class="dialog-footer" v-show="AuthModalOperate=='set'">
+                <el-button type="primary" @click="setAuth" size="mini">确 定</el-button>
+                <el-button @click="fileAuthModal=false" size="mini">取 消</el-button>
+            </span>
+        </el-dialog>
+
         <!-- 文件上传模态框 -->
         <el-dialog width="30%" :visible.sync="uploadModal" :show-close="false" :close-on-press-escape="false" :close-on-click-modal="false" append-to-body style="margin-top: 20vh;">
             <el-progress :text-inside="true" :stroke-width="26" :percentage="uploadProgree.persent"></el-progress>
@@ -139,14 +186,51 @@ ul,li{
                     <el-input v-model="itemInfo.icon" size="small"></el-input>
                     <a style="float: right;" href="/./static/sundry/workInfo/element-ui图标.png" target="view_window">查看图标</a>
                 </el-form-item>
+
                 <el-form-item label="上传文件" v-if="itemInfo.lev == 2">
                     <el-upload ref="upload" class="upload-demo" action="" :http-request="httpRequest" :on-remove="removeUpload" :before-upload="beforeUpload" :file-list="fileList" multiple>
                         <el-button size="mini" type="primary">点击上传</el-button>
                     </el-upload>
                 </el-form-item>
+
+                <el-form-item label="部门：" v-if="itemInfo.lev == 2">
+                    <el-cascader
+                        v-model="authDept"
+                        :options="deptoption"
+                        :props="{ label:'name',value:'id',children:'child',expandTrigger:'hover',multiple: true}"
+                        :show-all-levels='false'
+                        collapse-tags
+                        style="margin-right:121px;"
+                    >
+                    </el-cascader>
+                </el-form-item>
+
+                <el-form-item label="岗位：" v-if="itemInfo.lev == 2">
+                        <el-select v-model="authJob" placeholder="请选择" collapse-tags multiple :disabled="alljobFlag">
+                            <el-option-group
+                                v-for="group in joboptions"
+                                :key="group.dept_type_id"
+                                :label="group.name">
+                                <el-option
+                                    v-for="item in group.options"
+                                    :key="item.id"
+                                    :label="item.job"
+                                    :value="item.id">
+                                </el-option>
+                            </el-option-group>
+                        </el-select>
+                        全部岗位：
+                        <el-switch
+                            v-model="alljobFlag"
+                            active-color="#13ce66"
+                            inactive-color="#ccc">
+                        </el-switch>
+                </el-form-item>   
+
                 <el-form-item label="排序" v-if="itemInfo.lev < 2">
                     <el-input type="number" v-model="itemInfo.sort" size="small"></el-input>
                 </el-form-item>
+
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button type="primary" @click="createItem(itemInfo.lev)" size="mini">确 定</el-button>
@@ -170,6 +254,7 @@ ul,li{
                         </template>
                     </el-cascader>
                 </el-form-item>
+
                 <el-form-item label="排序">
                     <el-input type="number" v-model="itemInfo.sort" size="small"></el-input>
                 </el-form-item>
@@ -184,6 +269,7 @@ ul,li{
             <div style="flex:1;text-align:left;">
                 <el-button type="success" size="mini" v-if="sortArr.length>0" @click="updateSort" plain><i class="el-icon-sort"></i> 排序</el-button>
                 <el-button type="success" size="mini" v-else plain disabled><i class="el-icon-sort"></i> 排序</el-button>
+                <el-button type="success" size="mini" @click="openSetAuth"><i class="el-icon-sort"></i>设置已选中文件的可见范围</el-button>
             </div>
             <div style="flex:1;text-align:right;">
                 <el-button type="success" @click="exportLog1" size="mini" icon="el-icon-upload" plain>导出运营指南阅读记录</el-button>
@@ -193,11 +279,15 @@ ul,li{
         </div>
         <div class="content">
             <div class="header">
-                <div class="col-sm-8">标题名称</div>
+                <div class="col-sm-3">标题名称</div>
+                <div class="col-sm-2">选中文件</div>
+                <div class="col-sm-3">可见范围</div>
                 <div class="col-sm-1">排序</div>
                 <div class="col-sm-3">操作</div>
             </div>
-            <my-tree :data-tree='dataTree' @getsubitem="itemInfo=JSON.parse(JSON.stringify($event));updateModal=true;" @getsubid="itemInfo={id:0,pid:$event.id,name:'',sort:999,lev:$event.lev,del:1};addModal=true;" @delitem="delItem($event)" @updatedel="updateDel($event)" @setsort="sortChange($event)" @updatefile="updateFile($event)"></my-tree>
+            
+
+            <my-tree :data-tree='dataTree' :deptoption='deptoption' @getsubitem="itemInfo=JSON.parse(JSON.stringify($event));updateModal=true;" @getsubid="itemInfo={id:0,pid:$event.id,name:'',sort:999,lev:$event.lev,del:1};addModal=true;authDept=[];authJob=[];alljobFlag=false;" @delitem="delItem($event)" @updatedel="updateDel($event)" @setsort="sortChange($event)" @updatefile="updateFile($event)" @allselect="allselect($event)" @showauth="showauth($event)"></my-tree>
         </div>
     </div>
     <!-- 递归模板 -->
@@ -205,7 +295,7 @@ ul,li{
         <ul class="dataTree">
             <li v-for="(item,i) in dataTree" :style="{background:item.del==0?'#e2e0e0':''}">
                 <div class="row treeItem">
-                    <div @click="item.active = !item.active" class="col-sm-8" style="cursor: pointer;overflow:hidden;white-space: nowrap;text-overflow: ellipsis;">
+                    <div @click="item.active = !item.active" class="col-sm-4" style="cursor: pointer;overflow:hidden;white-space: nowrap;text-overflow: ellipsis;">
                         <div class="treeText">
                             <span v-for="n in item.lev">&nbsp;</span>
                             <span :style="{visibility:(item.children?'':'hidden')}" :class="item.active?'el-icon-arrow-down':'el-icon-arrow-right'"></span>
@@ -217,6 +307,32 @@ ul,li{
                             <i class="fa fa-reply file_edit" v-if="item.files && item.edit" aria-hidden="true" @click="item.edit=false"></i>
                         </div>
                     </div>
+
+                    <div class="col-sm-1">
+                        <div class="treeText" style="text-align:left ;">
+                            
+                            <!-- <el-cascader v-model="item.id" :options="deptoption" :props="{expandTrigger:'hover',label:'name', checkStrictly: true,value:'id',children:'child'}" v-if="item.files">
+                            </el-cascader> -->
+
+                            <!-- <el-cascader
+                                v-model="item.id"
+                                :options="deptoption"
+                                :props="{ checkStrictly: true ,label:'name',value:'id',children:'child',expandTrigger:'hover'}"
+                                :show-all-levels='false'
+                                v-if="item.files"
+                                :filterable="true"
+                            > -->
+                            <!-- </el-cascader> -->
+                            <input type="checkbox" name="file_mark" :lev="item.lev" :value="item.id" :datapid='item.pid' v-if="item.lev>=2" @click="$emit('allselect',item.id)">
+                        </div>
+                    </div>
+
+                    <div class="col-sm-3">
+                        <div class="treeText" style="text-align:center ;" v-if="item.lev>2">
+                            <a href="javascript:;" @click="$emit('showauth',item.id)">查看</a>
+                        </div>
+                    </div>
+
                     <div class="col-sm-1">
                         <div class="treeText" style="text-align:center;">
                             <el-input-number v-model="item.sort" @change="$emit('setsort',item)" :min="0" :max="999" size="mini" style="width: 100px;"></el-input-number>
@@ -232,7 +348,7 @@ ul,li{
                         </div>
                     </div>
                 </div>
-                <my-tree v-if="item.active && item.children" :data-tree="item.children" @getsubitem="$emit('getsubitem',$event)" @getsubid="$emit('getsubid',$event)" @delitem="$emit('delitem',$event)" @updatedel="$emit('updatedel',$event)" @setsort="$emit('setsort',$event)" @updatefile="$emit('updatefile',$event)"></my-tree>
+                <my-tree v-show="item.active && item.children" :deptoption="deptoption" :data-tree="item.children" @getsubitem="$emit('getsubitem',$event)" @getsubid="$emit('getsubid',$event)" @delitem="$emit('delitem',$event)" @updatedel="$emit('updatedel',$event)" @setsort="$emit('setsort',$event)" @updatefile="$emit('updatefile',$event)" @allselect="$emit('allselect',$event)" @showauth="$emit('showauth',$event)"></my-tree>
             </li>
         </ul>
     </template>
@@ -240,7 +356,7 @@ ul,li{
         Vue.component('my-tree',{
             name: "myTree",
             template: '#dataTreeTemplate',
-            props: ['dataTree']
+            props: ['dataTree','deptoption']
         });
     
         var vm = new Vue({
@@ -250,20 +366,143 @@ ul,li{
                 addModal: false,
                 updateModal: false,
                 uploadModal: false,
-                itemInfo: {id:0,pid:0,icon:'',name:'',sort:999,del:1},
+                itemInfo: {id:0,pid:0,icon:'',name:'',sort:999,del:1,deptId:0,jobId:0},
                 fileList:[],
                 sortArr:[],
                 uploadProgree: {
                     persent: 0,
                     color: ''
-                }
+                },
+                deptoption:[],
+                joboptions:[],
+                checkedIds:[],
+                fileAuthModal:false,
+                AuthModalOperate:'get',
+                authDept:'',
+                authJob:'',
+                alljobFlag:false
+            },
+            watch:{
+                //"authDept":function(newV,oldV){console.log(newV)},
+                //"authJob":function(newV,oldV){console.log(newV)}
             },
             mounted () {
                 this.createTree();
             },
             created(){
+                this.getDeptOption();
+                this.queryJob(false);
             },
             methods: {
+                showauth(id){
+                    this.AuthModalOperate = "get";
+                    this.authDept = '';
+                    this.authJob = '';
+                    axios.get("{:url('getAuth')}",{
+                        params:{
+                            id
+                        }
+                    }).then(res=>{
+                        
+                        this.authDept = res.data.authDept;
+                        if(res.data.authJob != 0){
+                            this.authJob =  res.data.authJob.split(',').map(function(currentV){
+                                return parseInt(currentV);
+                            });
+                        }else{
+                            this.alljobFlag = true;
+                        }
+
+                        this.fileAuthModal = true;
+
+                    })
+                },
+                queryJob(id){
+                    //console.log(id);
+                    
+                    axios.get("{:url('getJobOptions')}").then((res)=>{
+                        this.joboptions = res.data;
+                        // this.joboptions.unshift({
+                        //     dept_type_id:0,
+                        //     name: "全部",
+                        //     options:[
+                        //         {
+                        //             dept_type: 0,
+                        //             id: 0,
+                        //             job: "全部部门"
+                        //         }
+                        //     ]
+                        // })
+                    })
+                },
+                setAuth(){
+                    this.AuthModalOperate = 'set';
+                    var authJob = this.alljobFlag ? [0] : this.authJob;
+                    // var authDept = [];
+
+                    // for(var i=0;i<this.authDept.length;i++){
+                    //     authDept.push(this.authDept[i][(this.authDept[i].length - 1)]);
+                    // }
+
+                    axios.post("{:url('setAuth')}",{
+                        fileIds:this.checkedIds,
+                        authDept:this.authDept,
+                        authJob
+                    }).then(res=>{
+                        var msg ={};
+                        if(res.data){
+                            msg.info = '操作成功';
+                            msg.type = 'success';
+                        }else{
+                            msg.info = '操作失败';
+                            msg.type = 'error';
+                        }
+
+                        this.fileAuthModal = false;
+
+                        this.$notify({
+                            title: '操作提醒',
+                            message: msg.info,
+                            type: msg.type
+                        });
+
+                    })
+                },
+                openSetAuth(){
+                    this.AuthModalOperate = 'set';
+                    this.authDept = [];
+                    this.authJob = [];
+                    this.alljobFlag = false;
+
+                    var inputs = $("input:checkbox:checked");
+                    var arr = [];
+                    for(var i=0;i<inputs.length;i++){
+                        if(inputs.eq(i).attr('lev') > 2){
+                            arr.push(inputs.eq(i).val());
+                        }
+                    }
+
+                    if(!arr.length){
+                        this.$alert('请选中文件后再更改', {
+                            confirmButtonText: '确定',
+                        })
+                        return false;
+                    }
+
+                    this.checkedIds = arr;
+                    this.fileAuthModal = true;
+                },
+                allselect(pid){
+                    var targetVal = $("input[value='" + pid + "']").is(':checked');
+                    targetVal ? $("input[datapid='" + pid + "']").prop("checked", true) : $("input[datapid='" + pid + "']").prop("checked", false);
+                },
+                getDeptOption(){
+
+                    axios.get("{:url('AdminOrganize/getTree')}").then((res)=>{
+                        this.deptoption = res.data;
+                    });
+
+                },
                 getInfo(id,callback){
                     axios.post("{:url('getInfo')}",{id:id}).then((res)=>{
                         callback(res.data);
@@ -308,10 +547,23 @@ ul,li{
                         this.fileList.forEach(file=>{
                             formData.append("files[]",file,file.name);
                         });
+
+                        var authJob = this.alljobFlag ? [0] : this.authJob;
+                        this.authDept.forEach(deptArr=>{
+                            formData.append("authDept[]",deptArr);
+                        });
+
+                        authJob.forEach(jobV=>{
+                            formData.append("authJob[]",jobV);
+                        });
+
                         formData.append("fileLength",this.fileList.length);
                         formData.append("pid",this.itemInfo.pid);
                         formData.append("sort",this.itemInfo.sort);
                         formData.append("del",this.itemInfo.del);
+                        // console.log(formData);
+                        // return false;
+
                         axios.post("{:url('uploadFile')}",formData,
                         {
                             headers:{"Content-Type": "multipart/form-data"},

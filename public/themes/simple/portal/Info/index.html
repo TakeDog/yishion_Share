@@ -11,6 +11,7 @@
    .more_files{color:#409EFF;cursor: pointer;}
    .more_files:hover{color:#74b6fb;}
    .el-tab-pane{min-height: auto;}
+   .light-blue{color:#00b6ff;}
 </style>
 <!-- el-icon-s-home -- 制度类
 el-icon-bangzhu -- 通知类
@@ -28,13 +29,14 @@ el-icon-s-promotion -- 指引 -->
                         <button class="el-button el-button--info" style="vertical-align: text-bottom;">{{item.name}}</button>
                         <el-input v-model="searchNameArr[i].fileName" style="display:block;width:160px;margin-left:12px;margin-top: 5px;" @input="searchFiles(item,i)" placeholder="搜索文件名" size="small"></el-input>
                     </div>
-                    <div style="float:left;">
+                    <div style="float:left;min-width:810px;">
                         <el-tabs v-model="item.cActive" @tab-click="tabCut($event,i)" style="min-height: 200px;">
                             <el-tab-pane :label="ktem.name" :name="ktem.id+''" v-for="(ktem,k) in item.children" :page="ktem.page" lazy>
                                 <div v-if="ktem.children">
                                     <ul>
                                         <li v-for="(jtem,j) in ktem.children">
-                                            <a :href="'{:url(\'openFile\')}?path=/'+jtem.files+'&id='+jtem.id+'&file_name='+jtem.name" target="view_window">{{jtem.name}}</a>
+                                            <a :href="'{:url(\'openFile\')}?path=/'+jtem.files+'&id='+jtem.id+'&file_name='+jtem.name" target="view_window">{{jtem.name}}  </a>
+                                            <span class="pull-right light-blue">{{jtem.date}}</span>
                                         </li>
                                     </ul>
                                     <span v-if="ktem.total > ktem.children.length" class="more_files" @click="getMoreFiles(ktem,i,k)">更多</span>

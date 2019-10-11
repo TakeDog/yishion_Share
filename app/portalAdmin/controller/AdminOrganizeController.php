@@ -36,6 +36,7 @@ class AdminOrganizeController extends AdminBaseController{
      * )
      */
     public function index(){
+        $this -> assign('dept_type', json_encode( Db::name('DeptType') -> select() ));
         return $this -> fetch();
     }
 

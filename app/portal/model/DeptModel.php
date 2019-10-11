@@ -28,5 +28,4 @@ class DeptModel extends Model{
     }
     
 
-
 }

@@ -59,12 +59,12 @@ class Category {
                 $v[$name]=self::unlimitedForLayer($cate,$name,$v['id'],$pid);
 
                 $arr[]=$v;
-
+                
             }
 
         }
 
-        return $arr;
+        return count($arr) ? $arr : '';
 
     }
 

@@ -18,7 +18,7 @@ class InfoController extends HomeBaseController{
         if($where['id'] == -1){
             $data = Db::name('WorkInfo') -> where('files','') -> order('sort') -> select();
         }else{
-            $data = Db::name('WorkInfo') -> where('id',$where['id']) -> order('sort,date desc') -> select();
+            $data = Db::name('WorkInfo') -> where('id',$where['id']) -> order('sort desc,date desc') -> select();
         }
         return json($data);
     }
@@ -29,10 +29,26 @@ class InfoController extends HomeBaseController{
         $page = $this -> request -> param("page",1,"intval");
         $size = $this -> request -> param("size",3,"intval");
         
-        $total = Db::name('WorkInfo') -> where('pid',$pid) ->where('name','like',"%$fileName%") -> count();
+        $total = Db::name('WorkInfo') -> where(function($query){
+
+            $query->where('auth_dept','like', "%[".session("user_info",'','portal')['dept_id'].",%" ) -> whereor('auth_dept','like', "%,".session("user_info",'','portal')['dept_id'].",%") -> whereor('auth_dept','like', "%,".session("user_info",'','portal')['dept_id']."]%");
+
+        }) -> where(function($query){
+
+            $query->where('auth_job',0)->whereor('auth_job',session("user_info",'','portal')['job_id']);
+
+        }) -> where('pid',$pid) ->where('name','like',"%$fileName%") -> count();
         $current = $page * $size;
 
-        $data = Db::name('WorkInfo') -> where('pid',$pid) ->where('name','like',"%$fileName%") -> order('sort,date desc') -> limit(0,$current) -> select();
+        $data = Db::name('WorkInfo') -> where(function($query){
+
+            $query->where('auth_dept','like', "%[".session("user_info",'','portal')['dept_id'].",%" ) -> whereor('auth_dept','like', "%,".session("user_info",'','portal')['dept_id'].",%") -> whereor('auth_dept','like', "%,".session("user_info",'','portal')['dept_id']."]%");
+
+        }) -> where(function($query){
+
+            $query->where('auth_job',0)->whereor('auth_job',session("user_info",'','portal')['job_id']);
+
+        }) -> where('pid',$pid) ->where('name','like',"%$fileName%") -> order('sort desc,date desc') -> limit(0,$current) -> select();
 
         $res['files'] = $data;
         $res['total'] = $total;
