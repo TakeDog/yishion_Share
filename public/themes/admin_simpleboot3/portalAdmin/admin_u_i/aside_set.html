@@ -104,7 +104,6 @@
                 </table>
             </el-col>
             <el-col :span="6" style="min-height: 700px;border-left: 2px #E4E7ED solid;text-align: center;">
-                <el-button size="small" type="success" @click="exportAside" style="margin-bottom: 10px;">导出Excel</el-button>
                 <el-upload
                     class="upload-demo"
                     action="{:url('AsideSetHandle')}"
@@ -114,6 +113,7 @@
                     style="text-align:center;"
                     :on-success="function(){ $emit('p_data') }"
                     >
+                    <el-button size="small" type="success" @click="exportAside" style="margin-bottom: 10px;">导出阅读记录</el-button>
                     <el-button size="small" type="primary">点击上传</el-button>
                     <!-- <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div> -->
                 </el-upload>

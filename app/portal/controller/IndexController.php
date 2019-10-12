@@ -85,14 +85,23 @@ class IndexController extends HomeBaseController
     }
 
     public function staff_index2(){
+        //$userInfo = session("user_info",'','portal');
         //公司资讯
         $operateConfig = new OperateConfig();
-        $infoList = Db::name("WorkInfo") -> order("date desc") -> limit(0,5) -> select();
+        $infoList =  Db::name("WorkInfo") -> order("date desc") -> where(function($query){
+
+            $query->where('auth_dept','like', "%[".session("user_info",'','portal')['dept_id'].",%" ) -> whereor('auth_dept','like', "%,".session("user_info",'','portal')['dept_id'].",%") -> whereor('auth_dept','like', "%,".session("user_info",'','portal')['dept_id']."]%");
+
+        }) -> where(function($query){
+
+            $query->where('auth_job',0)->whereor('auth_job',session("user_info",'','portal')['job_id']);
+
+        }) -> limit(0,5) -> select();
         
         //侧边栏信息
         $asideData = array(
-            "culture"=>Db::name("IndexAside") -> where('block',1) -> order('sort,date desc') -> limit(0,5) -> select(), //企业文化
-            "notify"=>Db::name("IndexAside") -> where('block',2) -> order('sort,date desc') -> limit(0,5) -> select(),  //内部通知
+            "culture" => Db::name("IndexAside") -> where('block',1) -> order('sort,date desc') -> limit(0,5) -> select(), //企业文化
+            "notify" => Db::name("IndexAside") -> where('block',2) -> order('sort,date desc') -> limit(0,5) -> select(),  //内部通知
             "rank" => Db::name("IndexAside") -> where('block',3) -> order('sort,date desc') -> limit(0,5) -> select()  //内部通知
         );
 

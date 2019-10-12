@@ -190,7 +190,7 @@
                     <el-cascader
                     v-model="user_form.dept_id"
                     :options="user_dept_option"
-                    :props="{ checkStrictly: true ,label:'name',value:'id',children:'child'}"
+                    :props="{ checkStrictly: true ,label:'name',value:'id',children:'child',expandTrigger:'hover'}"
                     :show-all-levels='false'
                     clearable
                     style="width:100%;"></el-cascader>
@@ -264,6 +264,8 @@
 </div>
 
 <script>
+    var deptType = JSON.parse('{$dept_type}');
+    console.log(deptType);
     var vue = {
         
         el:"#app",

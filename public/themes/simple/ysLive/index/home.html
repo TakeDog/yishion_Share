@@ -17,6 +17,7 @@
 .no-padding-card .el-table__header th,.no-padding-card .el-table__header tr.el-table__row td{text-align: center;padding:5px 0;}
 .el-table__row td .cell{text-align: center;}
 .el-table__row td{padding:5px 0;}
+.blank{color:#000;}
 </style>
 <div class="container live-container" id="app">
     <el-container>
@@ -31,6 +32,7 @@
                     <div class="tag_div">
                         <i class="fa fa-thumb-tack" aria-hidden="true" style="transform: rotate(45deg);"></i>
                         <span style="padding-left: 10px;">以纯动态</span>
+                        <span class="pull-right"><a href="#" class="blank">更多</a></span>
                     </div>
                     <el-card class="box-card" style="width:97%;margin: 20px auto;">
                         <p class="box_item">
@@ -39,18 +41,14 @@
                         <p class="box_item">
                                 <a href="/./static/PDF/9月21日以纯江门高新店盛大开业，正价货品两件8.8折！.pdf">2.9月21日以纯江门高新店盛大开业，正价货品两件8.8折！</a>
                             </p>
-                        <p class="box_item"> xxxxx </p>
-                        <p class="box_item"> xxxxx </p>
-                        <p class="box_item"> xxxxx </p>
-                        <p class="box_item"> xxxxx </p>
-                        <p class="box_item"> xxxxx </p>
-                        <p class="box_item"> xxxxx </p>
+                       
                     </el-card>
                 </div>
                 <div class="list_item">
                     <div class="tag_div">
                         <i class="fa fa-pencil-square" aria-hidden="true"></i>
                         <span style="padding-left: 10px;">时尚达人</span>
+                        <span class="pull-right"><a href="#" class="blank">更多</a></span>
                     </div>
                     <div style="display: flex;">
                         <div style="width:65%;">
@@ -112,6 +110,7 @@
                             <el-card class="aside-item no-padding-card" shadow="hover" style="min-height: 383px;">
                                 <div slot="header">
                                     <span>达人榜</span>
+                                    <span class="pull-right"><a href="#" class="blank">更多</a></span>
                                 </div>
                                 <el-table
                                     :data="UserScore"
@@ -141,6 +140,7 @@
                     <div class="tag_div">
                         <i class="fa fa-book" aria-hidden="true"></i>
                         <span style="padding-left: 10px;">生活百科</span>
+                        <span class="pull-right"><a href="#" class="blank">更多</a></span>
                     </div>
                     <el-card class="box-card" style="width:97%;margin: 20px auto;min-height: 250px;">
                         <p class="box_item">[科技] 去演唱会带什么相机拍得比较清楚？</p>
@@ -152,6 +152,7 @@
                     <div class="tag_div">
                         <i class="fa fa-search" aria-hidden="true"></i>
                         <span style="padding-left: 10px;">招兵买马</span>
+                        <span class="pull-right"><a href="#" class="blank">更多</a></span>
                     </div>
                     <el-table :data="inviteData" style="width: 97%;margin: 20px auto;" size="small" border>
                         <el-table-column prop="position" label="职位" width="130"></el-table-column>
