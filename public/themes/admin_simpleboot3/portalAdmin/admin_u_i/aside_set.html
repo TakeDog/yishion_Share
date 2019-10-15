@@ -18,24 +18,73 @@
         <el-breadcrumb-item>侧边栏设置</el-breadcrumb-item>
     </el-breadcrumb>
     
+    <!-- 设置可见范围模态框 -->
+    <el-dialog width="35%" :visible.sync="fileAuthModal" :show-close="true" :close-on-press-escape="false" :close-on-click-modal="false" append-to-body>
+
+        <div style="text-align:center;">
+            <span>部门：</span>
+            <el-cascader
+                v-model="authDept"
+                :options="deptoption"
+                :props="{ label:'name',value:'id',children:'child',expandTrigger:'hover',multiple: true}"
+                :show-all-levels='false'
+                collapse-tags
+                style="margin-right:121px;"
+            >
+            </el-cascader>
+        </div>
+
+        <div style="margin-top:20px;text-align:center;">
+            <span>岗位：</span>
+            <el-select v-model="authJob" placeholder="请选择" collapse-tags multiple :disabled="alljobFlag">
+                <el-option-group
+                    v-for="group in joboptions"
+                    :key="group.dept_type_id"
+                    :label="group.name">
+                    <el-option
+                        v-for="item in group.options"
+                        :key="item.id"
+                        :label="item.job"
+                        :value="item.id">
+                    </el-option>
+                </el-option-group>
+            </el-select>
+            全部岗位：
+            <el-switch
+                v-model="alljobFlag"
+                active-color="#13ce66"
+                inactive-color="#ccc">
+            </el-switch>
+
+        </div>
+
+        <span slot="footer" class="dialog-footer" v-show="AuthModalOperate=='set'">
+            <el-button type="primary" @click="setAuth" size="mini">确 定</el-button>
+            <el-button @click="fileAuthModal=false" size="mini">取 消</el-button>
+        </span>
+    </el-dialog>
+
 
     <el-tabs tab-position="left" style="height: 700px;" v-model="block" >
-            <el-row :gutter="10">
-                    <el-col :span="18">
-                        <el-input placeholder="输入文件名进行搜索" suffix-icon="el-icon-search" v-model="search" @input="getTableData" style="margin-bottom: 8px;"></el-input>
-                    </el-col>
-            </el-row>
+        <el-row :gutter="0">
+            <el-col :span="14">
+                <el-input placeholder="输入文件名进行搜索" suffix-icon="el-icon-search" v-model="search" @input="getTableData" style="margin-bottom: 8px;"></el-input>
+            </el-col>
+            <el-col :span="4" style="text-align: right;">
+                <el-button type="primary" @click="openSetAuth">设置已选文件的可见范围</el-button>
+            </el-col>
+        </el-row>
             
         <el-tab-pane label="企业文化" name="1">
-            <block-content :table-data="tableData" :block="block" :search1="search"  @p_data="getTableData" @del_file="deleteItem" @edt_item="edtData" ></block-content>
+            <block-content :table-data="tableData" :block="block" :search1="search"  @p_data="getTableData" @del_file="deleteItem" @edt_item="edtData" @handleSelectionChange="handleselectionchange" @showauth='showauth'></block-content>
         </el-tab-pane>
 
         <el-tab-pane label="内部通知" name="2">
-            <block-content :table-data="tableData" :block="block" :search1="search"  @p_data="getTableData" @del_file="deleteItem" @edt_item="edtData" ></block-content>
+            <block-content :table-data="tableData" :block="block" :search1="search"  @p_data="getTableData" @del_file="deleteItem" @edt_item="edtData" @handleselectionchange="handleselectionchange" @showauth='showauth'></block-content>
         </el-tab-pane>
 
         <el-tab-pane label="龙虎榜单" name="3">
-            <block-content :table-data="tableData" :block="block" :search1="search"  @p_data="getTableData" @del_file="deleteItem" @edt_item="edtData"></block-content>
+            <block-content :table-data="tableData" :block="block" :search1="search"  @p_data="getTableData" @del_file="deleteItem" @edt_item="edtData" @handleselectionchange="handleselectionchange" @showauth='showauth'></block-content>
         </el-tab-pane>
         
         
@@ -65,13 +114,93 @@
         <el-row :gutter="10">
             <el-col :span="18" style="min-height: 700px;">
 
-                <table class="table table-striped" style="border-bottom: 2px #E4E7ED solid;">
+
+            <el-table
+                ref="multipleTable"
+                :data="tableData"
+                tooltip-effect="dark"
+                style="width: 100%"
+                @selection-change="$emit('handleselectionchange',$event)">
+                <el-table-column
+                    type="selection"
+                    width="50">
+                </el-table-column>
+                <el-table-column
+                    prop="id"
+                    label="ID"
+                    width="50">
+                </el-table-column>
+                <el-table-column
+                    label="文件名"
+                    show-overflow-tooltip
+                    >
+                    <template slot-scope="scope">
+
+                        <span v-if="!scope.row.edit">{{scope.row.file_name}}</span> 
+                        <el-input
+                            ref="fileName_input"
+                            v-if="scope.row.edit"
+                            size="mini"
+                            v-model="scope.row.file_name"
+                            @focus="temp = scope.row.file_name"
+                            @blur="scope.row.edit=false;"
+                            @keyup.enter.native="scope.row.edit=false;$emit('edt_item','file_name',scope.row.id,scope.row.file_name,temp);"
+                        ></el-input>
+                        <i class="el-icon-edit file_edit pull-right" v-if="!scope.row.edit" @click="showInput(scope.row)"></i>
+
+                    </template>
+                </el-table-column>
+
+                <el-table-column
+                    label="可见范围"
+                    width="100">
+                    <template slot-scope="scope">
+                        <a href="javascript:;" @click="$emit('showauth',scope.row.id)">查看</a>
+                    </template>    
+                </el-table-column>
+
+                <el-table-column
+                    prop="date"
+                    label="上传时间"
+                    width="200">
+                </el-table-column>
+
+                <el-table-column
+                    label="排序"
+                    width="100">
+                    <template slot-scope="scope">
+                        <el-input
+                            size="mini"
+                            v-model="scope.row.sort"
+                            @focus="temp = scope.row.sort"
+                            @blur=" $emit('edt_item','sort',scope.row.id,scope.row.sort,temp)"
+                            style="width:50px;"
+                        >
+                        </el-input>
+                    </template>
+                </el-table-column>
+
+                <el-table-column
+                    label="操作"
+                    width="70">
+                    <template slot-scope="scope">
+                        <a href="javascript:;" @click="$emit('del_file',scope.row.id);">删除</a>
+                    </template>
+                </el-table-column>
+
+            </el-table>
+
+
+                <!-- <table class="table table-striped" style="border-bottom: 2px #E4E7ED solid;">
                     <thead>
-                        <tr><th>ID</th><th>文件名</th><th>上传时间</th><th>排序</th><th>操作</th></tr>
+                        <tr><th>ID</th><th>选中</th><th>文件名</th><th>上传时间</th><th>排序</th><th>操作</th></tr>
                     </thead>
                     <tbody>
                         <tr v-for="(item,index) in tableData" :key="item.id"> 
                             <td>{{item.id}}</td>
+                            <td>
+                                <input type="checkbox" name="slt_file" :value="item.id">
+                            </td>
                             <td>
                                 <span v-if="!item.edit">{{item.file_name}}</span> 
                                 <el-input
@@ -101,7 +230,7 @@
                             <td><a href="javascript:;" @click="$emit('del_file',item.id);">删除</a></td>
                         </tr>
                     </tbody>
-                </table>
+                </table> -->
             </el-col>
             <el-col :span="6" style="min-height: 700px;border-left: 2px #E4E7ED solid;text-align: center;">
                 <el-upload
@@ -133,10 +262,98 @@
                 page:1,
                 total:0,
                 page_size:0
-            }
+            },
+            authDept:'',
+            authJob:'',
+            deptoption:[],
+            joboptions:[],
+            alljobFlag:false,
+            fileAuthModal:false,
+            AuthModalOperate:"get",
+            checkedIds:''
         },
         methods: {
+            showauth(id){
+                this.AuthModalOperate = "get";
+                this.authDept = '';
+                this.authJob = '';
+                axios.get("{:url('getAuth')}",{
+                    params:{
+                        id
+                    }
+                }).then(res=>{
+                    
+                    this.authDept = res.data.authDept;
+                    if(res.data.authJob){
+                        this.authJob =  res.data.authJob.split(',').map(function(currentV){
+                            return parseInt(currentV);
+                        });
+                    }else{
+                        this.alljobFlag = true;
+                    }
 
+                    this.fileAuthModal = true;
+
+                })
+            },
+            openSetAuth(){
+                this.AuthModalOperate = 'set';
+                this.authDept = [];
+                this.authJob = [];
+                this.alljobFlag = false;
+
+                if(!this.checkedIds.length){
+                    this.$alert('请选中文件后再更改', {
+                        confirmButtonText: '确定',
+                    })
+                    return false;
+                }
+                this.fileAuthModal = true;
+            },
+            setAuth(){
+                var authJob = this.alljobFlag ? [0] : this.authJob;
+                axios.post("{:url('setAuth')}",{
+                    fileIds:this.checkedIds,
+                    authDept:this.authDept,
+                    authJob
+                }).then(res=>{
+                    var msg ={};
+                    if(res.data){
+                        msg.info = '操作成功';
+                        msg.type = 'success';
+                    }else{
+                        msg.info = '操作失败';
+                        msg.type = 'error';
+                    }
+
+                    this.fileAuthModal = false;
+
+                    this.$notify({
+                        title: '操作提醒',
+                        message: msg.info,
+                        type: msg.type
+                    });
+
+                })
+            },
+            queryJob(id){
+                axios.get("{:url('AdminYsWork/getJobOptions')}").then((res)=>{
+                    this.joboptions = res.data;
+                    
+                })
+            },
+            getDeptOption(){
+                axios.get("{:url('AdminOrganize/getTree')}").then((res)=>{
+                    this.deptoption = res.data;
+                });
+            },
+            handleselectionchange(val){
+                var arr = [];
+                val.forEach(el => {
+                    arr.push(el.id);
+                });
+                this.checkedIds = arr;
+            },
             getTableData(){
 
                 axios.get("{:url('getAsideData')}",{
@@ -174,9 +391,9 @@
                     }).then((res)=>{
                         if(res.data){
                             this.getTableData();
-                            this.$messagee.success("已成功删除该文件.");
+                            this.$message.success("已成功删除该文件.");
                         }else{
-                            this.$messagee.error("删除失败!");
+                            this.$message.error("删除失败!");
                         }
                     })
 
@@ -202,6 +419,8 @@
         },
         created () {
             this.getTableData();
+            this.getDeptOption();
+            this.queryJob(false);
         },
         watch: {
             "block":function(newV,oldV){
@@ -224,7 +443,8 @@
 
                         item.edit = true;
                         setTimeout(()=>{
-                            this.$refs.fileName_input[0].focus();
+                            //console.log(this.$refs.fileName_input);
+                            this.$refs.fileName_input.focus();
                         },10)
                         
                     },
