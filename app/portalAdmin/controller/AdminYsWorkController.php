@@ -186,7 +186,7 @@ class AdminYsWorkController extends AdminBaseController{
 
         $authDept = array();
         foreach($this -> request -> param('authDept') as $k => $v){
-            $authDept[$k] = explode(',',$v);
+            $authDept[$k] = explode(',',trim($v,"\""));
         }
 
         $files = $this -> request -> file("files");
@@ -194,7 +194,7 @@ class AdminYsWorkController extends AdminBaseController{
         $data['sort'] = $this -> request -> param("sort",1000,"intval");
         $data['del'] = $this -> request -> param("del",1,"intval");
         $data['date'] = date("Y-m-d H:i:s");
-        $data['auth_dept'] = json_encode($authDept);
+        $data['auth_dept'] = str_replace('"','',json_encode($authDept)) ;
         $data['auth_job'] =  implode(',',$this -> request -> param('authJob'));
 
         foreach($files as $file){

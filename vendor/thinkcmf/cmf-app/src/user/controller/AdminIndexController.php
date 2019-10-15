@@ -16,6 +16,7 @@ use think\Db;
 use think\db\Query;
 use tree\Tree;
 use app\user\model\CActionModel;
+use app\portal\model\CUserModel;
 /**
  * Class AdminIndexController
  * @package app\user\controller
@@ -57,7 +58,7 @@ class AdminIndexController extends AdminBaseController
      * )
      */
     public function index()
-    {
+    {   
         $content = hook_one('user_admin_index_view');
         if (!empty($content)) {
             return $content;
@@ -108,6 +109,24 @@ class AdminIndexController extends AdminBaseController
         $this->assign('page', $page);
         // 渲染模板输出
         return $this->fetch();
+    }
+
+    /**
+     * 导出用户信息Excel
+     * @adminMenu(
+     *     'name'   => '导出用户信息Excel',
+     *     'parent' => 'default1',
+     *     'display'=> false,
+     *     'hasView'=> false,
+     *     'order'  => 10000,
+     *     'icon'   => '',
+     *     'remark' => '导出用户信息Excel',
+     *     'param'  => ''
+     * )
+     */
+    public function exportExcel(){
+        $userDb = new CUserModel();
+        $userDb -> exportExcel($this -> request -> param());
     }
 
     /**

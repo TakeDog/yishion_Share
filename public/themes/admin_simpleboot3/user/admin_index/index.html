@@ -21,6 +21,7 @@
         </select>
         <input type="submit" class="btn btn-primary" value="搜索"/>
         <a class="btn btn-danger" href="{:url('user/adminIndex/index')}">清空</a>
+        <input type="submit" formaction="{:url('exportExcel')}" class="btn btn-success" value="导出Excel"/>
     </form>
     <form method="post" class="js-ajax-form">
         <table class="table table-hover table-bordered">
@@ -57,7 +58,7 @@
                     <td>{$vo.role_name}</td>
                     <td>{$vo.real_name}</td>
                     <!-- <td> </td> -->
-                    <td>{$vo.deptName}</td>
+                    <td>{:implode('/',\\app\\portalAdmin\\model\\DeptModel::getFullName($vo.dept_id))}</td>
                     <td>{$vo.jobName ? $vo.jobName : '无'}</td>
                     <td><img width="25" height="25" src="{:url('user/public/    ',array('id'=>$vo['id']))}"/></td>
                     <td>{$vo.user_email}</td>

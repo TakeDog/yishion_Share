@@ -13,6 +13,24 @@ class IndexController extends HomeBaseController{
         return $this->fetch();
     }
 
+    public function getEncList(){
+        $root = "./upload/live/生活百科/";
+        $dir = $this -> request -> param('type');
+        $path =$root.$dir;
+
+        $path = iconv("utf-8","gbk",$path);
+        $fileList = scandir($path);
+        unset($fileList[0]);
+        unset($fileList[1]);
+        
+        foreach($fileList as $k => $v){
+            $data[] = ['name'=>iconv("gbk","utf-8", explode('.',$v)[0]),'file'=>iconv("gbk","utf-8",$v),'date'=>date("Y-m-d H:i:s", filemtime($path.'/'.$v))];
+        }
+
+        echo json_encode($data);
+
+    }
+
     public function home(){
         
         $operateConfig = new OperateConfig();

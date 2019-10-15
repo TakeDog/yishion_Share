@@ -269,4 +269,48 @@ class AdminUIController extends AdminBaseController{
         $CLogModel -> exportFileLog(36,'share_index_aside','file_name');
     }
 
+     /**
+     * 设置文件可见权限
+     * @adminMenu(
+     *     'name'   => '设置文件可见权限',
+     *     'parent' => 'AsideSet',
+     *     'display'=> false,
+     *     'hasView'=> false,
+     *     'order'  => 1,
+     *     'icon'   => '',
+     *     'remark' => '设置文件可见权限',
+     *     'param'  => ''
+     * )
+     */
+    public function setAuth(){
+        $params = $this -> request -> param();
+
+        $data['auth_dept'] = json_encode($params['authDept']);
+        $data['auth_job'] = implode(',',$params['authJob']);
+        $affect = Db::name("IndexAside") -> where("id",'in', implode(',',$params['fileIds']) ) -> update($data);
+
+        echo $affect;
+    }
+
+    /**
+     * 查看可见范围
+     * @adminMenu(
+     *     'name'   => '查看可见范围',
+     *     'parent' => 'AsideSet',
+     *     'display'=> false,
+     *     'hasView'=> false,
+     *     'order'  => 1,
+     *     'icon'   => '',
+     *     'remark' => '查看可见范围',
+     *     'param'  => ''
+     * )
+     */
+    public function getAuth(){
+        $id = $this -> request -> param("id",0,'intval');
+        $data = Db::name("IndexAside") -> field('auth_dept,auth_job') -> find($id);
+        $retuanData['authDept'] = json_decode($data['auth_dept']);
+        $retuanData['authJob'] = $data['auth_job'];
+
+        echo json_encode($retuanData);
+    }
 }

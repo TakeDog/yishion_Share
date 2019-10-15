@@ -100,9 +100,28 @@ class IndexController extends HomeBaseController
         
         //侧边栏信息
         $asideData = array(
-            "culture" => Db::name("IndexAside") -> where('block',1) -> order('sort,date desc') -> limit(0,5) -> select(), //企业文化
-            "notify" => Db::name("IndexAside") -> where('block',2) -> order('sort,date desc') -> limit(0,5) -> select(),  //内部通知
-            "rank" => Db::name("IndexAside") -> where('block',3) -> order('sort,date desc') -> limit(0,5) -> select()  //内部通知
+
+            //企业文化
+            "culture" => Db::name("IndexAside") -> where('block',1) -> where(function($query){
+                $query->where('auth_dept','like', "%[".session("user_info",'','portal')['dept_id'].",%" ) -> whereor('auth_dept','like', "%,".session("user_info",'','portal')['dept_id'].",%") -> whereor('auth_dept','like', "%,".session("user_info",'','portal')['dept_id']."]%");  
+            }) -> where(function($query){
+                $query->where('auth_job',0)->whereor('auth_job',session("user_info",'','portal')['job_id']);
+            }) -> order('sort,date desc') -> limit(0,5) -> select(), 
+
+            //内部通知
+            "notify" => Db::name("IndexAside") -> where('block',2) -> where(function($query){
+                $query->where('auth_dept','like', "%[".session("user_info",'','portal')['dept_id'].",%" ) -> whereor('auth_dept','like', "%,".session("user_info",'','portal')['dept_id'].",%") -> whereor('auth_dept','like', "%,".session("user_info",'','portal')['dept_id']."]%");
+            }) -> where(function($query){
+                $query->where('auth_job',0)->whereor('auth_job',session("user_info",'','portal')['job_id']);
+            }) -> order('sort,date desc') -> limit(0,5) -> select(), 
+
+            //龙虎榜
+            "rank" => Db::name("IndexAside") -> where('block',3) -> where(function($query){
+                $query->where('auth_dept','like', "%[".session("user_info",'','portal')['dept_id'].",%" ) -> whereor('auth_dept','like', "%,".session("user_info",'','portal')['dept_id'].",%") -> whereor('auth_dept','like', "%,".session("user_info",'','portal')['dept_id']."]%");
+            }) -> where(function($query){
+                $query->where('auth_job',0)->whereor('auth_job',session("user_info",'','portal')['job_id']);
+            }) ->  order('sort,date desc') -> limit(0,5) -> select() 
+
         );
 
         $this -> assign("ConfigUI",$operateConfig -> getConfig());
@@ -440,6 +459,12 @@ class IndexController extends HomeBaseController
         $tableData = Db::name("IndexAside") 
         -> where("block",$this -> request -> param('block'))
         -> whereLike("file_name","%".$this -> request -> param('search_key')."%")
+        -> where(function($query){
+            $query->where('auth_dept','like', "%[".session("user_info",'','portal')['dept_id'].",%" ) -> whereor('auth_dept','like', "%,".session("user_info",'','portal')['dept_id'].",%") -> whereor('auth_dept','like', "%,".session("user_info",'','portal')['dept_id']."]%");
+        }) 
+        -> where(function($query){
+            $query->where('auth_job',0)->whereor('auth_job',session("user_info",'','portal')['job_id']);
+        })
         -> limit(($page-1)*$page_size,$page_size)
         -> order("sort")
         -> select();
@@ -447,6 +472,12 @@ class IndexController extends HomeBaseController
         $total = Db::name("IndexAside")
         -> where("block",$this -> request -> param('block'))
         -> whereLike("file_name","%".$this -> request -> param('search_key')."%")
+        -> where(function($query){
+            $query->where('auth_dept','like', "%[".session("user_info",'','portal')['dept_id'].",%" ) -> whereor('auth_dept','like', "%,".session("user_info",'','portal')['dept_id'].",%") -> whereor('auth_dept','like', "%,".session("user_info",'','portal')['dept_id']."]%");
+        }) 
+        -> where(function($query){
+            $query->where('auth_job',0)->whereor('auth_job',session("user_info",'','portal')['job_id']);
+        })
         -> count();
 
         $data['page_size'] = $page_size;
