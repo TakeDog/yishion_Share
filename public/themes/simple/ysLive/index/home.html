@@ -142,11 +142,38 @@
                         <span style="padding-left: 10px;">生活百科</span>
                         <span class="pull-right"><a href="#" class="blank">更多</a></span>
                     </div>
-                    <el-card class="box-card" style="width:97%;margin: 20px auto;min-height: 250px;">
-                        <p class="box_item">[科技] 去演唱会带什么相机拍得比较清楚？</p>
-                        <p class="box_item">[生活]《哪吒》观后感</p>
-                        <p class="box_item">[美妆] 美妆小白的入门必备</p>
-                    </el-card>
+                    
+
+                        <el-tabs v-model="encCurType" type="border-card" style="width:97%;margin: 20px auto;min-height: 250px;" @tab-click='getEnc'>
+                            <el-tab-pane label="服饰" name="服饰">
+                                <p v-for="(item,index) in ecnList">
+                                    <a :href="'/upload/live/生活百科/' + encCurType + '/' + item.file " target="_blank">{{index+1}}.{{item.name}}</a>
+                                </p>
+                            </el-tab-pane>
+                            <el-tab-pane label="生活" name="生活">
+                                <p v-for="(item,index) in ecnList">
+                                    <a :href="'/upload/live/生活百科/' + encCurType + '/' + item.file " target="_blank">{{index+1}}.{{item.name}}</a>
+                                </p>
+                            </el-tab-pane>
+                            <el-tab-pane label="美妆" name="美妆">
+                                <p v-for="(item,index) in ecnList">
+                                    <a :href="'/upload/live/生活百科/' + encCurType + '/' + item.file " target="_blank">{{index+1}}.{{item.name}}</a>
+                                </p>
+                            </el-tab-pane>
+                            <el-tab-pane label="科技" name="科技">
+                                <p v-for="(item,index) in ecnList">
+                                    <a :href="'/upload/live/生活百科/' + encCurType + '/' + item.file " target="_blank">{{index+1}}.{{item.name}}</a>
+                                </p>
+                            </el-tab-pane>
+
+                            <el-tab-pane label="美食" name="美食">
+                                <p v-for="(item,index) in ecnList">
+                                    <a :href="'/upload/live/生活百科/' + encCurType + '/' + item.file " target="_blank">{{index+1}}.{{item.name}}</a>
+                                </p>
+                            </el-tab-pane>
+                        </el-tabs>
+
+                    
                 </div>
                 <div class="list_item">
                     <div class="tag_div">
@@ -187,6 +214,8 @@
             articleList:[],
             total:0,
             page_size:0,
+            encCurType:'服饰',
+            ecnList:'',
         },
         methods:{
 
@@ -203,15 +232,23 @@
                     this.page_size = data['page_size'];
                 })
             },
-
             toPage(page){
                 this.getArticle(page);
             },
-
-
+            getEnc(){
+                axios.get("{:url('getEncList')}",{
+                    params:{
+                        type:this.encCurType
+                    }
+                }).then((res) => {
+                    console.log(res.data);
+                    this.ecnList = res.data;
+                })
+            }
         },
         created () {
             this.getArticle(1);
+            this.getEnc();
         }
     }
 </script>

@@ -41,7 +41,7 @@
                             
                             <p style="font-size:16px;padding:0 0 10px 10px;line-height: 30px;border-bottom: 1px solid #DADADA;">
                                 组织架构
-                                <el-button type="primary" plain size="mini" class="pull-right" style="margin-right: 10px;" @click="dialogVisible=true;append_dept_pid=0;operate='add'">添加部门</el-button>
+                                <el-button type="primary" plain size="mini" class="pull-right" style="margin-right: 10px;" @click="dialogVisible=true;append_dept_pid=0;deptType='';operate='add'">添加部门</el-button>
                             </p>
                             <div class="set_input">
                                 <el-input placeholder="输入关键字进行过滤" v-model="filterText" style="width: 95%;" >
@@ -71,8 +71,8 @@
                                         </div>
 
                                         <el-dropdown-menu slot="dropdown">
-                                            <el-dropdown-item > <span @click="dialogVisible=true;append_dept_pid=data.id;operate='add'">添加子部门</span> </el-dropdown-item>
-                                            <el-dropdown-item > <span @click="dialogVisible=true;editId=data.id;operate='edit';deptInput=data.name">修改名称</span></el-dropdown-item>
+                                            <el-dropdown-item > <span @click="dialogVisible=true;append_dept_pid=data.id;deptType='';operate='add'">添加子部门</span> </el-dropdown-item>
+                                            <el-dropdown-item > <span @click="dialogVisible=true;editId=data.id;operate='edit';deptType=data.type;deptInput=data.name">修改信息</span></el-dropdown-item>
                                             <el-dropdown-item ><span @click="setSupInit(data)">设置上级</span></el-dropdown-item>
                                             <el-dropdown-item > <span @click="remove(data.id)">删除&emsp;&emsp;&emsp;</span></el-dropdown-item>
                                             <el-dropdown-item  :disabled='true'>部门ID：{{curId}}</el-dropdown-item>
@@ -102,7 +102,7 @@
                             
                             <div style="margin:0;line-height: 32px;flex:2;text-align: center;">
                                 <p style="margin:0;" v-show="!searchAll">
-                                    <a href="" @click.prevent="dialogVisible=true;editId=main_header.id;operate='edit';deptInput=main_header.name">修改名称</a> | 
+                                    <a href="" @click.prevent="dialogVisible=true;editId=main_header.id;operate='edit';deptType=main_header.type;deptInput=main_header.name">修改信息</a> | 
                                     <a href="" @click.prevent="dialogVisible=true;append_dept_pid=main_header.id;operate='add'">添加子部门</a> | 
                                     <a href="" @click.prevent="setSupInit(main_header,'sup')">设置上级部门</a>
                                 </p>
@@ -181,6 +181,7 @@
                     <el-input v-model="user_form.real_name" placeholder="请输入内容"></el-input>
                 </el-col>
             </el-row>
+
             <el-row style="margin-top:10px;">
                 <el-col :span="8" style="text-align: right;">
                     <span style="line-height: 40px;">部门名称：</span>
@@ -219,31 +220,53 @@
             </el-row>
 
         </div>
-        
 
-        <el-row :gutter="20" style="margin-bottom:10px;" v-if="operate != 'user_dept'">
-            <el-col :span="8" style="text-align: right;">
-                <span style="line-height: 40px;">部门名称：</span>
-            </el-col>
-            <el-col :span="10">
+        <!-- 新增或修改 -->
+        <div v-if="operate != 'user_dept'">
 
-                <input type="text" ref="deptEle" class="form-control" v-show="operate=='add'">
+            <el-row :gutter="20" style="margin-bottom:10px;" >
+                <el-col :span="8" style="text-align: right;">
+                    <span style="line-height: 40px;">部门名称：</span>
+                </el-col>
+                <el-col :span="10">
+    
+                    <input type="text" ref="deptEle" class="form-control" v-show="operate=='add'">
+    
+                    <input type="text" v-model="deptInput" class="form-control" v-show="operate=='edit'">
+    
+                    <el-select v-model="supDept" placeholder="请选择" filterable v-show="operate=='setSup'">
+                        <el-option
+                            v-for="item in option"
+                            :key="item.id"
+                            :label="item.html + item.name"
+                            :value="item.id"
+                            :disabled="item.disabled">
+                        </el-option>
+                    </el-select>
+    
+                </el-col>
+    
+            </el-row>
 
-                <input type="text" v-model="deptInput" class="form-control" v-show="operate=='edit'">
+            <el-row :gutter="20" style="margin-bottom:10px;" v-show="operate=='add' || operate=='edit' ">
+                <el-col :span="8" style="text-align: right;">
+                    <span style="line-height: 40px;">部门类型：</span>
+                </el-col>
+                <el-col :span="10">
+    
+                    <el-select v-model="deptType" placeholder="请选择" style="width:100%;">
+                        <el-option
+                            v-for="item in deptTypeOption"
+                            :key="item.dept_type_id"
+                            :label="item.name"
+                            :value="item.dept_type_id">
+                        </el-option>
+                    </el-select>
+    
+                </el-col>
+            </el-row>
 
-                <el-select v-model="supDept" placeholder="请选择" filterable v-show="operate=='setSup'">
-                    <el-option
-                        v-for="item in option"
-                        :key="item.id"
-                        :label="item.html + item.name"
-                        :value="item.id"
-                        :disabled="item.disabled">
-                    </el-option>
-                </el-select>
-
-            </el-col>
-
-        </el-row>
+        </div>
         
         
 
@@ -264,12 +287,14 @@
 </div>
 
 <script>
-    var deptType = JSON.parse('{$dept_type}');
-    console.log(deptType);
+    var deptTypeOption = JSON.parse('{$dept_type}');
+   
     var vue = {
         
         el:"#app",
         data:{
+            deptTypeOption,
+            deptType:'',
             dialogVisible:false,
             filterText:'',
             props:{ 
@@ -302,7 +327,18 @@
             }
         },
         methods: {
+            checkType_name(){
+                if(!this.$refs.deptEle.value){
+                    this.$message.error("请输入部门名称");
+                    return false;
+                }
 
+                if(!this.deptType){
+                    this.$message.error("请选择部门类型");
+                    return false;
+                }
+                return true;
+            },
             getTree(id){
 
                     axios.get("{:url('AdminOrganize/getTree')}").then((res)=>{
@@ -315,63 +351,71 @@
             },
 
             append() {
-                axios.get("{:url('AdminOrganize/append')}",{
-                    params:{
-                        pid:this.append_dept_pid,
-                        name:this.$refs.deptEle.value
-                    }
-                }).then((res)=>{
 
-                    if(res.data){
-                        this.$message({
-                            showClose: true,
-                            message: '新增部门成功',
-                            type: 'success',
-                            duration:2000
-                        });
-                        this.getTree(false);
-                    }else{
-                        this.$message({
-                            showClose: true,
-                            message: '新增部门失败',
-                            type: 'error',
-                            duration:2000
-                        });
-                    }
-                    this.dialogVisible = false;
-                })
+                if(this.checkType_name()){
+                    axios.get("{:url('AdminOrganize/append')}",{
+                        params:{
+                            pid:this.append_dept_pid,
+                            name:this.$refs.deptEle.value,
+                            type:this.deptType
+                        }
+                    }).then((res)=>{
+    
+                        if(res.data){
+                            this.$message({
+                                showClose: true,
+                                message: '新增部门成功',
+                                type: 'success',
+                                duration:2000
+                            });
+                            this.getTree(false);
+                        }else{
+                            this.$message({
+                                showClose: true,
+                                message: '新增部门失败',
+                                type: 'error',
+                                duration:2000
+                            });
+                        }
+                        this.dialogVisible = false;
+                    })
+                }
             },
 
             edit(){
-                axios.get("{:url('AdminOrganize/edit')}",{
-                    params:{
-                        id:this.editId,
-                        name:this.deptInput
-                    }
-                }).then((res)=>{
-                    if(res.data){
 
-                        this.$message({
-                            showClose: true,
-                            message: '部门修改成功',
-                            type: 'success',
-                            duration:2000
-                        });
-
-                        if(this.main_header['id'] == this.editId) { this.main_header['name'] = this.deptInput }
-
-                        this.getTree(false);
-
-                    }else{
-                        this.$message({
-                            showClose: true,
-                            message: '部门修改失败',
-                            type: 'error',
-                            duration:2000
-                        });
-                    }
-                    this.dialogVisible = false;
-                }) 
+                if(this.checkType_name()){
+                    axios.get("{:url('AdminOrganize/edit')}",{
+                        params:{
+                            id:this.editId,
+                            name:this.deptInput,
+                            type:this.deptType
+                        }
+                    }).then((res)=>{
+                        if(res.data){
+    
+                            this.$message({
+                                showClose: true,
+                                message: '部门修改成功',
+                                type: 'success',
+                                duration:2000
+                            });
+    
+                            if(this.main_header['id'] == this.editId) { this.main_header['name'] = this.deptInput }
+    
+                            this.getTree(false);
+    
+                        }else{
+                            this.$message({
+                                showClose: true,
+                                message: '部门修改失败',
+                                type: 'error',
+                                duration:2000
+                            });
+                        }
+                        this.dialogVisible = false;
+                    }) 
+                }
             },
 
             remove(id) {
