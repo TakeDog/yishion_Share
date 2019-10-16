@@ -189,13 +189,18 @@ class AdminYsWorkController extends AdminBaseController{
             $authDept[$k] = explode(',',trim($v,"\""));
         }
 
+        
+
         $files = $this -> request -> file("files");
         $data['pid'] = $this -> request -> param("pid",0,"intval");
         $data['sort'] = $this -> request -> param("sort",1000,"intval");
         $data['del'] = $this -> request -> param("del",1,"intval");
         $data['date'] = date("Y-m-d H:i:s");
         $data['auth_dept'] = str_replace('"','',json_encode($authDept)) ;
-        $data['auth_job'] =  implode(',',$this -> request -> param('authJob'));
+
+
+        //var_dump($this -> request -> param('authJob'));
+        $data['auth_job'] =  implode(',' , $this -> request -> param('authJob'));
 
         foreach($files as $file){
             $in = $file -> getInfo();
