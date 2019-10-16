@@ -328,10 +328,22 @@
         },
         methods: {
             checkType_name(){
-                if(!this.$refs.deptEle.value){
-                    this.$message.error("请输入部门名称");
-                    return false;
+                if(this.operate == 'add'){
+
+                    if(!this.$refs.deptEle.value){
+                        this.$message.error("请输入部门名称");
+                        return false;
+                    }
+
+                }else{
+
+                    if(!this.deptInput){
+                        this.$message.error("请输入部门名称");
+                        return false;
+                    }
+
                 }
+
 
                 if(!this.deptType){
                     this.$message.error("请选择部门类型");

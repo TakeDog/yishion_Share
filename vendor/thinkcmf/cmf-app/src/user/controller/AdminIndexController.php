@@ -105,8 +105,15 @@ class AdminIndexController extends AdminBaseController
         //     $list[$k]['part'] = $deptMsg['name'];
         // }
 
-        $this->assign('list', $list);
-        $this->assign('page', $page);
+
+        //用户账号情况
+        $ban = Db::name("CUser") -> where('user_status',0) -> count();      //禁用
+        $valid = Db::name("CUser") -> where('user_status',1) -> count();    //启用
+        $undispose = Db::name("CUser") -> where('user_status',2) -> count();//未验证
+
+        $this -> assign('user_count',['ban'=>$ban,'valid'=>$valid,'undispose'=>$undispose]);
+        $this -> assign('list', $list);
+        $this -> assign('page', $page);
         // 渲染模板输出
         return $this->fetch();
     }
