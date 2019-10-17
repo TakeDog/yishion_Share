@@ -189,7 +189,7 @@ function normalizeComponent (
 
 /***/ }),
 
-/***/ 16:
+/***/ 14:
 /***/ (function(module, exports) {
 
 module.exports = require("element-ui/lib/utils/popup");
@@ -485,13 +485,18 @@ var component = Object(componentNormalizer["a" /* default */])(
 if (false) { var api; }
 component.options.__file = "packages/notification/src/main.vue"
 /* harmony default export */ var main = (component.exports);
+// EXTERNAL MODULE: external "element-ui/lib/utils/merge"
+var merge_ = __webpack_require__(9);
+var merge_default = /*#__PURE__*/__webpack_require__.n(merge_);
+
 // EXTERNAL MODULE: external "element-ui/lib/utils/popup"
-var popup_ = __webpack_require__(16);
+var popup_ = __webpack_require__(14);
 
 // EXTERNAL MODULE: external "element-ui/lib/utils/vdom"
 var vdom_ = __webpack_require__(23);
 
 // CONCATENATED MODULE: ./packages/notification/src/main.js
+
 
 
 
@@ -504,7 +509,7 @@ var seed = 1;
 
 var main_Notification = function Notification(options) {
   if (external_vue_default.a.prototype.$isServer) return;
-  options = options || {};
+  options = merge_default()({}, options);
   var userOnClose = options.onClose;
   var id = 'notification_' + seed++;
   var position = options.position || 'top-right';
@@ -596,6 +601,13 @@ main_Notification.closeAll = function () {
 /***/ (function(module, exports) {
 
 module.exports = require("vue");
+
+/***/ }),
+
+/***/ 9:
+/***/ (function(module, exports) {
+
+module.exports = require("element-ui/lib/utils/merge");
 
 /***/ })
 

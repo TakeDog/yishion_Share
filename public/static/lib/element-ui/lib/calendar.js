@@ -82,7 +82,7 @@ module.exports =
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 65);
+/******/ 	return __webpack_require__(__webpack_require__.s = 66);
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -210,7 +210,7 @@ module.exports = require("element-ui/lib/mixins/locale");
 
 /***/ }),
 
-/***/ 65:
+/***/ 66:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -322,7 +322,8 @@ var render = function() {
                 date: range[0],
                 "selected-day": _vm.realSelectedDay,
                 range: range,
-                "hide-header": index !== 0
+                "hide-header": index !== 0,
+                "first-day-of-week": _vm.realFirstDayOfWeek
               },
               on: { pick: _vm.pickDay }
             })
@@ -353,7 +354,6 @@ var date_util_ = __webpack_require__(1);
 
 
 
-var WEEK_DAYS = Object(date_util_["getI18nSettings"])().dayNames;
 /* harmony default export */ var date_tablevue_type_script_lang_js_ = ({
   props: {
     selectedDay: String, // formated date yyyy-MM-dd
@@ -373,6 +373,13 @@ var WEEK_DAYS = Object(date_util_["getI18nSettings"])().dayNames;
   },
 
   inject: ['elCalendar'],
+
+  data: function data() {
+    return {
+      WEEK_DAYS: Object(date_util_["getI18nSettings"])().dayNames
+    };
+  },
+
 
   methods: {
     toNestedArr: function toNestedArr(days) {
@@ -508,6 +515,9 @@ var WEEK_DAYS = Object(date_util_["getI18nSettings"])().dayNames;
     },
     weekDays: function weekDays() {
       var start = this.firstDayOfWeek;
+      var WEEK_DAYS = this.WEEK_DAYS;
+
+
       if (typeof start !== 'number' || start === 0) {
         return WEEK_DAYS.slice();
       } else {
@@ -654,6 +664,7 @@ component.options.__file = "packages/calendar/src/date-table.vue"
 //
 //
 //
+//
 
 
 
@@ -661,6 +672,7 @@ component.options.__file = "packages/calendar/src/date-table.vue"
 
 
 var validTypes = ['prev-month', 'today', 'next-month'];
+var weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 var oneDay = 86400000;
 
 /* harmony default export */ var mainvue_type_script_lang_js_ = ({
@@ -724,6 +736,16 @@ var oneDay = 86400000;
         throw new Error('invalid val');
       }
       return val instanceof Date ? val : new Date(val);
+    },
+    rangeValidator: function rangeValidator(date, isStart) {
+      var firstDayOfWeek = this.realFirstDayOfWeek;
+      var expected = isStart ? firstDayOfWeek : firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
+      var message = (isStart ? 'start' : 'end') + ' of range should be ' + weekDays[expected] + '.';
+      if (date.getDay() !== expected) {
+        console.warn('[ElementCalendar]', message, 'Invalid range will be ignored.');
+        return false;
+      }
+      return true;
     }
   },
 
@@ -768,7 +790,8 @@ var oneDay = 86400000;
     date: function date() {
       if (!this.value) {
         if (this.realSelectedDay) {
-          return new Date(this.selectedDay);
+          var d = this.selectedDay.split('-');
+          return new Date(d[0], d[1] - 1, d[2]);
         } else if (this.validatedRange.length) {
           return this.validatedRange[0][0];
         }
@@ -785,21 +808,9 @@ var oneDay = 86400000;
 
       var range = this.range;
       if (!range) return [];
-      var expetedMap = {
-        0: {
-          value: 1,
-          message: 'start of range should be Monday.'
-        },
-        1: {
-          value: 0,
-          message: 'end of range should be Sunday.'
-        }
-      };
       range = range.reduce(function (prev, val, index) {
         var date = _this.toDate(val);
-        if (date.getDay() !== expetedMap[index].value) {
-          console.warn('[ElementCalendar]', expetedMap[index].message, ' invalid range will be ignored');
-        } else {
+        if (_this.rangeValidator(date, index === 0)) {
           prev = prev.concat(date);
         }
         return prev;
@@ -824,9 +835,20 @@ var oneDay = 86400000;
           console.warn('[ElementCalendar]start time and end time interval must not exceed two months');
           return [];
         }
+        // 第一个月的时间范围
         data.push([start, lastDay]);
-        var interval = startDay.getDay();
-        interval = interval <= 1 ? Math.abs(interval - 1) : 8 - interval;
+        // 下一月的时间范围，需要计算一下该月的第一个周起始日
+        var firstDayOfWeek = this.realFirstDayOfWeek;
+        var nextMontFirstDay = startDay.getDay();
+        var interval = 0;
+        if (nextMontFirstDay !== firstDayOfWeek) {
+          if (firstDayOfWeek === 0) {
+            interval = 7 - nextMontFirstDay;
+          } else {
+            interval = firstDayOfWeek - nextMontFirstDay;
+            interval = interval > 0 ? interval : 7 + interval;
+          }
+        }
         startDay = this.toDate(startDay.getTime() + interval * oneDay);
         if (startDay.getDate() < end.getDate()) {
           data.push([startDay, end]);
