@@ -68,7 +68,7 @@ class AdminIndexController extends AdminBaseController
             -> join('c_user_role ur','u.id = ur.user_id','LEFT')
             -> join('c_role r','ur.role_id=r.id','LEFT')
             -> join('job j','u.job_id = j.id','LEFT')
-            -> join('dept d','u.dept_id = d.id')
+            -> join('dept d','u.dept_id = d.id','LEFT')
             -> where(function (Query $query) {
                 $data = $this->request->param();
 

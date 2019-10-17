@@ -37,6 +37,7 @@
                 <th>{:lang('USERNAME')}</th>
                 <th>{:lang('NICENAME')}</th>
                 <th>角色</th>
+                <th>账号类型</th>
                 <th>真实名字</th>
                 <!-- <th>机构</th> -->
                 <th>部门</th>
@@ -62,6 +63,16 @@
                     </td>
                     <td>{$vo['user_nickname']?$vo['user_nickname']:lang('NOT_FILLED')}</td>
                     <td>{$vo.role_name}</td>
+                    <td>
+                        <switch name="vo.type">
+                            <case value="1">
+                                <span style="color:#3FAD46;">全平台</span>
+                            </case>
+                            <case value="2">
+                                <span style="color:#006fc4;">纯生活</span>
+                            </case>
+                        </switch>
+                    </td>
                     <td>{$vo.real_name}</td>
                     <!-- <td> </td> -->
                     <td>{:implode('/',\\app\\portalAdmin\\model\\DeptModel::getFullName($vo.dept_id))}</td>
