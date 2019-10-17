@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>以纯 • 纯分享</title>
+    <link rel="stylesheet" href="__STATIC__/lib/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="__STATIC__/lib/font-awesome-4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="__STATIC__/lib/element-ui/lib/theme-chalk/index.css">
+    <script src="__STATIC__/js/vue.js"></script>
+    <script src="__STATIC__/lib/element-ui/lib/index.js"></script>
+    <script src="__STATIC__/js/axios.min.js"></script>
+    <style>
+        body{background: url(__STATIC__/images/bg2.jpg) no-repeat;width: 100%;height: 1080px;background-size: cover;position: relative;}
+        .btn-box{width: 100%;position: absolute;top:650px;text-align: center;}
+        .btn-box>a{line-height: 50px;font-size: 35px;background-color:rgba(0,0,0,.5);border-color:rgba(0,0,0,.5);}
+        .btn-box>a:hover{background-color:rgba(0,0,0,.7);border-color:rgba(0,0,0,.7);}
+        .btn-box>a:first-child{margin-right: 40px;}
+        .btn-box>a:last-child{margin-left: 40px;}
+        .banner{width: 100%;height:600px;background-color: rgba(0, 0, 0, .3);position: absolute;top:40px;text-align: center;}
+        .banner img{width: 500px;position: relative;top:25px;}
+        .company{width:280px;position: relative;top:20px;left:50px;}
+
+        .clearfix:before,.clearfix:after {display: table;content: "";}
+        .clearfix:after {clear: both}
+
+        #app{position: relative;}
+        #login{width: 500px;margin: 20px auto;}
+        .text-vertical{line-height:40px;}
+        .el-row:not(:first-child){margin-top: 20px;}
+        .clearfix:before,.clearfix:after {display: table;content: "";}
+        .clearfix:after {clear: both}
+        .el-col{text-align: right;}
+    </style>
+</head>
+
+<body>
+    <img src="__STATIC__/images/company.png" alt="" class="company">
+    <div class="banner">
+        <img src="__STATIC__/images/banner.png" alt="">
+    </div>
+    <div id="app">
+        <el-card class="aside-item" id="login">
+            <div slot="header">
+                <span class="bold">用户注册</span>
+            </div>
+            <el-form :model="form" :rules="rules" ref="form" label-width="100px" class="demo-ruleForm" status-icon>
+                <el-form-item label="昵称" prop="user_nickname">
+                    <el-input v-model="form.user_nickname" placeholder="请输入昵称" clearableprefix-icon="el-icon-user-solid"></el-input>
+                </el-form-item>
+                <el-form-item label="用户名" prop="user_name">
+                    <el-input v-model="form.user_name" placeholder="请输入用户名" clearableprefix-icon="el-icon-user-solid"></el-input>
+                </el-form-item>
+                
+                <el-form-item label="手机号码" prop="mobile">
+                    <el-input v-model="form.mobile" placeholder="手机号码" type="number" clearableprefix-icon="el-icon-user-solid"></el-input>
+                </el-form-item>
+
+                <el-form-item label="密码" prop="pwd">
+                    <el-input v-model="form.pwd" type="password" placeholder="请输入密码" clearableprefix-icon="el-icon-edit"></el-input>
+                </el-form-item>
+                <el-form-item label="确认密码" prop="cpwd">
+                    <el-input v-model="form.cpwd" type="password" placeholder="再输入密码" clearableprefix-icon="el-icon-edit" @keyup.enter.native="regist"></el-input>
+                </el-form-item>
+                <el-form-item style="text-align:right;">
+                    <el-button type="primary" @click="toLogin">返回登录</el-button>
+                    <el-button @click="reset('form')">重置</el-button>
+                    <el-button type="success" @click="regist('form')">注&emsp;册</el-button>
+                </el-form-item>
+            </el-form>
+
+            
+        </el-card>
+        
+
+    </div>
+</body>
+</html>
+
+<script>
+    var vm = new Vue({
+        el:"#app",
+        data:{
+            form:{
+                user_nickname:'',
+                user_name:'',
+                pwd:'',
+                cpwd: '',
+                mobile:''
+            },
+            selectDept:'',
+            
+            showTreeDia:false,
+            props:{ 
+                children: 'child',
+                label: 'name'
+            },
+            
+            job_option:[],
+            rules: {
+                user_nickname: [
+                    { required: true, message: '请输入昵称', trigger: 'change' }
+                ],
+                user_name: [
+                    {required: true, trigger: 'change' }
+                ],
+                pwd: [
+                    { required: true, message: '请输入密码', trigger: 'change' }
+                ],
+                cpwd: [
+                    { message: '密码不一致', trigger: 'change', validator:''}
+                ],
+                mobile:[
+                    { required: true, message: '请输入手机号', trigger: 'change' },
+                    { min: 11, max: 11, message: '请输入11位有效手机号', trigger: 'change' }
+                ]
+            }
+        },
+        created () {
+            // axios.get("{:url('index/getOption')}").then((res)=>{
+            //     this.option = res.data;
+            // })
+        },
+        mounted(){
+            this.rules.cpwd[0].validator = (rule, value, callback) => {
+                if (value === '') {
+                    callback(new Error('请再次输入密码'));
+                } else if (value !== this.form.pwd) {
+                    callback(new Error('两次输入密码不一致!'));
+                } else {
+                    callback();
+                }
+            };
+
+            this.rules.user_name[0].validator = (rule, value, callback) => {
+                var uPattern = /^[a-zA-Z0-9_-]{4,16}$/;
+
+                if (value === '') {
+                    callback(new Error('请输入用户名'));
+                } else if (!uPattern.test(value)) {
+                    callback(new Error('用户名只能是4到16位（字母，数字，下划线，减号）'));
+                } else {
+                    callback();
+                }
+            };
+
+        },
+        methods: {
+
+            regist(formName){
+                this.$refs[formName].validate((valid) => {
+                    let _this = this;
+                    if (valid) {
+                        delete _this.form.cpwd;
+                        axios.post("{:url('register')}",_this.form).then((res)=>{
+                            if(res.data.code > 0){
+                                _this.$message({
+                                    message: res.data.msg,
+                                    type: 'success'
+                                });
+                                _this.reset(formName);
+                                setTimeout(()=>{
+                                    window.location.href = "./login.html";
+                                },2000);
+                            }else{
+                                _this.$message({
+                                    message: res.data.msg,
+                                    type: 'error'
+                                });
+                            }
+                        });
+                    } else {
+                        return false;
+                    }
+                });
+            },
+            reset(formName){
+                this.$refs[formName].resetFields();
+            },
+            toLogin(){
+                window.location.href="./login.html"
+            }
+        }
+    });
+</script>
