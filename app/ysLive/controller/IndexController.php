@@ -92,14 +92,22 @@ class IndexController extends HomeBaseController{
     }
 
     public function getArticle(){
-
+        $sortType = input("param.sortType");
         $cur_page = input("param.page") ? input("param.page") : 1;
         $keyword = input("param.keyword");
         $num = 10;
-
+        
+        if($sortType == 'time'){
+            $sortStr = "ORDER BY DATE DESC";
+        }else if($sortType == 'view'){
+            $sortStr = "ORDER BY view_count DESC";
+        }
         // $query = Db::name("CArticle") -> alias('at') -> join("CUser u","at.user_id = u.id","LEFT") -> where('at.title','like','%'.$keyword.'%') -> order("date desc");
-        $list = Db::query("SELECT at.*,u.user_name,u.avatar,u.user_nickname,(SELECT COUNT(id) FROM share_c_article_comment scac WHERE scac.article_id=at.id) AS comment_count FROM share_c_article AT LEFT JOIN share_c_user u ON at.user_id=u.id
-        WHERE at.title LIKE '%$keyword%' AND at.status=1 ORDER BY DATE DESC limit ".($cur_page-1)*$num .", $num");
+        $list_total = Db::query("SELECT at.*,u.user_name,u.avatar,u.user_nickname,(SELECT COUNT(id) FROM share_c_article_comment scac WHERE scac.article_id=at.id) AS comment_count,(SELECT COUNT(*) FROM share_c_article_like scal WHERE scal.article_id=at.id) AS like_count FROM share_c_article AT LEFT JOIN share_c_user u ON at.user_id=u.id
+        WHERE at.title LIKE '%$keyword%' AND at.status=1 $sortStr");
+
+        $list = Db::query("SELECT at.*,u.user_name,u.avatar,u.user_nickname,(SELECT COUNT(id) FROM share_c_article_comment scac WHERE scac.article_id=at.id) AS comment_count,(SELECT COUNT(*) FROM share_c_article_like scal WHERE scal.article_id=at.id) AS like_count FROM share_c_article AT LEFT JOIN share_c_user u ON at.user_id=u.id
+        WHERE at.title LIKE '%$keyword%' AND at.status=1 $sortStr limit ".($cur_page-1)*$num .", $num");
 
         // $list = $query -> limit(($cur_page-1)*$num , $num) -> field("at.*,u.user_name,u.avatar,u.user_nickname") -> select() -> toArray();
 
@@ -124,8 +132,26 @@ class IndexController extends HomeBaseController{
 
         $data['list'] = $list;
         $data['page_size'] =  $num;
-        $data['total'] =  count($list);
+        $data['total'] =  count($list_total);
         return json($data);
+    }
+
+    public function giveLike(){
+        $data['article_id'] = input("article_id");
+        $data['user_id'] = getUser('id');
+
+        $likeCount = Db::name('CArticleLike') ->where($data) -> count();
+
+        if($likeCount > 0){
+            Db::name('CArticleLike') ->where($data) -> delete();
+
+            return 1002;
+        }else{
+            Db::name('CArticleLike') -> insert($data);
+
+            return 1001;
+        }
+
     }
 
 
@@ -204,7 +230,7 @@ class IndexController extends HomeBaseController{
 
         $data['list'] = $list;
         $data['page_size'] = $num;
-        $data['total'] = $query -> count();;
+        $data['total'] = $query -> count();
         return json($data);
     }
 
@@ -229,6 +255,18 @@ class IndexController extends HomeBaseController{
         $article_id = $this -> request -> param('article_id',0,'intval');
         
         $res = Db::name('CArticle') -> WHERE('id',$article_id) -> setInc("view_count",1);
+    }
+
+    public function getUserScore(){
+        $page = $this -> request -> param('page');
+        $size = $this -> request -> param('size');
+
+        // $view = Db::table('vw_c_view_total') -> field("(@i:=@i+1) i") -> select();
+        $res['total'] = count(Db::query("SELECT (@sort:=@sort+1) sort,view_count_total,STATUS,user_name,avatar,user_nickname FROM vw_c_view_total,(SELECT @sort:=0) AS s"));
+
+        $res['list'] = Db::query("SELECT (@sort:=@sort+1) sort,view_count_total,STATUS,user_name,avatar,user_nickname FROM vw_c_view_total,(SELECT @sort:=0) AS s LIMIT ".($page-1)*$size.",$size");
+
+        return json($res);
     }
 
 }
