@@ -23,6 +23,12 @@
         <a class="btn btn-danger" href="{:url('user/adminIndex/index')}">清空</a>
         <input type="submit" formaction="{:url('exportExcel')}" class="btn btn-success" value="导出Excel"/>
     </form>
+    <p>
+        <span style="color:#3FAD46;">已启用人数：{$user_count['valid']}</span> &emsp;
+        <span style="color:#d9534f;">已禁用人数：{$user_count['ban']}</span> &emsp;
+        <span style="color:#006fc4;">未验证人数：{$user_count['undispose']}</span> &emsp;
+        <span style="color:#000;">总人数：{$user_count['valid']+$user_count['ban']+$user_count['undispose']}</span>
+    </p>
     <form method="post" class="js-ajax-form">
         <table class="table table-hover table-bordered">
             <thead>
@@ -31,6 +37,7 @@
                 <th>{:lang('USERNAME')}</th>
                 <th>{:lang('NICENAME')}</th>
                 <th>角色</th>
+                <th>账号类型</th>
                 <th>真实名字</th>
                 <!-- <th>机构</th> -->
                 <th>部门</th>
@@ -56,6 +63,16 @@
                     </td>
                     <td>{$vo['user_nickname']?$vo['user_nickname']:lang('NOT_FILLED')}</td>
                     <td>{$vo.role_name}</td>
+                    <td>
+                        <switch name="vo.type">
+                            <case value="1">
+                                <span style="color:#3FAD46;">全平台</span>
+                            </case>
+                            <case value="2">
+                                <span style="color:#006fc4;">纯生活</span>
+                            </case>
+                        </switch>
+                    </td>
                     <td>{$vo.real_name}</td>
                     <!-- <td> </td> -->
                     <td>{:implode('/',\\app\\portalAdmin\\model\\DeptModel::getFullName($vo.dept_id))}</td>
@@ -85,7 +102,7 @@
                             <case value="1">
                                 <a class="btn btn-xs btn-warning js-ajax-dialog-btn"
                                    href="{:url('adminIndex/ban',array('id'=>$vo['id']))}"
-                                   data-msg="{:lang('BLOCK_USER_CONFIRM_MESSAGE')}">{:lang('BLOCK_USER')}</a>
+                                   data-msg="{:lang('BLOCK_USER_CONFIRM_MESSAGE')}">已禁用</a>
                                 <a class="btn btn-xs btn-primary"
                                    href="{:url('adminIndex/roleEdit',array('u_id'=>$vo['id']))}"
                                   >角色管理</a>
@@ -96,7 +113,7 @@
                                     data-msg="{:lang('ACTIVATE_USER_CONFIRM_MESSAGE')}">{:lang('ACTIVATE_USER')}</a>
                                 <a class="btn btn-xs btn-warning js-ajax-dialog-btn"
                                     href="{:url('adminIndex/ban',array('id'=>$vo['id']))}"
-                                    data-msg="{:lang('BLOCK_USER_CONFIRM_MESSAGE')}">{:lang('BLOCK_USER')}</a>
+                                    data-msg="{:lang('BLOCK_USER_CONFIRM_MESSAGE')}">已禁用</a>
                             </case>
                             <case value="0">
                                     <a class="btn btn-xs btn-success js-ajax-dialog-btn"

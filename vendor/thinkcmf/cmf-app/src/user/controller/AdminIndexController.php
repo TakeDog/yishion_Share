@@ -68,7 +68,7 @@ class AdminIndexController extends AdminBaseController
             -> join('c_user_role ur','u.id = ur.user_id','LEFT')
             -> join('c_role r','ur.role_id=r.id','LEFT')
             -> join('job j','u.job_id = j.id','LEFT')
-            -> join('dept d','u.dept_id = d.id')
+            -> join('dept d','u.dept_id = d.id','LEFT')
             -> where(function (Query $query) {
                 $data = $this->request->param();
 
@@ -105,8 +105,15 @@ class AdminIndexController extends AdminBaseController
         //     $list[$k]['part'] = $deptMsg['name'];
         // }
 
-        $this->assign('list', $list);
-        $this->assign('page', $page);
+
+        //用户账号情况
+        $ban = Db::name("CUser") -> where('user_status',0) -> count();      //禁用
+        $valid = Db::name("CUser") -> where('user_status',1) -> count();    //启用
+        $undispose = Db::name("CUser") -> where('user_status',2) -> count();//未验证
+
+        $this -> assign('user_count',['ban'=>$ban,'valid'=>$valid,'undispose'=>$undispose]);
+        $this -> assign('list', $list);
+        $this -> assign('page', $page);
         // 渲染模板输出
         return $this->fetch();
     }

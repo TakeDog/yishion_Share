@@ -52,10 +52,41 @@ class CUserModel extends Model{
 
         // session存储个人信息
         session('user_info', $userInfo->toArray(),'portal');
+        session('user_info', $userInfo->toArray(),'live');
         // session存储权限
         session('auth', $auth,'portal');
         return 1;
 
+    }
+
+    public function loginVerifyLive($user,$pwd){
+       
+        $userInfo = $this -> where("user_name",$user) -> find();
+        
+        if(!$userInfo) return 0;
+
+        if($userInfo['pwd'] != MD5($pwd)) return -2;
+
+        if($userInfo['user_status'] == 0) return -1;
+
+        // 定义存session时 需要删除的个人信息
+        $unField  = ['pwd','salt','last_login_ip','last_login_time','user_status'];
+        
+        // 删除部分个人信息
+        foreach ($unField as $fKey => $fVal){
+            unset($userInfo[$fVal]);
+        }
+
+        $data['last_login_time'] = time();
+        $data['last_login_ip']    = getClientIp();    // 自定义公用获取登录ip
+
+        // 更新登录状态
+        $this -> where('id', $userInfo['id']) -> update($data);
+
+        // session存储个人信息
+        session('user_info', $userInfo->toArray(),'live');
+        // session存储权限
+        return 1;
     }
 
     public function registVerify($user){
@@ -76,6 +107,25 @@ class CUserModel extends Model{
             return $res;
         }catch(\Exception $e){
             Db::rollback();
+            return 0;
+        }
+    }
+
+    public function registerVerifyLive($user){
+        $userInfo = $this -> where("user_name",$user['user_name']) -> find();
+
+        if($userInfo) return -1;
+
+        $user['pwd'] = MD5($user['pwd']);
+        $user['user_status'] = 2;
+        $user['super'] = 0;
+        $user['create_time'] = time();
+        $user['type'] = 2;
+
+        try{
+            $res = $this -> insert($user);
+            return $res;
+        }catch(\Exception $e){
             return 0;
         }
     }
