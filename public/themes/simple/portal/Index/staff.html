@@ -123,23 +123,23 @@
         })
         
     
-        
+        var num = "{$person_count}";
     
         var vm = new Vue({
             el: "#app",
             data: {
-                num: 0
+                num: num
             },
             mounted() {
-                window.addEventListener('load', e => this.onload(e))
+                //window.addEventListener('load', e => this.onload(e))
                 window.addEventListener('beforeunload', e => this.beforeunloadHandler(e))
             },
             methods: {
-                onload(e){
-                　　axios.post("{:url('online')}").then((res) => {
-                        this.num = res.data;
-                    });
-                },
+                // onload(e){
+                // 　　axios.post("{:url('online')}").then((res) => {
+                //         this.num = res.data;
+                //     });
+                // },
                 beforeunloadHandler(e){
                 　　axios.post("{:url('outline')}").then((res) => {
                     });

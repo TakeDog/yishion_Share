@@ -31,6 +31,15 @@
         .clearfix:before,.clearfix:after {display: table;content: "";}
         .clearfix:after {clear: both}
         .el-col{text-align: right;}
+
+        .avatar-uploader .el-upload {border: 1px dashed #d9d9d9;border-radius: 6px;cursor: pointer;position: relative;overflow: hidden;}
+        .avatar-uploader .el-upload:hover {border-color: #409EFF;}
+        .avatar-uploader-icon {font-size: 28px;color: #8c939d;width: 178px;height: 178px;line-height: 178px;text-align: center;}
+        .avatar {width: 178px;height: 178px;display: block;}
+        .el-upload__input{display:none !important;}
+        .o_avatar_block{width: 178px;height: 178px;position: relative;}
+        .s_mask{position: absolute;top: 0;left: 0;bottom:0;right: 0;background-color: rgba(0, 0, 0, .3);}
+        .s_mask p{line-height: 178px;text-align: center;color:white;}
     </style>
 </head>
 
@@ -41,7 +50,32 @@
             <div slot="header">
                 <span class="bold">修改个人信息</span>
             </div>
+
+            
+
             <el-form :model="form" :rules="rules" ref="form" label-width="100px" class="demo-ruleForm" status-icon>
+
+                <el-form-item label="头像" prop="avatar">
+                    <el-upload
+                        class="avatar-uploader"
+                        action=""
+                        :show-file-list="false"
+                        :on-success="handleAvatarSuccess"
+                        :before-upload="beforeAvatarUpload">
+                        <div v-if="newAvatarUrl">
+                            <img :src="newAvatarUrl" class="avatar">
+                        </div>
+
+                        <div v-else="oldAvatarUrl" class="o_avatar_block" @mouseover="oldAvatarMask=true;" @mouseout="oldAvatarMask=false;">
+                            <div class="s_mask" v-show="oldAvatarMask">
+                                <p>点击更换头像</p>
+                            </div>
+                            <img :src="oldAvatarUrl" class="avatar">
+                        </div>
+                        
+                    </el-upload>
+                </el-form-item>
+
                 <el-form-item label="用户名" prop="user_name">
                     <el-input v-model="form.user_name" placeholder="请输入用户名" clearableprefix-icon="el-icon-user-solid" disabled></el-input>
                 </el-form-item>
@@ -113,6 +147,9 @@
     var vm = new Vue({
         el:"#app",
         data:{
+            oldAvatarMask:false,
+            avatarFile:'',
+            newAvatarUrl: '',
             form:{
                 id: '',
                 user_nickname:'',
@@ -186,6 +223,25 @@
             };
         },
         methods: {
+
+            handleAvatarSuccess(res, file) {
+                this.avatarFile = file.raw;
+                this.newAvatarUrl = URL.createObjectURL(file.raw);
+            },
+
+            beforeAvatarUpload(file) {
+                const isJPG = (file.type === 'image/jpeg') || (file.type === 'image/png');
+                const isLt2M = file.size / 1024 / 1024 < 2;
+
+                if (!isJPG) {
+                    this.$message.error('上传头像图片只能是 JPG,PNG 格式!');
+                }
+                if (!isLt2M) {
+                    this.$message.error('上传头像图片大小不能超过 2MB!');
+                }
+                return isJPG && isLt2M;
+            },
+
             cancelSlect(){
                 this.form.dept_id = '';
                 this.selectDept = '';
@@ -199,12 +255,39 @@
             edit(formName){
                 this.$refs[formName].validate((valid) => {
                     let _this = this;
+
+                    var formData = new FormData();
+
+                        formData.append("id",this.form.id);
+                        //formData.append("user_name",this.form.user_name);
+                        formData.append("user_nickname",this.form.user_nickname);
+                        formData.append("real_name",this.form.real_name);
+                        formData.append("mobile",this.form.mobile);
+                        formData.append("editPwd",this.form.editPwd);
+
+                    if(this.form.editPwd){
+                        formData.append("pwd",this.form.pwd);
+                    }
+
+                    if(this.newAvatarUrl){
+                        formData.append("avatarFile",this.avatarFile,this.avatarFile.name);
+                    }    
+                    
                     if (valid) {
                         if(!this.form.editPwd){
                             delete _this.form.pwd;
+                        }else{
+                            formData.append("pwd",this.form.pwd);
                         }
                         delete _this.form.cpwd;
-                        axios.post("{:url('edit')}",_this.form).then((res)=>{
+                        
+                        
+
+                        axios.post("{:url('edit')}",formData,{
+
+                            headers:{"Content-Type": "multipart/form-data"}
+
+                        }).then((res)=>{
                             if(res.data.status == 1001){
                                 _this.$message({
                                     message: res.data.msg,
@@ -233,6 +316,10 @@
             // dept_id(){
             //     return this.form.dept_id;
             // }
+            oldAvatarUrl(){
+                var user_info = JSON.parse('{$user_info|json_encode=true}');
+                return user_info.avatar ? '/' + user_info.avatar : "/upload/avatar/default.jpg";
+            }
         },
         watch: {
             // dept_id(newV,oldV){

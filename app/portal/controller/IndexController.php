@@ -72,6 +72,9 @@ class IndexController extends HomeBaseController
 
     public function staff(){
         $this -> assign('news',$this -> indexNews());
+        $person_count = $this -> online();
+        
+        $this -> assign('person_count',$person_count);
         return $this -> fetch();
     }
 

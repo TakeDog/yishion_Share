@@ -207,6 +207,7 @@ class CUserModel extends Model{
         $roleName = $this->getUserRoleName($userInfo->id);
         $userInfo['role'] = $roleName;
 
+        $userInfo['login_id'] = session('user_info','','portal')['login_id'];
         // session存储个人信息
         session('user_info', $userInfo->toArray(),'portal');
     }
