@@ -210,6 +210,7 @@ class CUserModel extends Model{
         $userInfo['login_id'] = session('user_info','','portal')['login_id'];
         // session存储个人信息
         session('user_info', $userInfo->toArray(),'portal');
+        session('user_info', $userInfo->toArray(),'live');
     }
 
     public function exportExcel($data){

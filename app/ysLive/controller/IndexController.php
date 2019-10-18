@@ -300,4 +300,43 @@ class IndexController extends HomeBaseController{
         $this -> redirect("index");
     }
 
+    public function editUser(){
+        return $this -> fetch();
+    }
+
+    public function editHandle(){
+        $param = $this -> request -> param();
+        $file = $this -> request -> file("avatarFile");
+
+        $userModel = new CUserModel();
+        if($param['editPwd'] == "true"){
+            $param['pwd'] = MD5($param['pwd']);
+        }
+        unset($param['editPwd']);
+
+        if($file){
+            $info = $file->move('upload/avatar');
+            if($info){
+                $param['avatar'] = 'upload/avatar/'.str_replace("\\","/",$info->getSaveName());
+            }else{
+                // 上传失败获取错误信息
+                $message['msg'] = "头像上传失败！";
+                $message['status'] = 1003;
+                return json($message);
+            }
+        }
+
+        $res = Db::name("c_user") -> update($param);
+
+        if($res){
+            //$userModel-> setUserSessionById($param['id']);
+            $message['msg'] = "修改个人信息成功！,请重新登录";
+            $message['status'] = 1001;
+            return json($message);
+        }else{
+            $message['msg'] = "修改个人信息失败！！！";
+            $message['status'] = 1002;
+            return json($message);
+        }
+    }
 }
