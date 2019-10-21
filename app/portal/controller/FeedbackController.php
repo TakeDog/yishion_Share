@@ -124,11 +124,8 @@ class FeedbackController extends HomeBaseController{
     public function editInfo(){
 
         $catetory = new Category();
-
         $option_data = Db::name("dept") -> select();
         $tree_data = Db::name("dept") -> order('id') ->select();
-        
-        
         $this -> assign('tree',json_encode($catetory -> unlimitedForLayer($tree_data)));
         $this -> assign('option',json_encode($catetory -> unlimitedForLevel($option_data,'|—')));
         return $this -> fetch();
@@ -146,16 +143,29 @@ class FeedbackController extends HomeBaseController{
 
     public function edit(){
         $param = $this -> request -> param();
-        if($param['editPwd']){
+        $file = $this -> request -> file("avatarFile");
+
+        if($param['editPwd'] == "true"){
             $param['pwd'] = MD5($param['pwd']);
         }
         unset($param['editPwd']);
-        
+
+        if($file){
+            $info = $file->move('upload/avatar');
+            if($info){
+                $param['avatar'] = 'upload/avatar/'.str_replace("\\","/",$info->getSaveName());
+            }else{
+                // 上传失败获取错误信息
+                $message['msg'] = "头像上传失败！";
+                $message['status'] = 1003;
+                return json($message);
+            }
+        }
+
         $res = Db::name("c_user") -> update($param);
 
         if($res){
             model("CUser") -> setUserSessionById($param['id']);
-
             $message['msg'] = "修改个人信息成功！！！";
             $message['status'] = 1001;
             return json($message);

@@ -131,7 +131,7 @@
                                     <li class="main-row" v-for="(item,i) in articleList" :key="item.id">
                                         <div class="avatar">
                                             <a href="#">
-                                                <img src="__STATIC__/images/avatar.jpg" alt="">
+                                                <img :src="item.avatar ? '/' + item.avatar : '/upload/avatar/default.jpg'" alt="">
                                             </a>
                                         </div>
                                         <div class="list-content">
