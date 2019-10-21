@@ -177,7 +177,7 @@ class AdminUIController extends AdminBaseController{
      * )
      */
     public function getAsideData(){
-        $page_size = 13;
+        $page_size = 11;
         $search = $this -> request -> param('search');
         $page = $this -> request -> param('page',1,'intval');
 

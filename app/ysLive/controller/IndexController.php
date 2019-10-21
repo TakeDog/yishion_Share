@@ -50,6 +50,7 @@ class IndexController extends HomeBaseController{
      //保存富文本内容
      public function saveEditor(){
         $data['content'] = input('post.content');
+        
         //正则表达式匹配查找图片路径
         // $pattern = '/\<[img|IMG].*?src=[\'|\"](.*?(?:[\.gif|\.jpg|\.jpeg|\.png]))[\'|\"].*?[\/]?\>/i';
         $pattern = '/<img.*?src=[\"|\']?(.*?)[\"|\']?\s.*?>/i';
@@ -77,9 +78,9 @@ class IndexController extends HomeBaseController{
                 $data['content']=str_replace('/img_temp/','/img/',$data['content']);
             }
         }
-        
+
         $data['title'] = input("param.title");
-        $data['user_id'] = getUser('id');
+        $data['user_id'] = getUserLive('id');
         $data['status'] = 0;
         $data['date'] = time();
 

@@ -114,7 +114,6 @@
         <el-row :gutter="10">
             <el-col :span="18" style="min-height: 700px;">
 
-
             <el-table
                 ref="multipleTable"
                 :data="tableData"
@@ -143,7 +142,7 @@
                             size="mini"
                             v-model="scope.row.file_name"
                             @focus="temp = scope.row.file_name"
-                            @blur="scope.row.edit=false;"
+                            @blur="scope.row.edit=false;$emit('edt_item','file_name',scope.row.id,scope.row.file_name,temp);"
                             @keyup.enter.native="scope.row.edit=false;$emit('edt_item','file_name',scope.row.id,scope.row.file_name,temp);"
                         ></el-input>
                         <i class="el-icon-edit file_edit pull-right" v-if="!scope.row.edit" @click="showInput(scope.row)"></i>
@@ -284,7 +283,7 @@
                 }).then(res=>{
                     
                     this.authDept = res.data.authDept;
-                    if(res.data.authJob){
+                    if(!res.data.authJob){
                         this.authJob =  res.data.authJob.split(',').map(function(currentV){
                             return parseInt(currentV);
                         });

@@ -183,7 +183,7 @@
                         }).then((res)=>{
                         if(res.data == 1001){
                             ue.setContent("");
-                            this.$message("发布成功");
+                            this.$message("发布成功,请等待审核");
                             this.getArticle();
                         }else{
                             this.$message("发布失败");
