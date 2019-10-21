@@ -27,6 +27,8 @@
 .comment .el-tabs{background-color: #fff;border: 1px solid #d2d2d2;margin-bottom:20px;}
 .comment .el-tabs__item{font-size:16px;font-weight: bold;}
 .el-dialog{overflow-y: scroll !important;height: 92% !important;}
+.auth_msg_item{cursor: pointer;}
+.auth_msg_item:hover{color: #bbb;}
 
 </style>
 <div class="container" id="app" style="min-height: 650px;">
@@ -114,6 +116,10 @@
             <div>
                 <!-- <span class="glyphicon glyphicon-share"></span>&nbsp;分享
                 &nbsp;&nbsp; -->
+                <span class="auth_msg_item" @click="giveLike('{$data['id']}')">
+                    <span class="glyphicon glyphicon-eye-open"></span>&nbsp;{{like_count>999?"999+":like_count}}
+                &nbsp;&nbsp;
+                </span>
                 <span class="glyphicon glyphicon-eye-open"></span>&nbsp;{$data['view_count']>999?"999+":$data['view_count']}
                 &nbsp;&nbsp;
                 <span class="glyphicon glyphicon-comment"></span>&nbsp;{$data['comment_count']>999?"999+":$data['comment_count']}
@@ -250,7 +256,8 @@
                 index: 0,
                 comment:'',
                 visible: false
-            }
+            },
+            like_count: "{$data['like_count']}"
         },
         methods: {
             addViewCount(){
@@ -295,6 +302,17 @@
                     if(index)
                         this.allReplyModal.comment = JSON.parse(JSON.stringify(this.comment_list.list[index]));
                 })
+            },
+            giveLike(id){
+                axios.post("{:url('giveLike')}",{article_id:id}).then((res) => {
+                    if(res.data == 1001){
+                        ++this.like_count;
+                    }else if(res.data == 1002){
+                        --this.like_count;
+                    }else if(res.data == 1004){
+                        parent.location.href = "/yslive/index/login";
+                    }
+                });
             },
             toReply(status,i,k){
                 var arr = this.comment_list.list[i];

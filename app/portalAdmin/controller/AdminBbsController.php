@@ -59,6 +59,9 @@ class AdminBbsController extends AdminBaseController{
     public function getAllArticleData(){
         $data = $this -> request -> param();
 
+        $list_total = Db::query("SELECT at.id,at.title,at.view_count,at.status,at.date,u.user_name,u.user_nickname,(SELECT COUNT(id) FROM share_c_article_comment scac WHERE scac.article_id=at.id) AS comment_count FROM share_c_article AT LEFT JOIN share_c_user u ON at.user_id=u.id
+        WHERE at.title LIKE '%".$data['title']."%' ORDER BY DATE DESC");
+
         $list = Db::query("SELECT at.id,at.title,at.view_count,at.status,at.date,u.user_name,u.user_nickname,(SELECT COUNT(id) FROM share_c_article_comment scac WHERE scac.article_id=at.id) AS comment_count FROM share_c_article AT LEFT JOIN share_c_user u ON at.user_id=u.id
         WHERE at.title LIKE '%".$data['title']."%' ORDER BY DATE DESC limit ".($data['page']-1)*$data['pageSize'] .",".$data['pageSize']);
 
@@ -68,7 +71,7 @@ class AdminBbsController extends AdminBaseController{
         
 
         $res['list'] = $list;
-        $res['total'] =  count($list);
+        $res['total'] =  count($list_total);
         return json($res);
     }
     /**

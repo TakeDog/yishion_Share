@@ -11,10 +11,49 @@
     .el-table__row td{padding:5px 0;}
     .main .el-tabs__header{margin:0 0 10px;}
     .fiex-card{width: 200px;position: fixed;top: 26px;padding: 0 0 0 20px;}
+    .sortActive{color:#F5B6A7}
+    .sortActive:focus{color:#F5B6A7}
+    .auth_msg_item{cursor: pointer;}
+    .auth_msg_item:hover{color: #bbb;}
+    .currentRank_Div{margin-top:20px;width:100%;border-top:1px solid #ebeef5;border-bottom:1px solid #ebeef5;}
+    .currentRank_Div .rank_item{display: flex;padding: 5px 0px 5px 7px;}
+    .currentRank_Div .rank_item .cell{flex: 1;text-align: center;}
+    .el-table .current-user{background: oldlace;}
 </style>
 
 
 <div id="app" style="margin-top:20px;">
+    <el-drawer title="达人榜" :visible.sync="rankDrawer" direction="rtl" :show-close="false" stripe>
+        <el-table :data="userRankDrawer.list":row-class-name="currentUser" style="width: 100%;margin:10px 5px;text-align: center;">
+            <el-table-column prop="rn" label="排名" header-align="center"></el-table-column>
+            <el-table-column prop="user_nickname" label="用户" header-align="center"></el-table-column>
+            <el-table-column prop="view_count_total" label="阅读量" header-align="center"></el-table-column>
+        </el-table>
+        <div class="currentRank_Div">
+            <div class="rank_item" v-if="currentUserRank && '{$user_id}'!==''">
+                <div class="cell">
+                    <div>{{currentUserRank.rn}}</div>
+                </div>
+                <div class="cell">
+                    <div>{{currentUserRank.user_nickname}}</div>
+                </div>
+                <div class="cell">
+                    <div>{{currentUserRank.view_count_total}}</div>
+                </div>
+            </div>
+            <div class="rank_item" v-if="!currentUserRank && '{$user_id}'!==''">
+                <div class="cell">
+                    <div>暂无排名</div>
+                </div>
+            </div>
+            <div class="rank_item" v-if="!currentUserRank && '{$user_id}'===''">
+                <div class="cell">
+                    <div>请 <a href="{:url('login')}" class="navbar-link color-b" target="_blank">登录</a> 查看排名</div>
+                </div>
+            </div>
+        </div>
+        <el-pagination background layout="prev, pager, next" :page-size="userRankDrawer.size" :total="userRankDrawer.total" @current-change="rankToPage" @prev-click="rankToPage" @next-click="rankToPage" style="text-align:center;"></el-pagination>
+    </el-drawer>
     <el-container>
         <div class="container" style="margin-bottom:20px;min-height: 750px;padding:0 30px;" id="main">
             <el-container>          
@@ -33,25 +72,26 @@
                             <el-card class="aside-item no-padding-card" shadow="hover" style="min-height: 383px;">
                                 <div slot="header">
                                     <span>达人榜</span>
+                                    <el-link type="primary" :underline="false" style="float:right;" @click="showRankMore">更多</el-link>
                                 </div>
                                 <el-table
-                                    :data="UserScore"
+                                    :data="userRank"
                                     style="width: 100%"
                                     stripe
                                     style="text-align: center;"
                                     >
                                     <el-table-column
-                                        prop="sort"
+                                        prop="rn"
                                         label="排名"
                                     ></el-table-column>
                                     <el-table-column
-                                        prop="user_name"
+                                        prop="user_nickname"
                                         label="用户"
                                     >
                                     </el-table-column>
                                     <el-table-column
-                                        prop="score"
-                                        label="积分">
+                                        prop="view_count_total"
+                                        label="阅读量">
                                     </el-table-column>
                                 </el-table>
                             </el-card>
@@ -69,7 +109,11 @@
                                 </span>
                             </el-tab-pane>
 
-                            <p style="margin-left:5px;"><a href="#">按时间</a> | <a href="#">按热门</a> | <a href="#">按关注</a></p>
+                            <p style="margin-left:5px;">
+                                <a href="javascript:" :class="{'sortActive':articleSort=='time'}" @click="sortChange('time')">按时间</a> | 
+                                <a href="javascript:" :class="{'sortActive':articleSort=='view'}" @click="sortChange('view')">按热门</a> | 
+                                <a href="javascript:" :class="{'sortActive':articleSort==''}" @click="sortChange('')">按关注</a>
+                            </p>
 
                             <div class="search-row">
                                 <div class="input-group" style="margin-bottom:10px;">
@@ -84,7 +128,7 @@
                             </div>
                             <div class="main_wrap">
                                 <ul class="main_list">
-                                    <li class="main-row" v-for="item in articleList" :key="item.id">
+                                    <li class="main-row" v-for="(item,i) in articleList" :key="item.id">
                                         <div class="avatar">
                                             <a href="#">
                                                 <img :src="item.avatar ? '/' + item.avatar : '/upload/avatar/default.jpg'" alt="">
@@ -100,6 +144,10 @@
                                                 <span>{{item.offsetTime}}</span>
                                                 <!-- <span>置顶</span> -->
                                                 <p class="pull-right">
+                                                    <span class="auth_msg_item" @click="giveLike(item.id,i)">
+                                                        <span class="glyphicon glyphicon-thumbs-up" style="color:#8c8c8c;"></span>&nbsp;{{item.like_count>999?"999+":item.like_count}}
+                                                    </span>
+                                                    &nbsp;&nbsp;
                                                     <span>
                                                         <span class="glyphicon glyphicon-eye-open"></span>&nbsp;{{item.view_count>999?"999+":item.view_count}}
                                                     </span>
@@ -160,17 +208,20 @@
             total:0,
             page_size:0,
             keyword:'',
-            UserScore:[
-                {sort:1, user_name:'周杰伦',score:100000},
-                {sort:2, user_name:'蔡徐坤',score:11},
-                {sort:3, user_name:'周杰伦',score:100000},
-                {sort:4, user_name:'蔡徐坤',score:11},
-                {sort:5, user_name:'周杰伦',score:100000},
-                {sort:6, user_name:'蔡徐坤',score:11},
-                {sort:7, user_name:'蔡徐坤',score:11},
-                {sort:8, user_name:'周杰伦',score:100000},
-                {sort:9, user_name:'蔡徐坤',score:11}
-            ]
+            articleSort: 'time',
+            userRankDrawer:{
+                list: [],
+                page: 1,
+                size: 10,
+                total: 0
+            },
+            userRank:[],
+            rankDrawer: false,
+            currentUserRank: null
+        },
+        mounted () {
+            this.getArticle(1);
+            this.getUserScore(9);
         },
         methods: {
             publish(){
@@ -184,7 +235,7 @@
                         if(res.data == 1001){
                             ue.setContent("");
                             this.$message("发布成功");
-                            this.getArticle();
+                            this.getArticle(1);
                         }else{
                             this.$message("发布失败");
                         }
@@ -198,7 +249,8 @@
                 axios.get("{:url('getArticle')}",{
                     params:{
                         page,
-                        keyword:this.keyword
+                        keyword:this.keyword,
+                        sortType: this.articleSort
                     }
                 }).then((res) => {
                     var data = res.data;
@@ -207,17 +259,78 @@
                     this.page_size = data['page_size'];
                 })
             },
+            getUserScore(size){
+                axios.get("{:url('getUserScore')}",{
+                    params:{
+                        page: 1,
+                        size: size,
+                    }
+                }).then((res) => {
+                    this.userRank = res.data.list;
+                });
+
+            },
+            getUserScoreDrawer(){
+                axios.get("{:url('getUserScore')}",{
+                    params:{
+                        page: this.userRankDrawer.page,
+                        size: this.userRankDrawer.size
+                    }
+                }).then((res) => {
+                    this.userRankDrawer.list = res.data.list;
+                    this.userRankDrawer.total = res.data.total;
+                });
+
+            },
+            getUserScoreById(){
+                axios.post("{:url('getUserScoreById')}",{
+                    user_id: '{$user_id}'
+                }).then((res) => {
+                    if(res.data)
+                        this.currentUserRank = res.data[0];
+
+                });
+
+            },
+            currentUser({row,rowIndex}){
+                if(row.user_id == '{$user_id}'){
+                    return 'current-user';
+                }
+            },
+            showRankMore(){
+                this.rankDrawer=true;
+                this.userRankDrawer.page = 1;
+                this.getUserScoreDrawer();
+                this.getUserScoreById();
+            },
             toPage(page){
                 this.getArticle(page);
+            },
+            rankToPage(page){
+                this.userRankDrawer.page = page;
+                this.getUserScoreDrawer();
+            },
+            sortChange(type){
+                this.articleSort = type;
+                this.getArticle(1);
+
+            },
+            giveLike(id,i){
+                axios.post("{:url('giveLike')}",{article_id:id}).then((res) => {
+                    if(res.data == 1001){
+                        ++this.articleList[i].like_count;
+                    }else if(res.data == 1002){
+                        --this.articleList[i].like_count;
+                    }else if(res.data == 1004){
+                        parent.location.href = "/yslive/index/login";
+                    }
+                });
             }
         },
         watch:{
             keyword:function(newV,oldV){
                 this.getArticle(1);
             }
-        },
-        mounted () {
-            this.getArticle(1);
         }
     };
 </script>
