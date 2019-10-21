@@ -7,6 +7,16 @@ use app\common\AppLog;
 
 class InfoController extends HomeBaseController{
 
+    public function searchAllFiles(){
+        $filesName = $this -> request -> param("filesName");
+
+        // $total = Db::query("SELECT count(*) count FROM share_work_info WHERE files<>'' AND NAME LIKE '%$filesName%'");
+        
+        $data = Db::query("SELECT * FROM share_work_info WHERE files<>'' AND NAME LIKE '%$filesName%'");
+
+        return json($data);
+    }
+
     public function index(){
         return $this -> fetch();
     }
@@ -100,6 +110,4 @@ class InfoController extends HomeBaseController{
         $this -> assign('fileList', json_encode($data));
         return $this -> fetch();
     }
-
-
 }
