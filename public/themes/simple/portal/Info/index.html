@@ -20,6 +20,13 @@ el-icon-s-promotion -- 指引 -->
 
 
 <div class="container" id="app" v-cloak>
+    <div style="margin:10px 0;">
+        <el-autocomplete v-model="filesName" :fetch-suggestions="searchAllFiles" placeholder="搜索文件" :trigger-on-focus="false" value-key="name" prefix-icon="el-icon-document" style="width:100%">
+            <template slot-scope="{item}">
+                <a :href="'{:url(\'openFile\')}?path=/'+item.files+'&id='+item.id+'&file_name='+item.name" target="view_window" style="display: block;">{{item.name}}</a>
+            </template>
+        </el-autocomplete>
+    </div>
     <div class="full-row-block">
         <el-card shadow="never" v-for="(item,i) in infoTree" style="margin-bottom: 20px;">
             <div class="activity-item">
@@ -57,7 +64,9 @@ el-icon-s-promotion -- 指引 -->
         data:{
             filesLimit: 5,
             searchNameArr:[],
-            infoTree: []
+            infoTree: [],
+            filesName: '',
+            allFiles: []
         },
         mounted() {
             this.createTree();
@@ -87,6 +96,11 @@ el-icon-s-promotion -- 指引 -->
                     this.infoTree[i].children[this.searchNameArr[i].index].children = res.files;
                     this.infoTree[i].children[this.searchNameArr[i].index].total = res.total;
                     Vue.set(this.infoTree,i,this.infoTree[i]);
+                });
+            },
+            searchAllFiles(query,cb){
+                axios.post("{:url('searchAllFiles')}",{filesName: query}).then((res)=>{
+                    cb(res.data);
                 });
             },
             getMoreFiles(ktem,i,k){

@@ -5,6 +5,7 @@ use think\Db;
 use cmf\controller\AdminBaseController;
 use app\common\Category;
 use think\db\Query;
+use app\common\MsgOperate;
 /**
  * Class OrganizeController
  * @package app\portalAdmin\controller
@@ -22,6 +23,12 @@ use think\db\Query;
  */
 
 class AdminOrganizeController extends AdminBaseController{
+    public function testSendMsg(){
+        $msgClass = new MsgOperate();
+        $data = $msgClass -> sendMsg('18819471027,13316685768,13143517538','您的验证码为4568，请勿泄露。【YISHION】');
+        dump($data);
+    }
+
     /**
      * 组织架构首页
      * @adminMenu(
@@ -205,9 +212,9 @@ class AdminOrganizeController extends AdminBaseController{
             $where['u.dept_id'] = $input['dept_id'];
         }
 
-        $main = Db::name("CUser") -> alias('u') -> join("share_dept d","u.dept_id=d.id",'LEFT') -> join('share_job j','u.job_id = j.id','LEFT') -> where($where) -> whereLike($likeField,'%'.$keyword.'%')  -> field("u.id,u.user_name,u.user_nickname,u.avatar,u.user_status,u.super,u.user_email,u.mobile,u.create_time,u.real_name,u.dept_id,u.job_id,d.name as dept,j.job as job") -> limit(($page-1) * $num,$num) -> select();
+        $main = Db::name("CUser") -> alias('u') -> join("share_dept d","u.dept_id=d.id",'LEFT') -> join('share_job j','u.job_id = j.id','LEFT') -> where($where) -> whereLike($likeField,'%'.$keyword.'%') -> where('u.type',1)  -> field("u.id,u.user_name,u.user_nickname,u.avatar,u.user_status,u.super,u.user_email,u.mobile,u.create_time,u.real_name,u.dept_id,u.job_id,d.name as dept,j.job as job") -> limit(($page-1) * $num,$num) -> select();
 
-        $count = Db::name("CUser") -> alias('u') -> join("share_dept d","u.dept_id=d.id",'LEFT') -> join('share_job j','u.job_id = j.id','LEFT') -> where($where) -> whereLike($likeField,'%'.$keyword.'%')  -> count();
+        $count = Db::name("CUser") -> alias('u') -> join("share_dept d","u.dept_id=d.id",'LEFT') -> join('share_job j','u.job_id = j.id','LEFT') -> where($where) -> whereLike($likeField,'%'.$keyword.'%') -> where('u.type',1)  -> count();
 
         $data['main'] = $main;
         $data['total'] = $count;

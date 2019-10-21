@@ -6,6 +6,7 @@ use think\Db;
 use cmf\controller\HomeBaseController;
 use app\common\Category;
 use app\common\OperateConfig;
+use app\portal\model\CUserModel;
 
 class IndexController extends HomeBaseController{
 
@@ -43,6 +44,11 @@ class IndexController extends HomeBaseController{
     }
 
     public function bbs(){
+        if(getLiveUser()){
+            $this -> assign("user_id",getLiveUser()['id']);
+        }else{
+            $this -> assign("user_id",null);
+        }
         return $this -> fetch();
     }
 
@@ -62,13 +68,13 @@ class IndexController extends HomeBaseController{
             //新建日期文件夹
             $tmp_arr = explode('/',$ueditor_img);
 
-            $oldFloder = './upload/portal/ueditor/img_temp/'.$tmp_arr[7];
-            $newFloder = './upload/portal/ueditor/img/'.$tmp_arr[7];
+            $oldFloder = './upload/portal/ueditor/img_temp/'.$tmp_arr[6];
+            $newFloder = './upload/portal/ueditor/img/'.$tmp_arr[6];
             if(!is_dir($newFloder)){
                 mkdir($newFloder,0777);
             }
 
-            $img_name = substr($tmp_arr[8],0,strlen($tmp_arr[8])-1);
+            $img_name = substr($tmp_arr[7],0,strlen($tmp_arr[7])-1);
            
             if(copy($oldFloder."/".$img_name,$newFloder."/".$img_name)){
                 unlink($oldFloder."/".$img_name);
@@ -78,7 +84,7 @@ class IndexController extends HomeBaseController{
         }
         
         $data['title'] = input("param.title");
-        $data['user_id'] = getUser('id');
+        $data['user_id'] = getLiveUser()['id'];
         $data['status'] = 0;
         $data['date'] = time();
 
@@ -137,19 +143,24 @@ class IndexController extends HomeBaseController{
     }
 
     public function giveLike(){
-        $data['article_id'] = input("article_id");
-        $data['user_id'] = getUser('id');
+        if(session("user_info",'','live') != null){
+            $data['article_id'] = input("article_id");
+            $data['user_id'] = getLiveUser()['id'];
 
-        $likeCount = Db::name('CArticleLike') ->where($data) -> count();
+            $likeCount = Db::name('CArticleLike') ->where($data) -> count();
 
-        if($likeCount > 0){
-            Db::name('CArticleLike') ->where($data) -> delete();
+            if($likeCount > 0){
+                Db::name('CArticleLike') ->where($data) -> delete();
 
-            return 1002;
+                return 1002;
+            }else{
+                Db::name('CArticleLike') -> insert($data);
+
+                return 1001;
+            }
+
         }else{
-            Db::name('CArticleLike') -> insert($data);
-
-            return 1001;
+            return 1004;
         }
 
     }
@@ -158,7 +169,7 @@ class IndexController extends HomeBaseController{
     public function articleDet(){
         $id = $this -> request -> param('id',0,'intval');
         // $data = Db::name('CArticle') -> alias('a') -> join('CUser u','a.user_id = u.id','LEFT') -> where('a.id',$id) -> field('a.*,u.user_name,u.user_nickname') -> select();
-        $data = Db::query("SELECT at.*,u.user_name,u.avatar,u.user_nickname,(SELECT COUNT(id) FROM share_c_article_comment scac WHERE scac.article_id=at.id) AS comment_count FROM share_c_article AT LEFT JOIN share_c_user u ON at.user_id=u.id
+        $data = Db::query("SELECT at.*,u.user_name,u.avatar,u.user_nickname,(SELECT COUNT(id) FROM share_c_article_comment scac WHERE scac.article_id=at.id) AS comment_count,(SELECT COUNT(*) FROM share_c_article_like scal WHERE scal.article_id=at.id) AS like_count FROM share_c_article AT LEFT JOIN share_c_user u ON at.user_id=u.id
         WHERE at.id=$id");
         $content = str_replace('\\','',trim($data[0]['content'],'"'));
 
@@ -260,13 +271,96 @@ class IndexController extends HomeBaseController{
     public function getUserScore(){
         $page = $this -> request -> param('page');
         $size = $this -> request -> param('size');
+        $user_id = $this -> request -> param('user_id')?$this -> request -> param('user_id'):'';
+
+        if($user_id){
+            $where = "WHERE user_id LIKE '%$user_id%'";
+        }else{
+            $where = "";
+        }
 
         // $view = Db::table('vw_c_view_total') -> field("(@i:=@i+1) i") -> select();
-        $res['total'] = count(Db::query("SELECT (@sort:=@sort+1) sort,view_count_total,STATUS,user_name,avatar,user_nickname FROM vw_c_view_total,(SELECT @sort:=0) AS s"));
+        $res['total'] = count(Db::query("SELECT rn,view_count_total,STATUS,user_id,user_name,avatar,user_nickname FROM vw_c_view_total,(SELECT @sort:=0) AS s $where"));
 
-        $res['list'] = Db::query("SELECT (@sort:=@sort+1) sort,view_count_total,STATUS,user_name,avatar,user_nickname FROM vw_c_view_total,(SELECT @sort:=0) AS s LIMIT ".($page-1)*$size.",$size");
+        $res['list'] = Db::query("SELECT rn,view_count_total,STATUS,user_id,user_name,avatar,user_nickname FROM vw_c_view_total,(SELECT @sort:=0) AS s $where LIMIT ".($page-1)*$size.",$size");
 
         return json($res);
+    }
+
+    public function getUserScoreById(){
+        $user_id = $this -> request -> param('user_id')?$this -> request -> param('user_id'):'';
+
+        $res = Db::query("SELECT rn,view_count_total,STATUS,user_id,user_name,avatar,user_nickname FROM vw_c_view_total,(SELECT @sort:=0) AS s WHERE user_id = '$user_id'");
+
+        return json($res);
+    }
+    
+    public function login(){
+        return $this -> fetch();
+    }
+
+    public function regist(){
+        return $this -> fetch();
+    }
+
+    public function register(){
+        $userDb  = new CUserModel();
+        $user = input("post.");
+    
+        if(!$user['user_name']) return json(array('code'=>0,'msg'=>'用户名不能为空'));
+
+        if(!$user['pwd'])  return json(array('code'=>0,'msg'=>'密码不能为空'));
+
+        if(!$user['mobile'])  return json(array('code'=>0,'msg'=>'手机号码不能为空'));
+
+        $existedMb = Db::name('CUser') -> where('mobile',$user['mobile']) -> count();
+
+        if($existedMb) return json(array('code'=>0,'msg'=>'手机号已存在，请重新输入'));
+
+
+        $res = $userDb -> registerVerifyLive($user);
+
+        if($res && $res > 0){
+            return json(array('code'=>1,'msg'=>'注册信息已发送至管理员，请静候审批。'));
+        }else{
+            if($res == -1){
+                return json(array('code'=>0,'msg'=>'注册失败，用户名已存在'));
+            }
+            return json(array('code'=>0,'msg'=>'注册失败'));
+        }
+    }
+
+    public function verify(){
+        $userDb  = new CUserModel();
+
+        $query = input("post.");
+    
+        if(!$query['user']) return json(array('code'=>0,'msg'=>'用户名不能为空'));
+
+        if(!$query['pwd'])  return json(array('code'=>0,'msg'=>'密码不能为空'));
+
+        $info = $userDb -> loginVerifyLive($query['user'], $query['pwd']);  
+
+        if(0 === $info)     return json(array('code'=>0,'msg'=>'账号不存在'));
+        if(-1 === $info)    return json(array('code'=>0,'msg'=>'账号被禁用'));
+        if(-2 === $info)    return json(array('code'=>0,'msg'=>'密码不正确'));
+
+        if(1 == $info){
+            //$user['user_id'] = getUser('id');
+            //$user['last_logout_time'] = null;
+            //$user['login_time'] = date("Y-m-d H:i:s");
+            //$login_id = Db::name("c_user_login_total") -> insertGetId($user);
+
+            //setUser('login_id',$login_id);
+            //$this -> online();
+            return json(array('code'=>1,'msg'=>'登录成功','url'=>'index'));
+        }
+
+    }
+
+    public function logout(){
+        session('user_info',null,'live');
+        $this -> redirect("index");
     }
 
 }

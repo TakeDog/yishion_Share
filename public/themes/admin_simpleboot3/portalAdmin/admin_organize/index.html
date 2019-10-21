@@ -132,9 +132,9 @@
                                     <td>{{item.dept}}</td>
                                     <td>{{item.job ? item.job : '无'}}</td>
                                     <td>
-                                        <span class="label label-warning" v-if="item.user_status == 0">未验证</span>
+                                        <span class="label label-danger" v-if="item.user_status == 0">禁止</span>
                                         <span class="label label-success" v-if="item.user_status == 1">正常</span>
-                                        <span class="label label-danger" v-if="item.user_status == 2">拉黑</span>
+                                        <span class="label label-warning" v-if="item.user_status == 2">未验证</span>
                                     </td>
                                     <td>
                                         <a href="#" @click.prevent="UserDeptInit(item)">修改信息</a> |

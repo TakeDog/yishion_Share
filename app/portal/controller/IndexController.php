@@ -22,21 +22,23 @@ class IndexController extends HomeBaseController
         try {
             $protalOnline = $config -> protalOnline;
         } finally{
-            if($protalOnline == null){
-                $protalOnline = [array('id'=>$id,'login_id'=>$login_id)];
-            }else{
-                $status = true;
-                foreach ($protalOnline as $k => $v) {
-                    if($v -> id == $id){
-                        $status = false;
+            if(!empty($id) && !empty($login_id)){
+                if($protalOnline == null){
+                    $protalOnline = [array('id'=>$id,'login_id'=>$login_id)];
+                }else{
+                    $status = true;
+                    foreach ($protalOnline as $k => $v) {
+                        if($v -> id == $id){
+                            $status = false;
+                        }
+                    }
+                    if($status){
+                        $protalOnline[] = array('id'=>$id,'login_id'=>$login_id);
                     }
                 }
-                if($status){
-                    $protalOnline[] = array('id'=>$id,'login_id'=>$login_id);
-                }
+                $config -> protalOnline = $protalOnline;
+                $operateConfig -> setConfig($config);
             }
-            $config -> protalOnline = $protalOnline;
-            $operateConfig -> setConfig($config);
             return count($protalOnline);
         }
     }
