@@ -14,6 +14,20 @@ class IndexController extends HomeBaseController{
         return $this->fetch();
     }
 
+     //以纯动态静态页：
+     public function ActionIndex(){
+        return $this -> fetch();
+    }
+
+    //生活百科静态页：
+    public function encyIndex(){
+        return $this -> fetch();
+    }
+    //页面待开发
+    public function unblock(){
+        return $this -> fetch();
+    }
+
     public function getEncList(){
         $root = "./upload/live/生活百科/";
         $dir = $this -> request -> param('type');
@@ -403,4 +417,8 @@ class IndexController extends HomeBaseController{
             return json($message);
         }
     }
+
+
+   
+    
 }

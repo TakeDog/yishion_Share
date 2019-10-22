@@ -1,0 +1,98 @@
+<layout name="public@layout_live" />
+<style>
+.el-main{padding: 0;}
+.main_list .tag_div{background: #F5B6A7;font-size: 17px;font-weight: 700;padding: 5px 15px;}
+.filter{display: flex;}
+.filter .filter_item{margin: 0 2px;cursor: pointer;}
+.filter .filter_item:hover{color: #F5B6A7;}
+.post_item{margin: 20px 0;}
+.post_item .post_content{margin: 0 10px;float:left;}
+.post_item .post_content .content_item {margin-bottom: 4px;}
+.post_item .post_content .content_item .content {width: 100%;}
+.post_item .status{margin: 10px 20px;clear: both;}
+.list_item{min-height: 300px;}
+.live-container{background: #FFF;padding:0;}
+.el-main{margin:0;}
+.no-padding-card .el-card__body{padding: 0;}
+.no-padding-card .el-table__header th,.no-padding-card .el-table__header tr.el-table__row td{text-align: center;padding:5px 0;}
+.el-table__row td .cell{text-align: center;}
+.el-table__row td{padding:5px 0;}
+.blank{color:#000;}
+</style>
+<div class="container live-container" id="app">
+    <el-container>
+        <el-main>
+            
+            <div class="main_list">
+               
+                
+                <div class="list_item">
+                    <div class="tag_div">
+                        <i class="fa fa-book" aria-hidden="true"></i>
+                        <span style="padding-left: 10px;">生活百科</span>
+                        <span class="pull-right"><a href="#" class="blank">更多</a></span>
+                    </div>
+                    
+
+                        <el-tabs v-model="encCurType" type="border-card" style="width:97%;margin: 20px auto;min-height: 250px;" @tab-click='getEnc'>
+                            <el-tab-pane label="服饰" name="服饰">
+                                <p v-for="(item,index) in ecnList">
+                                    <a :href="'/upload/live/生活百科/' + encCurType + '/' + item.file " target="_blank">{{index+1}}.{{item.name}}</a>
+                                </p>
+                            </el-tab-pane>
+                            <el-tab-pane label="生活" name="生活">
+                                <p v-for="(item,index) in ecnList">
+                                    <a :href="'/upload/live/生活百科/' + encCurType + '/' + item.file " target="_blank">{{index+1}}.{{item.name}}</a>
+                                </p>
+                            </el-tab-pane>
+                            <el-tab-pane label="美妆" name="美妆">
+                                <p v-for="(item,index) in ecnList">
+                                    <a :href="'/upload/live/生活百科/' + encCurType + '/' + item.file " target="_blank">{{index+1}}.{{item.name}}</a>
+                                </p>
+                            </el-tab-pane>
+                            <el-tab-pane label="科技" name="科技">
+                                <p v-for="(item,index) in ecnList">
+                                    <a :href="'/upload/live/生活百科/' + encCurType + '/' + item.file " target="_blank">{{index+1}}.{{item.name}}</a>
+                                </p>
+                            </el-tab-pane>
+
+                            <el-tab-pane label="美食" name="美食">
+                                <p v-for="(item,index) in ecnList">
+                                    <a :href="'/upload/live/生活百科/' + encCurType + '/' + item.file " target="_blank">{{index+1}}.{{item.name}}</a>
+                                </p>
+                            </el-tab-pane>
+                        </el-tabs>
+
+                    
+                </div>
+                
+            </div>
+        </el-main>
+    </el-container>
+
+</div>
+
+<script>
+    const vue = {
+        el: '#app',
+        data:{
+            encCurType:'服饰',
+            ecnList:'',
+        },
+        methods:{
+            getEnc(){
+                axios.get("{:url('getEncList')}",{
+                    params:{
+                        type:this.encCurType
+                    }
+                }).then((res) => {
+                    console.log(res.data);
+                    this.ecnList = res.data;
+                })
+            }
+        },
+        created () {
+            this.getEnc();
+        }
+    }
+</script>

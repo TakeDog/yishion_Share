@@ -207,9 +207,10 @@ class AdminOrganizeController extends AdminBaseController{
 
         $likeField = 'u.real_name|u.user_name|u.user_nickname';
         $keyword = empty($input['keyword']) ? '' : $input['keyword'];
-
+        
         if(!empty($input['dept_id'])){
             $where['u.dept_id'] = $input['dept_id'];
+            $data['dept_num'] = model('Dept') -> getDeptNum($input['dept_id']);
         }
 
         $main = Db::name("CUser") -> alias('u') -> join("share_dept d","u.dept_id=d.id",'LEFT') -> join('share_job j','u.job_id = j.id','LEFT') -> where($where) -> whereLike($likeField,'%'.$keyword.'%') -> where('u.type',1)  -> field("u.id,u.user_name,u.user_nickname,u.avatar,u.user_status,u.super,u.user_email,u.mobile,u.create_time,u.real_name,u.dept_id,u.job_id,d.name as dept,j.job as job") -> limit(($page-1) * $num,$num) -> select();
@@ -219,6 +220,7 @@ class AdminOrganizeController extends AdminBaseController{
         $data['main'] = $main;
         $data['total'] = $count;
         $data['size'] = $num;
+
 
         echo json_encode($data);
     }

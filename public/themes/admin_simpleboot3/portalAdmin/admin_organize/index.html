@@ -30,7 +30,7 @@
 
 </style>
 
-<div class="container" id="app" >
+<div class="container-fluid" id="app" >
 
     <div class="custom-tree-container">
 
@@ -41,7 +41,7 @@
                             
                             <p style="font-size:16px;padding:0 0 10px 10px;line-height: 30px;border-bottom: 1px solid #DADADA;">
                                 组织架构
-                                <el-button type="primary" plain size="mini" class="pull-right" style="margin-right: 10px;" @click="dialogVisible=true;append_dept_pid=0;deptType='';operate='add'">添加部门</el-button>
+                                <el-button type="primary" plain size="mini" class="pull-right" style="margin-right: 10px;" @click="dialogVisible=true;append_dept_pid=0;deptType='';operate='add';deptNumInput=0">添加部门</el-button>
                             </p>
                             <div class="set_input">
                                 <el-input placeholder="输入关键字进行过滤" v-model="filterText" style="width: 95%;" >
@@ -71,8 +71,8 @@
                                         </div>
 
                                         <el-dropdown-menu slot="dropdown">
-                                            <el-dropdown-item > <span @click="dialogVisible=true;append_dept_pid=data.id;deptType='';operate='add'">添加子部门</span> </el-dropdown-item>
-                                            <el-dropdown-item > <span @click="dialogVisible=true;editId=data.id;operate='edit';deptType=data.type;deptInput=data.name">修改信息</span></el-dropdown-item>
+                                            <el-dropdown-item > <span @click="dialogVisible=true;append_dept_pid=data.id;deptType='';operate='add';deptNumInput=0">添加子部门</span> </el-dropdown-item>
+                                            <el-dropdown-item > <span @click="dialogVisible=true;editId=data.id;operate='edit';deptType=data.type;deptInput=data.name;deptNumInput=data.num">修改信息</span></el-dropdown-item>
                                             <el-dropdown-item ><span @click="setSupInit(data)">设置上级</span></el-dropdown-item>
                                             <el-dropdown-item > <span @click="remove(data.id)">删除&emsp;&emsp;&emsp;</span></el-dropdown-item>
                                             <el-dropdown-item  :disabled='true'>部门ID：{{curId}}</el-dropdown-item>
@@ -93,7 +93,7 @@
 
                         <div class="main-right">
 
-                            <span style="flex:1;" v-show="!searchAll">{{main_header ? main_header.name : ''}} {{'(' + pagination['total'] + '人)'}} </span> <span style="flex:1;" v-show="searchAll">全部 {{'(' + pagination['total'] + '人)'}} </span> 
+                            <span style="flex:1;" v-show="!searchAll">{{main_header ? main_header.name : ''}} ( {{pagination['total']}} / {{main_header ? main_header.num : '' }} 人) </span> <span style="flex:1;" v-show="searchAll">全部 {{'(' + pagination['total'] + '人)'}} </span> 
 
                             <div style="flex:2;text-align: center;">
                                 <el-input v-model="search" placeholder="在此部门搜索"  :clearable="true" class="search" style="width:133px;margin-right:20px;"></el-input>
@@ -102,8 +102,8 @@
                             
                             <div style="margin:0;line-height: 32px;flex:2;text-align: center;">
                                 <p style="margin:0;" v-show="!searchAll">
-                                    <a href="" @click.prevent="dialogVisible=true;editId=main_header.id;operate='edit';deptType=main_header.type;deptInput=main_header.name">修改信息</a> | 
-                                    <a href="" @click.prevent="dialogVisible=true;append_dept_pid=main_header.id;operate='add'">添加子部门</a> | 
+                                    <a href="" @click.prevent="dialogVisible=true;editId=main_header.id;operate='edit';deptType=main_header.type;deptInput=main_header.name;deptNumInput=main_header.num">修改信息</a> | 
+                                    <a href="" @click.prevent="dialogVisible=true;append_dept_pid=main_header.id;operate='add';deptNumInput=0">添加子部门</a> | 
                                     <a href="" @click.prevent="setSupInit(main_header,'sup')">设置上级部门</a>
                                 </p>
                             </div>
@@ -221,7 +221,7 @@
 
         </div>
 
-        <!-- 新增或修改 -->
+        <!-- 新增或修改店铺信息 -->
         <div v-if="operate != 'user_dept'">
 
             <el-row :gutter="20" style="margin-bottom:10px;" >
@@ -266,6 +266,16 @@
                 </el-col>
             </el-row>
 
+            <el-row :gutter="20" style="margin-bottom:10px;" v-show="operate != 'setSup'">
+                <el-col :span="8" style="text-align: right;">
+                    <span style="line-height: 40px;">部门人数：</span>
+                </el-col>
+                <el-col :span="10">
+                    <el-input v-model="deptNumInput" placeholder="请输入内容"  type="number"></el-input>
+                </el-col>
+    
+            </el-row>
+
         </div>
         
         
@@ -293,6 +303,7 @@
         
         el:"#app",
         data:{
+            deptNumInput:0,
             deptTypeOption,
             deptType:'',
             dialogVisible:false,
@@ -327,6 +338,7 @@
             }
         },
         methods: {
+           
             checkType_name(){
                 if(this.operate == 'add'){
 
@@ -351,13 +363,14 @@
                 }
                 return true;
             },
-            getTree(id){
+            getTree(flag){
 
                     axios.get("{:url('AdminOrganize/getTree')}").then((res)=>{
                         this.tree_data = res.data;
-                        if(id){
-                            this.expandedKeys.push(id);
+                        if(flag){
+                            this.getMain(res.data[0],1);
                         }
+
                     })
                 
             },
@@ -369,7 +382,8 @@
                         params:{
                             pid:this.append_dept_pid,
                             name:this.$refs.deptEle.value,
-                            type:this.deptType
+                            type:this.deptType,
+                            num:this.deptNumInput
                         }
                     }).then((res)=>{
     
@@ -401,7 +415,8 @@
                         params:{
                             id:this.editId,
                             name:this.deptInput,
-                            type:this.deptType
+                            type:this.deptType,
+                            num:this.deptNumInput
                         }
                     }).then((res)=>{
                         if(res.data){
@@ -413,7 +428,10 @@
                                 duration:2000
                             });
     
-                            if(this.main_header['id'] == this.editId) { this.main_header['name'] = this.deptInput }
+                            if(this.main_header['id'] == this.editId) { 
+                                this.main_header['name'] = this.deptInput;
+                                this.main_header['num'] = this.deptNumInput;
+                            }
     
                             this.getTree(false);
     
@@ -542,7 +560,7 @@
                             type: 'success',
                             message: "设置成功"
                         });
-                        this.getTree(0);
+                        this.getTree(false);
 
                     }else{
 
@@ -677,11 +695,7 @@
             }
         },
         created() {
-            this.getTree(0);
-            this.getMain({
-                   id:1,
-                   name:"营销总部"
-            },1);
+            this.getTree(true);
         },
         watch: {
             selDept(newV,oldV){

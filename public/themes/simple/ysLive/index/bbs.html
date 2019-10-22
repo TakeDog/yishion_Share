@@ -313,7 +313,6 @@
             sortChange(type){
                 this.articleSort = type;
                 this.getArticle(1);
-
             },
             giveLike(id,i){
                 axios.post("{:url('giveLike')}",{article_id:id}).then((res) => {

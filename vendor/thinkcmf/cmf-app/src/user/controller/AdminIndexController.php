@@ -79,7 +79,7 @@ class AdminIndexController extends AdminBaseController
                 if (!empty($data['keyword'])) {
 
                     $keyword = $data['keyword'];
-                    $query->where('u.user_name|u.user_nickname|u.user_email|u.mobile', 'like', "%$keyword%");
+                    $query->where('u.user_name|u.user_nickname|u.user_email|u.mobile|u.real_name', 'like', "%$keyword%");
 
                 }if ( isset($data['user_status']) && $data['user_status'] !== '' ) {
 
@@ -766,4 +766,49 @@ class AdminIndexController extends AdminBaseController
         }
     }
 
+    /**
+     * 密码重设
+     * @adminMenu(
+     *     'name'   => '密码重设',
+     *     'parent' => 'actionList',
+     *     'display'=> false,
+     *     'hasView'=> false,
+     *     'order'  => 10000,
+     *     'icon'   => '',
+     *     'remark' => '密码重设',
+     *     'param'  => ''
+     * )
+     */
+    public function pwdReset(){
+        $id = $this -> request -> param('id',0,'intval');
+        $affectRow = Db::name("CUser") -> where("id",$id) -> update(['pwd'=>md5("123456")]);
+        if($affectRow){
+            $this->success("密码重设成功，新密码为：123456");
+        }else{
+            $this->error("密码重设失败。");
+        }
+    }
+
+    /**
+     * 用户删除
+     * @adminMenu(
+     *     'name'   => '用户删除',
+     *     'parent' => 'actionList',
+     *     'display'=> false,
+     *     'hasView'=> false,
+     *     'order'  => 10000,
+     *     'icon'   => '',
+     *     'remark' => '用户删除',
+     *     'param'  => ''
+     * )
+     */
+    public function delUser(){
+        $id = $this -> request -> param('id',0,'intval');
+        $affectRow = Db::name("CUser") -> delete($id);
+        if($affectRow){
+            $this->success("删除成功");
+        }else{
+            $this->error("删除失败");
+        }
+    }
 }

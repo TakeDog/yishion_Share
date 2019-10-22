@@ -18,6 +18,8 @@
 .el-table__row td .cell{text-align: center;}
 .el-table__row td{padding:5px 0;}
 .blank{color:#000;}
+.sortActive{color:#F5B6A7}
+.sortActive:focus{color:#F5B6A7}
 </style>
 <div class="container live-container" id="app">
     <el-container>
@@ -48,7 +50,7 @@
                     <div class="tag_div">
                         <i class="fa fa-pencil-square" aria-hidden="true"></i>
                         <span style="padding-left: 10px;">时尚达人</span>
-                        <span class="pull-right"><a href="#" class="blank">更多</a></span>
+                        <span class="pull-right"><a href="{:url('bbs')}" class="blank">更多</a></span>
                     </div>
                     <div style="display: flex;">
                         <div style="width:65%;">
@@ -57,16 +59,16 @@
                                     <span>帖子</span>
                                 </div>
                                 <div class="filter">
-                                    <div class="filter_item">按时间</div>
-                                    <div class="filter_item">按热门</div>
-                                    <div class="filter_item">按关注</div>
+                                    <a href="javascript:" :class="{'sortActive':articleSort=='time'}" @click="sortChange('time')">按时间</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+                                    <a href="javascript:" :class="{'sortActive':articleSort=='view'}" @click="sortChange('view')">按热门</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+                                    <a href="javascript:" :class="{'sortActive':articleSort==''}" @click="sortChange('')">按关注</a>
                                 </div>
                                 <div class="main_wrap">
                                     <ul class="main_list">
-                                        <li class="main-row" v-for="item in articleList" :key="item.id">
+                                        <li class="main-row" v-for="(item,i) in articleList" :key="item.id">
                                             <div class="avatar">
                                                 <a href="#">
-                                                    <img src="__STATIC__/images/avatar.jpg" alt="">
+                                                    <img :src="item.avatar ? '/' + item.avatar : '/upload/avatar/default.jpg'" alt="">
                                                 </a>
                                             </div>
                                             <div class="list-content">
@@ -79,6 +81,10 @@
                                                     <span>{{item.offsetTime}}</span>
                                                     <!-- <span>置顶</span> -->
                                                     <p class="pull-right">
+                                                        <span class="auth_msg_item" @click="giveLike(item.id,i)">
+                                                            <span class="glyphicon glyphicon-thumbs-up" style="color:#8c8c8c;"></span>&nbsp;{{item.like_count>999?"999+":item.like_count}}
+                                                        </span>
+                                                        &nbsp;&nbsp;
                                                         <span>
                                                             <span class="glyphicon glyphicon-eye-open"></span>&nbsp;{{item.view_count>999?"999+":item.view_count}}
                                                         </span>
@@ -103,33 +109,32 @@
                                             @next-click="toPage">
                                         </el-pagination>
                                     </div>
-                                </div>
+                                </div> 
                             </el-card>
                         </div>
                         <div style="width:30%;margin:20px auto;">
                             <el-card class="aside-item no-padding-card" shadow="hover" style="min-height: 383px;">
                                 <div slot="header">
                                     <span>达人榜</span>
-                                    <span class="pull-right"><a href="#" class="blank">更多</a></span>
                                 </div>
                                 <el-table
-                                    :data="UserScore"
+                                    :data="userRank"
                                     style="width: 100%"
                                     stripe
                                     style="text-align: center;"
                                     >
                                     <el-table-column
-                                        prop="sort"
+                                        prop="rn"
                                         label="排名"
                                     ></el-table-column>
                                     <el-table-column
-                                        prop="user_name"
+                                        prop="user_nickname"
                                         label="用户"
                                     >
                                     </el-table-column>
                                     <el-table-column
-                                        prop="score"
-                                        label="积分">
+                                        prop="view_count_total"
+                                        label="阅读量">
                                     </el-table-column>
                                 </el-table>
                             </el-card>
@@ -212,18 +217,31 @@
                 {sort:9, user_name:'蔡徐坤',score:11}
             ],
             articleList:[],
+            articleSort: 'time',
             total:0,
             page_size:0,
             encCurType:'服饰',
             ecnList:'',
+            userRank:[],
         },
         methods:{
+            getUserScore(size){
+                axios.get("{:url('getUserScore')}",{
+                    params:{
+                        page: 1,
+                        size: size,
+                    }
+                }).then((res) => {
+                    this.userRank = res.data.list;
+                });
 
+            },
             getArticle(page){
                 axios.get("{:url('getArticle')}",{
                     params:{
                         page,
-                        keyword:this.keyword
+                        keyword:'',
+                        sortType: this.articleSort
                     }
                 }).then((res) => {
                     var data = res.data;
@@ -231,6 +249,10 @@
                     this.total = data['total'];
                     this.page_size = data['page_size'];
                 })
+            },
+            sortChange(type){
+                this.articleSort = type;
+                this.getArticle(1);
             },
             toPage(page){
                 this.getArticle(page);
@@ -249,6 +271,7 @@
         created () {
             this.getArticle(1);
             this.getEnc();
+            this.getUserScore(9);
         }
     }
 </script>

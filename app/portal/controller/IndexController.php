@@ -170,6 +170,13 @@ class IndexController extends HomeBaseController
 
         if(!$user['dept_id'])  return json(array('code'=>0,'msg'=>'部门不能为空'));
 
+        $deptNum = Db::name("Dept") ->  find($user['dept_id']);
+        $current = Db::name("CUser") -> where('dept_id',$user['dept_id']) -> count();
+
+        if($deptNum['num'] <= $current){
+            return json(array('code'=>0,'msg'=>'部门人数已满，请重新选择'));
+        }
+
         if(!$user['mobile'])  return json(array('code'=>0,'msg'=>'手机号码不能为空'));
 
         $existedMb = Db::name('CUser') -> where('mobile',$user['mobile']) -> count();
@@ -177,6 +184,9 @@ class IndexController extends HomeBaseController
         if($existedMb) return json(array('code'=>0,'msg'=>'手机号已存在，请重新输入'));
 
         if( !isset($user['job_id']) )  return json(array('code'=>0,'msg'=>'岗位不能为空'));
+
+
+
 
         $res = model('c_user') -> registVerify($user);
 
