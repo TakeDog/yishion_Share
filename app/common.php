@@ -11,6 +11,11 @@ function getUser($field){
     return $data[$field];
 }
 
+function getUserLive($field){
+    $data = session('user_info','','live');
+    return $data[$field];
+}
+
 function setUser($field,$data){
     $user_info = session('user_info','','portal');
     $user_info[$field] = $data;
@@ -124,18 +129,12 @@ function redirectFile($path){
 
 function getLiveUser(){
     //$user_info = session("?user_info",'portal') ? session("user_info",'','portal') : ( session("?user_info",'live') ? session("user_info",'','live') : '');
-    if(session("user_info",'','portal') != null){
-        $user_info = session("user_info",'','portal');
+    
+    if(session("user_info",'','live') != null){
+        $user_info = session("user_info",'','live');
     }else{
-
-        if(session("user_info",'','live') != null){
-            $user_info = session("user_info",'','live');
-        }else{
-            $user_info = '';
-        }
-
+        $user_info = '';
     }
 
-    
     return $user_info;
 }

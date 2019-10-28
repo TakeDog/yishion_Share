@@ -10,8 +10,8 @@
         <input class="form-control" type="text" name="uid" style="width: 200px;" value="{:input('request.uid')}"
                placeholder="请输入用户ID">
         关键字：
-        <input class="form-control" type="text" name="keyword" style="width: 200px;" value="{:input('request.keyword')}"
-               placeholder="用户名/昵称/邮箱/手机">
+        <input class="form-control" type="text" name="keyword" style="width: 300px;" value="{:input('request.keyword')}"
+               placeholder="用户名/昵称/真实姓名/邮箱/手机">
         用户状态：
         <select name="user_status" class="form-control" style="width: 100px;">
             <option value="" <eq name= ":input('request.user_status')" value=''>selected</eq> > 全部</option>
@@ -77,7 +77,7 @@
                     <!-- <td> </td> -->
                     <td>{:implode('/',\\app\\portalAdmin\\model\\DeptModel::getFullName($vo.dept_id))}</td>
                     <td>{$vo.jobName ? $vo.jobName : '无'}</td>
-                    <td><img width="25" height="25" src="{:url('user/public/    ',array('id'=>$vo['id']))}"/></td>
+                    <td><img width="25" height="25" src="/{$vo.avatar ? $vo.avatar : 'upload/avatar/default.jpg' }"/></td>
                     <td>{$vo.user_email}</td>
                     <td>{$vo.mobile}</td>
                     <td>{:date('Y-m-d H:i:s',$vo['create_time'])}</td>
@@ -102,7 +102,7 @@
                             <case value="1">
                                 <a class="btn btn-xs btn-warning js-ajax-dialog-btn"
                                    href="{:url('adminIndex/ban',array('id'=>$vo['id']))}"
-                                   data-msg="{:lang('BLOCK_USER_CONFIRM_MESSAGE')}">已禁用</a>
+                                   data-msg="{:lang('BLOCK_USER_CONFIRM_MESSAGE')}">禁用</a>
                                 <a class="btn btn-xs btn-primary"
                                    href="{:url('adminIndex/roleEdit',array('u_id'=>$vo['id']))}"
                                   >角色管理</a>
@@ -113,7 +113,7 @@
                                     data-msg="{:lang('ACTIVATE_USER_CONFIRM_MESSAGE')}">{:lang('ACTIVATE_USER')}</a>
                                 <a class="btn btn-xs btn-warning js-ajax-dialog-btn"
                                     href="{:url('adminIndex/ban',array('id'=>$vo['id']))}"
-                                    data-msg="{:lang('BLOCK_USER_CONFIRM_MESSAGE')}">已禁用</a>
+                                    data-msg="{:lang('BLOCK_USER_CONFIRM_MESSAGE')}">禁用</a>
                             </case>
                             <case value="0">
                                     <a class="btn btn-xs btn-success js-ajax-dialog-btn"
@@ -121,6 +121,15 @@
                                     data-msg="{:lang('ACTIVATE_USER_CONFIRM_MESSAGE')}">{:lang('ACTIVATE_USER')}</a>
                             </case>
                         </switch>
+                        <a class=" js-ajax-dialog-btn"
+                            href="{:url('adminIndex/pwdReset',array('id'=>$vo['id']))}"
+                            data-msg="是否初始化用户密码（默认：123456，重设后无法恢复）？">密码重设</a>
+
+                        <a class=" js-ajax-dialog-btn"
+                            href="{:url('adminIndex/delUser',array('id'=>$vo['id']))}"
+                            data-msg="是否永久删除该用户（删除后无法恢复）？">删除</a>
+
+                        
                     </td>
                 </tr>
             </foreach>

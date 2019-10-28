@@ -25,5 +25,9 @@ class DeptModel extends Model{
 
         
     }
-    
+     
+    public function getDeptNum($id){
+        $data = $this -> find($id);
+        return $data['num'];
+    }
 }

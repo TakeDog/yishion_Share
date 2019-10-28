@@ -234,7 +234,7 @@
                         }).then((res)=>{
                         if(res.data == 1001){
                             ue.setContent("");
-                            this.$message("发布成功");
+                            this.$message("发布成功，请等待审核");
                             this.getArticle(1);
                         }else{
                             this.$message("发布失败");
@@ -313,7 +313,6 @@
             sortChange(type){
                 this.articleSort = type;
                 this.getArticle(1);
-
             },
             giveLike(id,i){
                 axios.post("{:url('giveLike')}",{article_id:id}).then((res) => {

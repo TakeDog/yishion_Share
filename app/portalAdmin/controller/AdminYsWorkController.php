@@ -329,4 +329,207 @@ class AdminYsWorkController extends AdminBaseController{
 
         echo json_encode($retuanData);
     }
+
+
+    /**
+     * 运营指南管理
+     * @adminMenu(
+     *     'name'   => '运营指南管理',
+     *     'parent' => 'default',
+     *     'display'=> true,
+     *     'hasView'=> true,
+     *     'order'  => 2,
+     *     'icon'   => '',
+     *     'remark' => '运营指南管理',
+     *     'param'  => ''
+     * )
+     */
+    public function OperateTeach(){
+        $root = "./static/PDF/运营指南";
+        $rootFile = scandir( iconv("utf-8","gbk",$root) );
+        unset($rootFile[0]);
+        unset($rootFile[1]);
+
+        foreach($rootFile as $k => $v){
+            $data[] = ['name'=>iconv("gbk","utf-8",$v),'visible'=>'1,2,3'];
+        }
+
+        $this -> assign('data',json_encode($data));
+        return $this -> fetch();
+    }
+
+     /**
+     * 文件列表
+     * @adminMenu(
+     *     'name'   => '文件列表',
+     *     'parent' => 'OperateTeach',
+     *     'display'=> false,
+     *     'hasView'=> false,
+     *     'order'  => 1,
+     *     'icon'   => '',
+     *     'remark' => '文件列表',
+     *     'param'  => ''
+     * )
+     */
+    public function fileList(){
+        $root = "./static/PDF/运营指南/";
+        $dir = $this -> request -> param('dir');
+        $path =$root.$dir;
+        
+        $dirArr = explode('/',$dir);
+        if( strpos(end($dirArr),'.') !== false ){
+            redirectFile('/'.$path);
+        }
+
+        $path = iconv("utf-8","gbk",$path);
+        $fileList = scandir($path);
+        unset($fileList[0]);
+        unset($fileList[1]);
+        
+        foreach($fileList as $k => $v){
+            $data[] = ['file'=>iconv("gbk","utf-8",$v),'date'=>date("Y-m-d H:i:s", filemtime($path.'/'.$v))];
+
+        }
+        
+        foreach($dirArr as $k => $v){
+            $nav[$k]['name'] = $v;
+            $navPath = '';
+            for($i=0;$i<($k+1);$i++){
+                $navPath.= '/'.$dirArr[$i];
+            }
+            $nav[$k]['link'] =  ltrim($navPath,'/');
+        }
+
+        $this -> assign('nav', json_encode($nav));
+        $this -> assign('fileList', json_encode($data));
+        return $this -> fetch();
+    }
+
+    /**
+     * 替换文件
+     * @adminMenu(
+     *     'name'   => '替换文件',
+     *     'parent' => 'OperateTeach',
+     *     'display'=> false,
+     *     'hasView'=> false,
+     *     'order'  => 1,
+     *     'icon'   => '',
+     *     'remark' => '替换文件',
+     *     'param'  => ''
+     * )
+     */
+    public function fileReplace(){
+        $root = "static/PDF/运营指南/";
+        $file = $this -> request -> file("file");
+        $old_dir = $this -> request -> param("old_file");
+
+        $dirArr = explode('/',$root.$old_dir);
+        unset($dirArr[count($dirArr)-1 ]);
+        $dir = implode('/',$dirArr);
+        $in = $file -> getInfo();
+
+        unlink(iconv("utf-8","gbk",$root.$old_dir));
+        if($file){
+            //不建立日期子文件夹及修改名称;
+            $info = $file->move( iconv('utf-8','gbk',$dir) ,'');
+
+            if($info){                
+                $res['status'] = 1000;
+                $res['msg'] = "替换成功";
+                return json($res);
+            }else{
+                // 上传失败获取错误信息
+                $res['status'] = 1002;
+                $res['msg'] = "替换失败";
+                return json($res);
+            }
+        }
+    }
+
+    /**
+     * 删除文件
+     * @adminMenu(
+     *     'name'   => '删除文件',
+     *     'parent' => 'OperateTeach',
+     *     'display'=> false,
+     *     'hasView'=> false,
+     *     'order'  => 1,
+     *     'icon'   => '',
+     *     'remark' => '删除文件',
+     *     'param'  => ''
+     * )
+     */
+    public  function fileDel(){
+        $root = "static/PDF/运营指南/";
+        $old_dir = $this -> request -> param("old_file");
+        unlink(iconv("utf-8","gbk",$root.$old_dir));
+        $res['status'] = 1000;
+        $res['msg'] = "删除成功";
+        return json($res);
+    }
+
+    /**
+     * 获取架构
+     * @adminMenu(
+     *     'name'   => '获取架构',
+     *     'parent' => 'OperateTeach',
+     *     'display'=> false,
+     *     'hasView'=> false,
+     *     'order'  => 1,
+     *     'icon'   => '',
+     *     'remark' => '获取架构',
+     *     'param'  => ''
+     * )
+     */
+    public function getFirstPOption(){
+        echo json_encode( Db::name("Dept") -> where('pid',0) -> select() );
+    }
+
+     /**
+     * 获取某文件夹的权限列表
+     * @adminMenu(
+     *     'name'   => '获取某文件夹的权限列表',
+     *     'parent' => 'OperateTeach',
+     *     'display'=> false,
+     *     'hasView'=> false,
+     *     'order'  => 1,
+     *     'icon'   => '',
+     *     'remark' => '获取某文件夹的权限列表',
+     *     'param'  => ''
+     * )
+     */
+    public function getOperateTeachAuth(){
+        $block = $this -> request -> param('name');
+        $authRow = Db::name('Operate') -> where("block",$block) -> find();
+        echo $authRow['dept_id'];
+    }
+
+    /**
+     * 设置某文件夹的权限列表
+     * @adminMenu(
+     *     'name'   => '设置某文件夹的权限列表',
+     *     'parent' => 'OperateTeach',
+     *     'display'=> false,
+     *     'hasView'=> false,
+     *     'order'  => 1,
+     *     'icon'   => '',
+     *     'remark' => '设置某文件夹的权限列表',
+     *     'param'  => ''
+     * )
+     */
+    public function setOperateTeachAuth(){
+        $params = $this -> request -> param();
+
+        $row_count = Db::name("Operate") -> where("block",$params['name']) -> count();
+        if($row_count){
+            $affectRow = Db::name("Operate") ->  where("block",$params['name']) -> update(['dept_id'=>$params['auth']]);
+        }else{
+            $data['block'] = $params['name'];
+            $data['dept_id'] = $params['auth'];
+            $affectRow = Db::name("Operate") ->  insert($data);
+        }
+
+        echo $affectRow;
+
+    }
 }

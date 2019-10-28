@@ -1,0 +1,58 @@
+<layout name="public@layout_live" />
+<style>
+.el-main{padding: 0;}
+.main_list .tag_div{background: #F5B6A7;font-size: 17px;font-weight: 700;padding: 5px 15px;}
+.filter{display: flex;}
+.filter .filter_item{margin: 0 2px;cursor: pointer;}
+.filter .filter_item:hover{color: #F5B6A7;}
+.post_item{margin: 20px 0;}
+.post_item .post_content{margin: 0 10px;float:left;}
+.post_item .post_content .content_item {margin-bottom: 4px;}
+.post_item .post_content .content_item .content {width: 100%;}
+.post_item .status{margin: 10px 20px;clear: both;}
+.list_item{min-height: 300px;}
+.live-container{background: #FFF;padding:0;}
+.el-main{margin:0;}
+.no-padding-card .el-card__body{padding: 0;}
+.no-padding-card .el-table__header th,.no-padding-card .el-table__header tr.el-table__row td{text-align: center;padding:5px 0;}
+.el-table__row td .cell{text-align: center;}
+.el-table__row td{padding:5px 0;}
+.blank{color:#000;}
+</style>
+<div class="container live-container" id="app">
+    <el-container>
+        <el-main>
+            
+            <div class="main_list">
+                
+                <div class="list_item">
+                    <div class="tag_div">
+                        <i class="fa fa-thumb-tack" aria-hidden="true" style="transform: rotate(45deg);"></i>
+                        <span style="padding-left: 10px;">以纯动态</span>
+                        <span class="pull-right"><a href="#" class="blank">更多</a></span>
+                    </div>
+                    <el-card class="box-card" style="width:97%;margin: 20px auto;">
+                        <p class="box_item">
+                            <a href="/./static/PDF/虎门万达、沙井新沙店铺转场效果展示.pdf">1.虎门万达、沙井新沙店铺转场效果展示</a>
+                        </p>
+                        <p class="box_item">
+                                <a href="/./static/PDF/9月21日以纯江门高新店盛大开业，正价货品两件8.8折！.pdf">2.9月21日以纯江门高新店盛大开业，正价货品两件8.8折！</a>
+                            </p>
+                       
+                    </el-card>
+                </div>
+                
+            </div>
+        </el-main>
+    </el-container>
+
+</div>
+
+<script>
+    const vue = {
+        el: '#app',
+        data:{
+            
+        }
+    }
+</script>
