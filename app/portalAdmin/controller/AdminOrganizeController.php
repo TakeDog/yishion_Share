@@ -281,16 +281,33 @@ class AdminOrganizeController extends AdminBaseController{
     }
 
     public function addTsDept(){
-        $zd = Db::name('dept') -> where('pid',49) -> select();
+        $zd = Db::name('Dept') -> where('pid',49) -> select();
         foreach($zd as $k => $v){
             
-            $xj = Db::name('dept') -> where('pid',$v['id']) -> select();
+            $xj = Db::name('Dept') -> where('pid',$v['id']) -> select();
 
             foreach($xj as $kk => $vv){
                 $add['id'] = $vv['id'];
                 $add['type'] = 3;
-                Db::name('dept') -> update($add);
+                Db::name('Dept') -> update($add);
             }
+           
+        }
+        echo "OK!";
+    }
+
+    public function addDepts(){
+        $zd = Db::name('Dept') -> where('pid',49) -> select();
+        foreach($zd as $k => $v){
+            $addData['pid'] = $v['id'];
+            $addData['name'] = "客户";
+            // $xj = Db::name('Dept') -> where('pid',$v['id']) -> select();
+
+            // foreach($xj as $kk => $vv){
+            //     $add['id'] = $vv['id'];
+            //     $add['type'] = 3;
+            //     Db::name('Dept') -> update($add);
+            // }
            
         }
         echo "OK!";

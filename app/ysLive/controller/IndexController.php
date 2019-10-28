@@ -212,7 +212,7 @@ class IndexController extends HomeBaseController{
     public function addComment(){
         $data = $this -> request -> param();
         $data['date'] = date("Y-m-d H:i:s");
-        $data['user_id'] = getUser('id');
+        $data['user_id'] = getLiveUser()['id'];
 
         if(!trim($data['comment'])){
             $error['error'] = 1001;
@@ -242,13 +242,13 @@ class IndexController extends HomeBaseController{
 
         $query = Db::name("CArticleComment") -> alias('ac') -> join('CUser u','ac.user_id = u.id','LEFT') -> join('CUser u2','ac.fuser_id = u2.id','LEFT') -> join('CArticle a','ac.article_id = a.id','LEFT') -> where(array('ac.article_id'=>$article_id,'ac.top_id'=>0));
 
-        $list = $query -> order("ac.date desc") -> field('ac.*,u.user_name,u.user_nickname hname,u2.user_nickname fname') ->limit(($cur_page-1)*$num,$num) -> select() -> toArray();
+        $list = $query -> order("ac.date desc") -> field('ac.*,u.user_name,u.user_nickname hname,u2.user_nickname fname,u.avatar') ->limit(($cur_page-1)*$num,$num) -> select() -> toArray();
 
         foreach($list as $k => $v){
 
             $query2 = Db::name("CArticleComment") -> alias('ac') -> join('CUser u','ac.user_id = u.id','LEFT') -> join('CUser u2','ac.fuser_id = u2.id', 'LEFT') -> join('CArticle a','ac.article_id = a.id','LEFT') -> where(array('ac.article_id'=>$article_id,'ac.top_id'=>$v['id']));
 
-            $list2 = $query2 -> order("ac.date desc") -> field('ac.*,u.user_name,u.user_nickname hname,u2.user_nickname fname') -> select() -> toArray();
+            $list2 = $query2 -> order("ac.date desc") -> field('ac.*,u.user_name,u.user_nickname hname,u2.user_nickname fname,u.avatar') -> select() -> toArray();
             if(count($list2)>0)
                 $list[$k]['ctree'] = $list2;
                 $list[$k]['total'] = $query2 -> count();
@@ -263,11 +263,11 @@ class IndexController extends HomeBaseController{
     public function getComListById(){
         $comment_id = $this -> request -> param('comment_id',0,'intval');
 
-        $list = Db::name("CArticleComment") -> alias('ac') -> join('CUser u','ac.user_id = u.id','LEFT') -> join('CUser u2','ac.fuser_id = u2.id','LEFT') -> join('CArticle a','ac.article_id = a.id','LEFT') -> where('ac.id',$comment_id) -> order("ac.date desc") -> field('ac.*,u.user_name,u.user_nickname hname,u2.user_nickname fname') -> find();
+        $list = Db::name("CArticleComment") -> alias('ac') -> join('CUser u','ac.user_id = u.id','LEFT') -> join('CUser u2','ac.fuser_id = u2.id','LEFT') -> join('CArticle a','ac.article_id = a.id','LEFT') -> where('ac.id',$comment_id) -> order("ac.date desc") -> field('ac.*,u.user_name,u.user_nickname hname,u2.user_nickname fname,u.avatar') -> find();
 
         $query2 = Db::name("CArticleComment") -> alias('ac') -> join('CUser u','ac.user_id = u.id','LEFT') -> join('CUser u2','ac.fuser_id = u2.id', 'LEFT') -> join('CArticle a','ac.article_id = a.id','LEFT') -> where('ac.top_id',$comment_id);
 
-        $list2 = $query2 -> order("ac.date desc") -> field('ac.*,u.user_name,u.user_nickname hname,u2.user_nickname fname') -> select() -> toArray();
+        $list2 = $query2 -> order("ac.date desc") -> field('ac.*,u.user_name,u.user_nickname hname,u2.user_nickname fname,u.avatar') -> select() -> toArray();
 
         if(count($list2)>0){
             $list['ctree'] = $list2;

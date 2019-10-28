@@ -4,7 +4,6 @@ use think\Db;
 use think\Controller;
 use cmf\controller\HomeBaseController;
 use app\common\AppLog;
-
 class InfoController extends HomeBaseController{
 
     public function searchAllFiles(){
@@ -82,6 +81,23 @@ class InfoController extends HomeBaseController{
         $path =$root.$dir;
         
         $dirArr = explode('/',$dir);
+
+        //权限检查：
+        $DeptDb = model("Dept");
+        $user_info = session("user_info",'','portal');
+        
+        $authRq = Db::name("Operate") -> where("block",$dirArr[0]) -> find();
+        $authList = explode(',',$authRq['dept_id']);
+        
+        $userPDept = $DeptDb -> getFirstP($user_info['dept_id']);
+
+        if(!in_array($userPDept,$authList)){
+            return "<h1 style='text-align:center;font-size:18px;'>对不起，您无查看权限。</h1>";
+            exit;
+        }
+        
+
+
         if( strpos(end($dirArr),'.') !== false ){
             AppLog::addLog(end($dirArr));
             redirectFile('/'.$path);

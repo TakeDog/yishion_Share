@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>以纯 • 纯分享</title>
+    <meta name="description" content="以纯社区官方论坛是以纯工作人员与粉丝的大本营，在这里可以交流以纯的第一手资讯，了解以纯的最新动态，参与活动互动，为员工与粉丝打造一个良好的互动交流平台" />
+    <meta name="keywords" content="以纯社区,纯分享,以纯论坛" />
+    <link rel="stylesheet" href="__STATIC__/lib/element-ui/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="__STATIC__/css/main.css">
+    <link rel="stylesheet" href="__STATIC__/lib/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="__STATIC__/css/index.css?v=1.02">
+    <script src="__STATIC__/js/jquery.min.js"></script>
+    <script src="__STATIC__/lib/bootstrap/js/bootstrap.min.js"></script>
+    <script src="__STATIC__/js/vue.js"></script>
+    <script src="__STATIC__/js/axios.min.js"></script>
+    <script src="__STATIC__/lib/element-ui/lib/index.js"></script>
+    <link rel="stylesheet" href="__STATIC__/lib/font-awesome-4.7.0/css/font-awesome.min.css">
+</head>
+<style>
+[v-cloak]{display: none;}
+body{background-color: #f3f3f3;}
+.el-table_1_column_2{text-align: center !important;}
+</style>
+<body>
+    <div class="container" id="app"> 
+
+        <el-breadcrumb separator-class="el-icon-arrow-right" style="margin:20px 0;font-size: 16px;">
+            <el-breadcrumb-item>首页</el-breadcrumb-item>
+            <el-breadcrumb-item>纯工作</el-breadcrumb-item>
+            <el-breadcrumb-item>运营指南管理</el-breadcrumb-item>
+        </el-breadcrumb>
+
+        <el-table
+            :data="tableData"
+            style="width: 100%;text-align: center;">
+            <el-table-column
+                label="文件夹"
+                >
+                <template slot-scope="scope">
+                    <a :href="'/portalAdmin/admin_ys_work/fileList?dir=' + scope.row.name">{{scope.row.name}}</a>
+                </template>
+            </el-table-column>
+            <el-table-column
+                label="操作">
+                <template slot-scope="scope">
+                    <a href="javascript:;" @click="name=scope.row.name;OpenChangeDia();">更改可见范围</a>
+                </template>
+            </el-table-column>
+        </el-table>
+
+        <!-- 设置可见范围模态框 -->
+        <el-dialog
+            title="提示"
+            :visible.sync="setAuthDia"
+            width="30%">
+
+            <el-form ref="form">
+                <el-form-item label="请选择部门架构">
+                    <el-select v-model="authList" multiple placeholder="请选择">
+                        <el-option
+                        v-for="item in deptOption"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.id">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+            </el-form>
+
+            
+
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="setAuthDia = false">取 消</el-button>
+                <el-button type="primary" @click="setAuth">确 定</el-button>
+            </span>
+        </el-dialog>
+
+    </div>
+</body>
+</html>
+<script>
+  
+    var tableData = JSON.parse('{$data}');
+
+    var vm = new Vue({
+        el: '#app',
+        data:{
+            tableData,
+            setAuthDia:false,
+            deptOption:'',
+            name:'',
+            authList:[] //[1, 49, 2644, 1181, 4]
+        },
+        methods: {
+            OpenChangeDia(dir){
+                this.setAuthDia = true;
+                this.getAuth(dir);
+                this.getOption();
+            },
+            setAuth(){
+                axios.post("{:url('setOperateTeachAuth')}",{
+                    name:this.name,
+                    auth:this.authList.join(",")
+                }).then(res=>{
+                    
+                    if(res.data){
+                        this.$message.success("操作成功");
+                    }else{
+                        this.$message.error("操作失败");
+                    }
+
+                    this.setAuthDia = false;
+                })
+            },
+            getOption(){
+                axios.get("{:url('getFirstPOption')}").then(res=>{
+                    this.deptOption = res.data;
+                })
+            },
+            getAuth(){
+                
+                axios.post("{:url('getOperateTeachAuth')}",{
+                    name:this.name
+                }).then(res=>{
+                    if(res.data){
+                        var res = String(res.data);
+                        this.authList = res.split(',');
+                        this.authList.forEach((ele,index) => {
+                            this.authList[index] = parseInt(ele);
+                        });
+                    }else{
+                        this.authList = [];
+                    }
+                })
+
+            }
+            
+        }
+    })
+</script>

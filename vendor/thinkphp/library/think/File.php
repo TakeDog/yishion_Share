@@ -359,6 +359,8 @@ class File extends SplFileObject
         $path = rtrim($path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
         // 文件保存命名规则
         $saveName = $this->buildSaveName($savename, $autoAppendExt);
+        $saveName = iconv("UTF-8", "GB2312", $saveName);
+
         $filename = $path . $saveName;
 
         // 检测目录

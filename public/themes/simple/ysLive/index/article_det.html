@@ -37,7 +37,7 @@
             <div class="comment_item">
                 <div class="avatar">
                     <a href="#">
-                        <img src="__STATIC__/images/avatar.jpg" alt="">
+                        <img :src="allReplyModal.comment.avatar ? '/' + allReplyModal.comment.avatar : '/upload/avatar/default.jpg'" alt="">
                     </a>
                 </div>
                 <div class="comment_content">
@@ -67,7 +67,7 @@
                     <div class="comment_item">
                         <div class="avatar">
                             <a href="#">
-                                <img src="__STATIC__/images/avatar.jpg" alt="">
+                                <img :src="ktem.avatar ? '/' + ktem.avatar : '/upload/avatar/default.jpg'" alt="">
                             </a>
                         </div>
                         <div class="comment_content">
@@ -106,7 +106,7 @@
         <h3 style="text-align: center;margin-top:0;padding:10px 0;">{$data['title']}</h3>
         <div class="auth_avator">
             <a href="#">
-                <img src="__STATIC__/images/avatar.jpg" alt="">
+                <img src="/{$data['avatar'] ? $data['avatar'] : 'upload/avatar/default.jpg'}" alt="">
             </a>
             <span style="line-height:30px;">{$data['user_nickname']}</span>
         </div>
@@ -131,7 +131,7 @@
     <div class="input-group" style="margin-bottom:10px;">
         <input type="text" class="form-control" placeholder="说说你的看法" style="height: 43px;" v-model="comment">
         <span class="input-group-btn">
-            <button class="btn btn-light-blue" type="button" style="line-height: 29px;" @click="addComment()">
+            <button class="btn btn-light-blue" type="button" style="line-height: 29px;" @click="addComment(undefined)">
                 <span class="glyphicon glyphicon-search"></span>
                 发表
             </button>
@@ -150,7 +150,7 @@
                         <div class="comment_item">
                             <div class="avatar">
                                 <a href="#">
-                                    <img src="__STATIC__/images/avatar.jpg" alt="">
+                                    <img :src="item.avatar ? '/' + item.avatar : '/upload/avatar/default.jpg'" alt="">
                                 </a>
                             </div>
                             <div class="comment_content">
@@ -180,7 +180,7 @@
                                 <div class="comment_item">
                                     <div class="avatar">
                                         <a href="#">
-                                            <img src="__STATIC__/images/avatar.jpg" alt="">
+                                            <img :src="ktem.avatar ? '/' + ktem.avatar : '/upload/avatar/default.jpg'" alt="">
                                         </a>
                                     </div>
                                     <div class="comment_content">
@@ -299,6 +299,7 @@
                 //getComList
                 axios.get("/{$Request.module}/{$Request.controller}/getComList?article_id={$data['id']}&page=" + page).then((res)=>{
                     this.comment_list = res.data;
+                    console.log(this.comment_list);
                     if(index)
                         this.allReplyModal.comment = JSON.parse(JSON.stringify(this.comment_list.list[index]));
                 })
