@@ -39,6 +39,19 @@ class AdminBbsController extends AdminBaseController{
         return $this->fetch();
     }
 
+    /**
+     * 评论管理
+     * @adminMenu(
+     *     'name'   => '评论管理',
+     *     'parent' => 'default',
+     *     'display'=> true,
+     *     'hasView'=> true,
+     *     'order'  => 1,
+     *     'icon'   => '',
+     *     'remark' => '评论管理',
+     *     'param'  => ''
+     * )
+     */
     public function commentManager(){
         return $this->fetch();
     }

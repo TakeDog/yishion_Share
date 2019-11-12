@@ -262,6 +262,51 @@ class AdminOrganizeController extends AdminBaseController{
         echo $affect ? 1 : 0;
     }
     
+    /**
+     * @adminMenu(
+     *     'name'   => '获取部门人数',
+     *     'parent' => 'index',
+     *     'display'=> false,
+     *     'hasView'=> false,
+     *     'order'  => 1000,
+     *     'icon'   => '',
+     *     'remark' => '获取部门人数',
+     *     'param'  => ''
+     * )
+     */
+    public function getJobNum(){
+        $dept_id = $this -> request -> param('dept_id',0,'intval');
+        $dept_type = $this -> request -> param('dept_type',0,'intval');
+        $deptDb = model("Dept");
+        $data = $deptDb -> getJobNum($dept_id,$dept_type);
+        echo json_encode($data);
+        //$affect = Db::name("CUser") -> update($input);
+        //echo $affect ? 1 : 0;
+    }
+    
+    /**
+     * @adminMenu(
+     *     'name'   => '修改部门岗位人数',
+     *     'parent' => 'index',
+     *     'display'=> false,
+     *     'hasView'=> false,
+     *     'order'  => 1000,
+     *     'icon'   => '',
+     *     'remark' => '修改部门岗位人数',
+     *     'param'  => ''
+     * )
+     */
+    public function savejobNum(){
+        $params = $this -> request -> param();
+        $exist = Db::name("JobNum") -> where(['dept_id' => $params['dept_id'] , 'job_id' => $params['job_id']]) -> count();
+        if($exist){
+            $affect = Db::name("JobNum") -> where(['dept_id' => $params['dept_id'] , 'job_id' => $params['job_id']]) -> update(['num'=>$params['num']]);
+        }else{
+            $affect = Db::name("JobNum") -> insert($params);
+        }
+        echo $affect;
+    }
+
     public function handlePost(){
         $files = request()->file('my_files');
         foreach($files as $file){

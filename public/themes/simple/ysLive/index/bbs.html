@@ -10,7 +10,10 @@
     .el-table__row td .cell{text-align: center;}
     .el-table__row td{padding:5px 0;}
     .main .el-tabs__header{margin:0 0 10px;}
-    .fiex-card{width: 200px;position: fixed;top: 26px;padding: 0 0 0 20px;}
+
+    .fiex-card{width: 135px;position: fixed;top: 26px;left:0;padding: 0 0 0 20px;overflow: visible;z-index: 1000;transition: left .5s;-webkit-transition: left .5s;-moz-transition: left .5s;-o-transition: left .5s;}
+    .fiex-card-left{left:-135px;}
+
     .sortActive{color:#F5B6A7}
     .sortActive:focus{color:#F5B6A7}
     .auth_msg_item{cursor: pointer;}
@@ -19,6 +22,9 @@
     .currentRank_Div .rank_item{display: flex;padding: 5px 0px 5px 7px;}
     .currentRank_Div .rank_item .cell{flex: 1;text-align: center;}
     .el-table .current-user{background: oldlace;}
+    .color-blue{color:#409eff !important;}
+    #edui1_iframeholder{height: 245px !important;}
+    .sh{position: absolute;top: 0;right: -32px;background-color: #fff;padding: 10 10px;padding: 5px 10px;cursor: pointer;border-radius: 5px;color: #337A87;box-shadow: 5px 0px 7px rgba(0,0,0,.1);}
 </style>
 
 
@@ -144,8 +150,8 @@
                                                 <span>{{item.offsetTime}}</span>
                                                 <!-- <span>置顶</span> -->
                                                 <p class="pull-right">
-                                                    <span class="auth_msg_item" @click="giveLike(item.id,i)">
-                                                        <span class="glyphicon glyphicon-thumbs-up" style="color:#8c8c8c;"></span>&nbsp;{{item.like_count>999?"999+":item.like_count}}
+                                                    <span class="auth_msg_item" :class="{'color-blue':item.like}" ref="zan" @click="giveLike(item.id,i)">
+                                                        <span class="glyphicon glyphicon-thumbs-up"  ></span>&nbsp;{{item.like_count>999?"999+":item.like_count}}
                                                     </span>
                                                     &nbsp;&nbsp;
                                                     <span>
@@ -180,11 +186,14 @@
         </div>
     </el-container>
 
-    <el-card class="fiex-card">
+    <el-card class="fiex-card" :class="{'fiex-card-left':!aside_box}">
         <p><a href="">我的帖子</a></p>
         <p><a href="">我的评论</a></p>
         <p><a href="">我的点赞</a></p>
         <p><a href="">我的关注</a></p>
+        <div class="sh" @click="aside_box = !aside_box;">
+            <span v-text="aside_box ? '<<':'>>'"></span>
+        </div>
     </el-card>
 </div>
 
@@ -217,7 +226,8 @@
             },
             userRank:[],
             rankDrawer: false,
-            currentUserRank: null
+            currentUserRank: null,
+            aside_box:false
         },
         mounted () {
             this.getArticle(1);
@@ -240,7 +250,7 @@
                             this.$message("发布失败");
                         }
                     });
-                }else{
+                }else{  
                     this.$message("请输入标题");
                 }
 
@@ -318,8 +328,10 @@
                 axios.post("{:url('giveLike')}",{article_id:id}).then((res) => {
                     if(res.data == 1001){
                         ++this.articleList[i].like_count;
+                        this.$refs.zan[i].style="color:#409eff;"
                     }else if(res.data == 1002){
                         --this.articleList[i].like_count;
+                        this.$refs.zan[i].style="color:#8c8c8c;"
                     }else if(res.data == 1004){
                         parent.location.href = "/yslive/index/login";
                     }

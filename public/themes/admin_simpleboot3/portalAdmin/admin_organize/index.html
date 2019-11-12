@@ -27,7 +27,8 @@
         height: 100px;    /* 滚动条滑块长度 */
         background-color: #ccc; 
     }
-
+    .noline:active,.noline:hover,.noline:visited{text-decoration: none !important;}
+    .hover-blue:hover{color:#337ab7;cursor: pointer;}
 </style>
 
 <div class="container-fluid" id="app" >
@@ -76,9 +77,9 @@
                                             <el-dropdown-item ><span @click="setSupInit(data)">设置上级</span></el-dropdown-item>
                                             <el-dropdown-item > <span @click="remove(data.id)">删除&emsp;&emsp;&emsp;</span></el-dropdown-item>
                                             <el-dropdown-item  :disabled='true'>部门ID：{{curId}}</el-dropdown-item>
-                                            <el-dropdown-item  :disabled='true' v-if='data.type==1'>结构类型：普通</el-dropdown-item>
-                                            <el-dropdown-item  :disabled='true' v-if='data.type==2'>结构类型：营运支持</el-dropdown-item>
-                                            <el-dropdown-item  :disabled='true' v-if='data.type==3'>结构类型：店铺</el-dropdown-item>
+
+                                            <el-dropdown-item  :disabled='true' >结构类型：{{theType(data.type)}}</el-dropdown-item>
+
                                         </el-dropdown-menu>
                                     </el-dropdown>
                                 </a>
@@ -95,69 +96,107 @@
 
                             <span style="flex:1;" v-show="!searchAll">{{main_header ? main_header.name : ''}} ( {{pagination['total']}} / {{main_header ? main_header.num : '' }} 人) </span> <span style="flex:1;" v-show="searchAll">全部 {{'(' + pagination['total'] + '人)'}} </span> 
 
-                            <div style="flex:2;text-align: center;">
-                                <el-input v-model="search" placeholder="在此部门搜索"  :clearable="true" class="search" style="width:133px;margin-right:20px;"></el-input>
-                                <el-input v-model="searchAll" placeholder="全局搜索"  :clearable="true" class="search" style="width:133px;"></el-input>
+                            <div style="flex:2;text-align: center;" >
+                                <div v-if="showModel == 'person'">
+                                    <el-input v-model="search" placeholder="在此部门搜索"  :clearable="true" class="search" style="width:133px;margin-right:20px;"></el-input>
+                                    <el-input v-model="searchAll" placeholder="全局搜索"  :clearable="true" class="search" style="width:133px;"></el-input>
+                                </div>
                             </div>
                             
                             <div style="margin:0;line-height: 32px;flex:2;text-align: center;">
                                 <p style="margin:0;" v-show="!searchAll">
-                                    <a href="" @click.prevent="dialogVisible=true;editId=main_header.id;operate='edit';deptType=main_header.type;deptInput=main_header.name;deptNumInput=main_header.num">修改信息</a> | 
-                                    <a href="" @click.prevent="dialogVisible=true;append_dept_pid=main_header.id;operate='add';deptNumInput=0">添加子部门</a> | 
-                                    <a href="" @click.prevent="setSupInit(main_header,'sup')">设置上级部门</a>
+                                    <a href="" @click.prevent="dialogVisible=true;editId=main_header.id;operate='edit';deptType=main_header.type;deptInput=main_header.name;deptNumInput=main_header.num" class="noline">修改信息</a> | 
+                                    <a href="" @click.prevent="dialogVisible=true;append_dept_pid=main_header.id;operate='add';deptNumInput=0" class="noline">添加子部门</a> | 
+                                    <a href="" @click.prevent="setSupInit(main_header,'sup')" class="noline">设置上级部门</a> |
+                                    <a href="javascript:;" @click="showModel= showModel == 'job' ? 'person' : 'job';" class="noline">{{showModel=='job' ? '人员模式' : '岗位模式'}}</a>
                                 </p>
                             </div>
                             
                         </div>
 
-                        <table class="table table-striped" style="text-align: center;margin-bottom: 0;border-bottom:1px solid #DADADA;" v-show="pagination['total']">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>用户名</th>
-                                    <th>姓名</th>
-                                    <th>电话</th>
-                                    <th>部门</th>
-                                    <th>岗位</th>
-                                    <th>状态</th>
-                                    <th>操作</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="item in mainData" :key="item.id">
-                                    <td>{{item.id}}</td>
-                                    <td>{{item.user_name}}</td>
-                                    <td>{{item.real_name}}</td>
-                                    <td>{{item.mobile}}</td>
-                                    <td>{{item.dept}}</td>
-                                    <td>{{item.job ? item.job : '无'}}</td>
-                                    <td>
-                                        <span class="label label-danger" v-if="item.user_status == 0">禁止</span>
-                                        <span class="label label-success" v-if="item.user_status == 1">正常</span>
-                                        <span class="label label-warning" v-if="item.user_status == 2">未验证</span>
-                                    </td>
-                                    <td>
-                                        <a href="#" @click.prevent="UserDeptInit(item)">修改信息</a> |
-                                        <a href="#" @click.prevent="delUser(item.id)" >删除</a> |
-                                        <a :href="'/user/admin_index/roleedit/back/og/u_id/'+ item.id" >角色管理</a>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-
-                        <div style="text-align: center;margin:25px 0 10px;" v-show="pagination['total']">
-                            <el-pagination
-                                background
-                                layout="prev, pager, next"
-                                :page-size="pagination['size']"
-                                :total="pagination['total']"
-                                :current-page="pagination['current']"
-                                @current-change = "changePage"
-                            >
-                            </el-pagination>
+                        <div v-if="showModel=='person'">
+                            <table class="table table-striped" style="text-align: center;margin-bottom: 0;border-bottom:1px solid #DADADA;" v-show="pagination['total']">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>用户名</th>
+                                        <th>姓名</th>
+                                        <th>电话</th>
+                                        <th>部门</th>
+                                        <th>岗位</th>
+                                        <th>状态</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="item in mainData" :key="item.id">
+                                        <td>{{item.id}}</td>
+                                        <td>{{item.user_name}}</td>
+                                        <td>{{item.real_name}}</td>
+                                        <td>{{item.mobile}}</td>
+                                        <td>{{item.dept}}</td>
+                                        <td>{{item.job ? item.job : '无'}}</td>
+                                        <td>
+                                            <span class="label label-danger" v-if="item.user_status == 0">禁止</span>
+                                            <span class="label label-success" v-if="item.user_status == 1">正常</span>
+                                            <span class="label label-warning" v-if="item.user_status == 2">未验证</span>
+                                        </td>
+                                        <td>
+                                            <a href="#" @click.prevent="UserDeptInit(item)">修改信息</a> |
+                                            <a href="#" @click.prevent="delUser(item.id)" >删除</a> |
+                                            <a :href="'/user/admin_index/roleedit/back/og/u_id/'+ item.id" >角色管理</a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+    
+                            <div style="text-align: center;margin:25px 0 10px;" v-show="pagination['total']">
+                                <el-pagination
+                                    background
+                                    layout="prev, pager, next"
+                                    :page-size="pagination['size']"
+                                    :total="pagination['total']"
+                                    :current-page="pagination['current']"
+                                    @current-change = "changePage"
+                                >
+                                </el-pagination>
+                            </div>
+                            
+                            <p style="text-align:center;color:#ccc;margin-top:100px;" v-show="!pagination['total']">暂无数据</p>
                         </div>
-                        
-                        <p style="text-align:center;color:#ccc;margin-top:100px;" v-show="!pagination['total']">暂无数据</p>
+
+                        <div v-else>
+
+                            <el-table
+                                :data="jobNumTable"
+                                border
+                                stripe
+                                >
+
+                                <el-table-column
+                                prop="job"
+                                label="岗位"
+                                >
+                                </el-table-column>
+
+                                <el-table-column
+                                prop="exist"
+                                label="现有人数"
+                                >
+                                </el-table-column>
+
+                                <el-table-column
+                                label="规划人数"
+                                >
+                                    <template slot-scope="scope">
+                                        <span v-show="!scope.row.edit">{{scope.row.num}}</span>
+                                        <i class="el-icon-edit pull-right hover-blue" style="margin-right:20px;" v-show="!scope.row.edit" @click="scope.row.edit = !scope.row.edit"></i>
+                                        <el-input v-model="scope.row.num" v-show="scope.row.edit" @blur="saveJobNum(scope.row)" ></el-input>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+
+                        </div>
 
                     </div>
                 </el-col>
@@ -194,6 +233,7 @@
                     :props="{ checkStrictly: true ,label:'name',value:'id',children:'child',expandTrigger:'hover'}"
                     :show-all-levels='false'
                     clearable
+                    filterable
                     style="width:100%;"></el-cascader>
 
                 </el-col>
@@ -335,10 +375,20 @@
                 dept_id:'',
                 job_option:[],
                 job_id:''
-            }
+            },
+            showModel:'person',
+            jobNumTable:[]
         },
         methods: {
-           
+            theType(type){
+                for(var i=0;i<this.deptTypeOption.length;i++){
+
+                    if(type == this.deptTypeOption[i].dept_type_id){
+                        return this.deptTypeOption[i].name;
+                    }
+
+                }
+            },
             checkType_name(){
                 if(this.operate == 'add'){
 
@@ -576,6 +626,7 @@
 
             getMain(data,page){
                 this.main_header = data;
+                this.showModel = 'person';
                 var page = typeof page == 'number' ? page : 1;
 
                 axios.get("{:url('AdminOrganize/getMain')}",{
@@ -588,6 +639,18 @@
                     this.pagination['total'] = res.data.total;
                     this.pagination['size'] = res.data.size;
                     this.pagination['current'] = page;
+                })
+            },
+
+            getJobNum(){
+                axios.get("{:url('getJobNum')}",{
+                    params:{
+                        dept_id:this.main_header.id,
+                        dept_type:this.main_header.type
+                    }
+                }).then(res=>{
+                    this.jobNumTable = res.data;
+                    //console.log(this.jobNumTable);
                 })
             },
 
@@ -685,7 +748,24 @@
                         });
                     }
                 })
-            }
+            },
+            saveJobNum(row){
+                axios.get("{:url('savejobNum')}",{
+                    params:{
+                        dept_id:this.main_header.id,
+                        job_id:row.id,
+                        num:row.num
+                    }
+                }).then(res=>{
+                    if(res.data){
+                        this.$message.success("修改成功");
+                    }else{
+                        this.$message.error("修改失败");
+                    }
+                })
+                row.edit = false;
+            },
+            
 
 
         },
@@ -759,8 +839,14 @@
                     this.pagination['current'] = 1;
                 })
 
+            },
+            showModel(newV,oldV){
+                if(newV == 'job'){
+                    this.getJobNum();
+                }else{
+                    this.getMain(this.main_header,this.pagination['current']);
+                }
             }
-
-        },
+        }
     };
 </script>

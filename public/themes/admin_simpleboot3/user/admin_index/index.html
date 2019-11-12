@@ -7,11 +7,14 @@
     </ul>
     <form class="well form-inline margin-top-20" method="post" action="{:url('user/adminIndex/index')}">
         用户ID：
-        <input class="form-control" type="text" name="uid" style="width: 200px;" value="{:input('request.uid')}"
+        <input class="form-control" type="text" name="uid" style="width: 50px;" value="{:input('request.uid')}"
                placeholder="请输入用户ID">
         关键字：
         <input class="form-control" type="text" name="keyword" style="width: 300px;" value="{:input('request.keyword')}"
                placeholder="用户名/昵称/真实姓名/邮箱/手机">
+        部门：
+        <input class="form-control" type="text" name="dept" style="width: 180px;" value="{:input('request.dept')}"
+               placeholder="部门名称">
         用户状态：
         <select name="user_status" class="form-control" style="width: 100px;">
             <option value="" <eq name= ":input('request.user_status')" value=''>selected</eq> > 全部</option>
