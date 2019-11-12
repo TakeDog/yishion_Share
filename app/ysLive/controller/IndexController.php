@@ -131,18 +131,35 @@ class IndexController extends HomeBaseController{
         WHERE at.title LIKE '%$keyword%' AND at.status=1 $sortStr limit ".($cur_page-1)*$num .", $num");
 
         // $list = $query -> limit(($cur_page-1)*$num , $num) -> field("at.*,u.user_name,u.avatar,u.user_nickname") -> select() -> toArray();
+        //增加已点赞状态值
+
+        if(session("user_info",'','live') != null){
+
+            $user_info = session('user_info','','live');
+            $userLikeList = Db::name("CArticleLike") -> where('user_id',$user_info['id']) -> column("article_id");
+
+            foreach($list as $k => $v){
+                $list[$k]['like'] = in_array($v['id'],$userLikeList) ? true : false;
+            }
+            
+        }
 
         $currentTime = time();
 
         foreach($list as $k => $v){
             $offsetTime = $currentTime - intval($v['date']);
             
+            if($offsetTime / 60 / 60 / 24 > 1){
+                $list[$k]['offsetTime'] = floor(($offsetTime / 60 / 60 /24)).'天前 '.date("Y-m-d H:i:s",intval($v['date'])).'';
+                continue;
+            }
+
             if($offsetTime / 60 / 60 > 1){
                 $list[$k]['offsetTime'] = floor(($offsetTime / 60 / 60)).'小时前';
                 continue;
             }
 
-            if($offsetTime / 60  > 1){
+            if($offsetTime / 60  > 3){
                 $list[$k]['offsetTime'] = floor(($offsetTime / 60)).'分钟前';
             }else{
                 $list[$k]['offsetTime'] = "刚刚";

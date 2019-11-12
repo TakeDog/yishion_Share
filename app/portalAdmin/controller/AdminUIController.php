@@ -61,7 +61,7 @@ class AdminUIController extends AdminBaseController{
         $video_type = $this -> request -> param('video_type');
     
         if($file){
-            $info = $file->move($filePath);
+            $info = $file -> rule("uniqid") -> move($filePath);
             if($info){
                 $operateConfig = new OperateConfig();
                 // 成功上传后 获取上传信息
@@ -70,21 +70,24 @@ class AdminUIController extends AdminBaseController{
                 
                 switch($video_type){
                     case 1: //纯工作视频
-                        unlink($configObj -> IndexVideo -> work);
+                        if(file_exists($configObj -> IndexVideo -> work)){
+                            unlink($configObj -> IndexVideo -> work);
+                        }
                         $configObj -> IndexVideo -> work = $filePath.'/'.$save_name;
                     break;
                     case 2: //纯生活视频
-                        unlink($configObj -> IndexVideo -> live);
+                        if(file_exists($configObj -> IndexVideo -> live)){
+                            unlink($configObj -> IndexVideo -> live);
+                        }
                         $configObj -> IndexVideo -> live = $filePath.'/'.$save_name;
                     break;
                     case 3: //纯工作&纯生活
-                        if($configObj -> IndexVideo -> work == $configObj -> IndexVideo -> live){
+                        if(file_exists($configObj -> IndexVideo -> work)){
                             unlink($configObj -> IndexVideo -> work);
-                        }else{
-                            unlink($configObj -> IndexVideo -> work);
+                        }
+                        if(file_exists($configObj -> IndexVideo -> live)){
                             unlink($configObj -> IndexVideo -> live);
                         }
-                        
                         $configObj -> IndexVideo -> work = $filePath.'/'.$save_name;
                         $configObj -> IndexVideo -> live = $filePath.'/'.$save_name;
                     break;

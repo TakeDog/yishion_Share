@@ -14,7 +14,7 @@
     /* position: absolute;bottom: 10px;width: 100%; */
 </style>
 
-<div class="container-fluid" id="app" style="width: 90%;margin: 0 auto;">
+<div class="container-fluid" id="app" style="width: 90%;margin: 0 auto 50px;">
     <el-breadcrumb separator-class="el-icon-arrow-right" style="margin:30px;">
         <el-breadcrumb-item>首页</el-breadcrumb-item>
         <el-breadcrumb-item>内部交流</el-breadcrumb-item>
@@ -27,12 +27,12 @@
       <el-table-column
         prop="id"
         label="ID"
-        width="180">
+        width="50">
       </el-table-column>
       <el-table-column
         prop="user_name"
         label="发起人"
-        width="180">
+        width="100">
       </el-table-column>
       <el-table-column
         prop="desc"
@@ -40,11 +40,13 @@
       </el-table-column>
       <el-table-column
         prop="date"
-        label="发起时间">
+        label="发起时间"
+        width="180">
       </el-table-column>
       <el-table-column
         prop="status"
-        label="需求进展">
+        label="需求进展"
+        width="100">
         <template slot-scope="scope">
             <span v-if='scope.row.status == 0' style="color:red;">未处理</span>
             <span v-if='scope.row.status == 1' style="color:#409EFF;">处理中</span>
@@ -54,16 +56,19 @@
       </el-table-column>
       <el-table-column
         prop="complete_date"
-        label="完成时间">
+        label="完成时间"
+        width="180">
       </el-table-column>
 
       <el-table-column
         prop="edit_num"
-        label="修改次数">
+        label="修改次数"
+        width="50">
       </el-table-column>
 
       <el-table-column
-        label="操作">
+        label="操作"
+        width="180">
         <template slot-scope="scope">
             <a href="javascript:;" @click="dialogVisible=true;operate='edit';form.id=scope.row.id;form.desc=scope.row.desc;">修改</a> |
             <a href="javascript:;" @click="delShit(scope.row.id)">删除</a> |

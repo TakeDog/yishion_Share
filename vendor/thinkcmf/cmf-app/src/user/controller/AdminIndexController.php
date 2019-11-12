@@ -17,6 +17,10 @@ use think\db\Query;
 use tree\Tree;
 use app\user\model\CActionModel;
 use app\portal\model\CUserModel;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use app\portalAdmin\model\DeptModel;
 /**
  * Class AdminIndexController
  * @package app\user\controller
@@ -81,11 +85,14 @@ class AdminIndexController extends AdminBaseController
                     $keyword = $data['keyword'];
                     $query->where('u.user_name|u.user_nickname|u.user_email|u.mobile|u.real_name', 'like', "%$keyword%");
 
-                }if ( isset($data['user_status']) && $data['user_status'] !== '' ) {
-
+                }
+                if ( isset($data['user_status']) && $data['user_status'] !== '' ) {
                     $user_status = $data['user_status'];
                     $query->where('u.user_status', $user_status);
-
+                }
+                if(!empty($data['dept'])){
+                    $ids = Db::name("Dept") -> whereLike("name","%".$data['dept']."%") -> column('id');
+                    $query -> where('u.dept_id', 'in', $ids);
                 }
             })
             -> field("u.*,GROUP_CONCAT(r.role_name separator ' | ') as role_name,d.name as deptName,j.job as jobName")
@@ -132,8 +139,90 @@ class AdminIndexController extends AdminBaseController
      * )
      */
     public function exportExcel(){
-        $userDb = new CUserModel();
-        $userDb -> exportExcel($this -> request -> param());
+        //$userDb = new CUserModel();
+
+        //$DeptModel = new DeptModel();
+        $spreadsheet = new Spreadsheet();  //创建一个新的excel文档
+        $objSheet = $spreadsheet->getActiveSheet();  //获取当前操作sheet的对象
+        $objSheet->setTitle('用户数据分析统计表');  //设置当前sheet的标题
+
+        //设置默认字体
+        $spreadsheet->getDefaultStyle()->getFont()->setName('Arial');
+        $spreadsheet->getDefaultStyle()->getFont()->setSize(11);
+        //设置列宽
+        $objSheet->getDefaultColumnDimension()->setWidth(14);
+        $objSheet->getColumnDimension('J')->setWidth(55);
+        //设置行高
+        // $objSheet->getDefaultRowDimension()->setRowHeight(38);
+        //设置垂直居中
+        $spreadsheet->getDefaultStyle()->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $spreadsheet->getDefaultStyle()->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+
+        $title = ['ID','用户名','昵称','角色','真实名字','部门','岗位','邮箱','手机','注册时间','最后登录时间','最后登录IP','状态'];
+
+        $i = "A";
+        foreach($title as $k => $v){
+            $objSheet->setCellValue($i.'1', $v);
+            $i++;
+        }
+
+        $list = Db::name('c_user')-> alias('u')
+            -> join('c_user_role ur','u.id = ur.user_id','LEFT')
+            -> join('c_role r','ur.role_id=r.id','LEFT')
+            -> join('job j','u.job_id = j.id','LEFT')
+            -> join('dept d','u.dept_id = d.id','LEFT')
+            -> where(function (Query $query) {
+                $data = $this->request->param();
+
+                if (!empty($data['uid'])) {
+                    $query->where('u.id', intval($data['uid']));
+                }
+
+                if (!empty($data['keyword'])) {
+
+                    $keyword = $data['keyword'];
+                    $query->where('u.user_name|u.user_nickname|u.user_email|u.mobile|u.real_name', 'like', "%$keyword%");
+
+                }if ( isset($data['user_status']) && $data['user_status'] !== '' ) {
+
+                    $user_status = $data['user_status'];
+                    $query->where('u.user_status', $user_status);
+
+                }
+            })
+            -> field("u.*,GROUP_CONCAT(r.role_name separator ' | ') as role_name,d.name as deptName,j.job as jobName")
+            -> group('u.id')
+            -> order("u.user_status desc,create_time DESC")
+            -> select() -> toArray();
+
+           // var_dump($list);
+            //exit;
+
+        $j=2;
+        foreach($list as $k => $v){
+            $objSheet->setCellValue('A'.$j, $v['id'])
+                     ->setCellValue('B'.$j, $v['user_name'])
+                     ->setCellValue('C'.$j, $v['user_nickname'])
+                     ->setCellValue('D'.$j, $v['role_name'])
+                     ->setCellValue('E'.$j, $v['real_name'])
+                     ->setCellValue('F'.$j, implode(',',DeptModel::getFullName($v['dept_id'])))
+                     ->setCellValue('G'.$j, $v['jobName'] ? $v['jobName'] : '无')
+                     ->setCellValue('H'.$j, $v['user_email'])
+                     ->setCellValue('I'.$j, $v['mobile'])
+                     ->setCellValue('J'.$j, date('Y-m-d H:i:s',$v['create_time']))
+                     ->setCellValue('K'.$j, date('Y-m-d H:i:s',$v['last_login_time']))
+                     ->setCellValue('L'.$j, $v['last_login_ip'])
+                     ->setCellValue('M'.$j, $v['user_status'] ? ($v['user_status']==1 ? '正常' :' 未验证') : '禁止登录');
+            $j++;
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename="用户记录表.xlsx"');
+        header('Cache-Control: max-age=0');
+        $writer->save('php://output');
+
+        //$userDb -> exportExcel($this -> request -> param());
     }
 
     /**
@@ -155,7 +244,7 @@ class AdminIndexController extends AdminBaseController
         if ($id) {
             $result = Db::name("c_user")->where('id',$id)->setField('user_status', 0);
             if ($result) {
-                $this->success("会员拉黑成功！", "adminIndex/index");
+                $this->success("会员拉黑成功！", '','',0);
             } else {
                 $this->error('会员拉黑失败,会员不存在,或者是管理员！');
             }
@@ -182,7 +271,7 @@ class AdminIndexController extends AdminBaseController
         $id = input('param.id', 0, 'intval');
         if ($id) {
             Db::name("c_user")->where('id',$id)->setField('user_status', 1);
-            $this->success("会员启用成功！", '');
+            $this->success("会员启用成功！", '','',0);
         } else {
             $this->error('数据传入失败！');
         }

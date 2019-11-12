@@ -60,6 +60,14 @@
                                                 <el-badge class="mark" :value="{$news['join_news']}"/>
                                             </gt>
                                         </el-dropdown-item>
+
+                                        <el-dropdown-item>
+                                            <a href="/admin/index/index.html#/portalAdmin/admin_bbs/articlemanager.html" target="_blank">时尚达人</a>
+                                            <gt name="news['bbs']" value='0'>
+                                                <el-badge class="mark" :value="{$news['bbs']}"/>
+                                            </gt>
+                                        </el-dropdown-item>
+
                                     </eq>
                                     <el-dropdown-item>
                                         其他
@@ -105,6 +113,9 @@
                                 <li><a>工作任务</a></li>
                                 <li>
                                     <a href="{:url('Feedback/index')}">我的</a>
+                                </li>
+                                <li>
+                                    <a href="{:url('ysLive/index/index')}" target="_blank">纯生活</a>
                                 </li>
                             </ul>
                         </div>

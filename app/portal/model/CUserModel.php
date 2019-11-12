@@ -22,7 +22,7 @@ class CUserModel extends Model{
 
         if($userInfo['pwd'] != MD5($pwd)) return -2;
 
-        if($userInfo['user_status'] == 0) return -1;
+        if($userInfo['user_status'] != 1) return -1;
 
         //添加机构信息
         $deptPID = $deptDb -> getFirstP($userInfo['dept_id']);
@@ -239,34 +239,35 @@ class CUserModel extends Model{
             $i++;
         }
 
+        $where = [];
+        if (!empty($data['uid'])) {
+            $where['u.id'] = intval($data['uid']);
+        }
+        if (!empty($data['keyword'])) {
+            $keyword = $data['keyword'];
+            $where['u.user_name|u.user_nickname|u.user_email|u.mobile'] = array('like',"%$keyword%") ;
+        }
+
+        if ( isset($data['user_status']) && $data['user_status'] !== '' ) {
+            $user_status = $data['user_status'];
+            $where['u.user_status'] = $user_status;
+        }
+
         $list = Db::name('c_user')-> alias('u')
             -> join('c_user_role ur','u.id = ur.user_id','LEFT')
             -> join('c_role r','ur.role_id=r.id','LEFT')
             -> join('job j','u.job_id = j.id','LEFT')
             -> join('dept d','u.dept_id = d.id')
-            -> where(function (Query $query) {
-                global $data;
-
-                if (!empty($data['uid'])) {
-                    $query->where('u.id', intval($data['uid']));
-                }
-
-                if (!empty($data['keyword'])) {
-
-                    $keyword = $data['keyword'];
-                    $query->where('u.user_name|u.user_nickname|u.user_email|u.mobile', 'like', "%$keyword%");
-
-                }if ( isset($data['user_status']) && $data['user_status'] !== '' ) {
-
-                    $user_status = $data['user_status'];
-                    $query->where('u.user_status', $user_status);
-
-                }
-            })
+            -> where($where)
+            -> whereLike("u.user_name|u.user_nickname|u.user_email|u.mobile","%".$data['keyword']."%")
             -> field("u.*,GROUP_CONCAT(r.role_name separator ' | ') as role_name,d.name as deptName,j.job as jobName")
             -> group('u.id')
             -> order("u.user_status desc,create_time DESC")
-            -> select();
+            -> select() 
+            -> toArray();
+
+            var_dump($list);
+            exit;
 
         $j=2;
         foreach($list as $k => $v){
@@ -293,6 +294,7 @@ class CUserModel extends Model{
         $writer->save('php://output');
 
     }
+
 
 
 }

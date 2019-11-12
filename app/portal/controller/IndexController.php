@@ -208,10 +208,10 @@ class IndexController extends HomeBaseController
 
         if(!$query['pwd'])  return json(array('code'=>0,'msg'=>'密码不能为空'));
 
-        $info = model('c_user') -> loginVerify($query['user'], $query['pwd']);  
+        $info = model('CUser') -> loginVerify($query['user'], $query['pwd']);  
 
         if(0 === $info)     return json(array('code'=>0,'msg'=>'账号不存在'));
-        if(-1 === $info)    return json(array('code'=>0,'msg'=>'账号被禁用'));
+        if(-1 === $info)    return json(array('code'=>0,'msg'=>'账号未验证或账号被禁用'));
         if(-2 === $info)    return json(array('code'=>0,'msg'=>'密码不正确'));
 
         if(1 == $info){
@@ -405,13 +405,20 @@ class IndexController extends HomeBaseController
 
     private function indexNews(){
         $joinNews = 0;
+        $bbs = 0;
         $user_info = session("user_info",'','portal');
         if($user_info['super'] == 1){
             $joinNews = intval(Db::name("CUser") -> where("user_status",2) -> count());
+            $bbs = intval(Db::name("CArticle") -> where("status",0) -> count());
         }
         $news['join_news'] = $joinNews;
+        $news['bbs'] = $bbs;
         //$news['count'] = $joinNews + a +b +c;
-        $news['count'] = $joinNews;
+        $count = 0;
+        foreach($news as $k => $v){
+            $count+=$v;
+        }
+        $news['count'] = $count;
         return $news;
     }
 
