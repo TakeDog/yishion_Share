@@ -10,7 +10,7 @@
     .el-table__row td .cell{text-align: center;}
     .el-table__row td{padding:5px 0;}
     .main .el-tabs__header{margin:0 0 10px;}
-
+    .main-row{overflow: unset;}
     .fiex-card{width: 135px;position: fixed;top: 26px;left:0;padding: 0 0 0 20px;overflow: visible;z-index: 1000;transition: left .5s;-webkit-transition: left .5s;-moz-transition: left .5s;-o-transition: left .5s;}
     .fiex-card-left{left:-135px;}
 
@@ -25,12 +25,26 @@
     .color-blue{color:#409eff !important;}
     #edui1_iframeholder{height: 245px !important;}
     .sh{position: absolute;top: 0;right: -32px;background-color: #fff;padding: 10 10px;padding: 5px 10px;cursor: pointer;border-radius: 5px;color: #337A87;box-shadow: 5px 0px 7px rgba(0,0,0,.1);}
-</style>
 
+    /**头像悬浮框样式*/
+    .el-main,.el-tabs__content{overflow: unset;}
+    .el-card, .el-message {overflow: unset;}
+    .avatar{position: relative;}
+    .avatar_info{position: absolute;position: absolute;top: 30px;left: 20px;width: 350px;z-index:9999;padding-top:20px}
+    .avatar_info .info_title:after{display: block;content:"";clear: both;}
+    .avatar_info .info_title{position: relative;display: flex;padding-bottom: 15px;border-bottom:1px solid #f7f7f7;}
+    .avatar_info .info_title .modal_avatar>img{width: 60px;height: 60px;border-radius: 50%;box-shadow: 1px 2px 4px #9c9c9c;}
+    .avatar_info .info_title .modal_avatar{position: absolute;top: -22px;}
+    .avatar_info .info_title .user_info{padding-left:75px;font-size: 17px;}
+    .avatar_info .info_content .count_div{display: flex;justify-content: space-around;padding-top:10px;}
+    .avatar_info .info_content .count_div .count_item{text-decoration: none;cursor:pointer;}
+    .avatar_info .info_content .count_div .count_item:hover>div{color:#F5B6A7 !important;}
+    .avatar_info .info_content .btn_div{padding-top: 15px;display: flex;justify-content: space-around;}
+</style>
 
 <div id="app" style="margin-top:20px;">
     <el-drawer title="达人榜" :visible.sync="rankDrawer" direction="rtl" :show-close="false" stripe>
-        <el-table :data="userRankDrawer.list":row-class-name="currentUser" style="width: 100%;margin:10px 5px;text-align: center;">
+        <el-table :data="userRankDrawer.list" :row-class-name="currentUser" style="width: 100%;margin:10px 5px;text-align: center;">
             <el-table-column prop="rn" label="排名" header-align="center"></el-table-column>
             <el-table-column prop="user_nickname" label="用户" header-align="center"></el-table-column>
             <el-table-column prop="view_count_total" label="阅读量" header-align="center"></el-table-column>
@@ -106,7 +120,7 @@
                     </el-container>
                     <!-- 加载编辑器的容器 -->
                     
-                    <!-- <el-card class="blue-bgc"> -->
+                    <!-- <div class="blue-bgc"> -->
                     <div class="main">
                         <el-tabs>
                             <el-tab-pane label="热门帖子" name="first" >
@@ -123,7 +137,7 @@
 
                             <div class="search-row">
                                 <div class="input-group" style="margin-bottom:10px;">
-                                    <input type="text" class="form-control" placeholder="查找主题" style="height: 43px;" v-model="keyword" @keyup.enter="getArticle(1)">
+                                    <input type="text" class="form-control" placeholder="查找主题/用户昵称" style="height: 43px;" v-model="keyword" @keyup.enter="getArticle(1)">
                                     <span class="input-group-btn">
                                         <button class="btn btn-light-blue" type="button" style="line-height: 29px;" @click="getArticle(1)">
                                             <span class="glyphicon glyphicon-search"></span>
@@ -135,10 +149,45 @@
                             <div class="main_wrap">
                                 <ul class="main_list">
                                     <li class="main-row" v-for="(item,i) in articleList" :key="item.id">
-                                        <div class="avatar">
+                                        <div class="avatar" @mouseenter="item.avatar_show=true;getAvatarInfo(item.user_id,i)" @mouseleave="item.avatar_show=false;avatar_info={};">
                                             <a href="#">
                                                 <img :src="item.avatar ? '/' + item.avatar : '/upload/avatar/default.jpg'" alt="">
                                             </a>
+                                            <transition name="el-fade-in-linear">
+                                                <div class="avatar_info" v-if="item.avatar_show">
+                                                    <el-card shadow="always">
+                                                        <div class="info_title">
+                                                            <div class="modal_avatar">
+                                                                <img :src="avatar_info.avatar ? '/' + avatar_info.avatar : '/upload/avatar/default.jpg'" alt="">
+                                                            </div>
+                                                            <div class="user_info">
+                                                                <p>{{avatar_info.user_nickname}}</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="info_content">
+                                                            <div class="count_div">
+                                                                <a :href="'{:url(\'checkArticle\')}'+'?id='+avatar_info.id+'&user_nickname='+avatar_info.user_nickname" class="count_item">
+                                                                    <div style="color:#666;">帖子</div>
+                                                                    <div style="text-align: center;font-weight:800;color:#666;">{{avatar_info.article_count}}</div>
+                                                                </a>
+                                                                <a href="#" class="count_item">
+                                                                    <div style="color:#666;">关注者</div>
+                                                                    <div style="text-align: center;font-weight:800;color:#666;">{{avatar_info.be_follow_count}}</div>
+                                                                </a>
+                                                            </div>
+                                                            <div class="btn_div" v-if="'{$user_id}' && '{$user_id}'!= avatar_info.id">
+                                                                <div>
+                                                                    <el-button type="primary" icon="el-icon-plus" size="mini" @click="followUser(avatar_info.id)" v-if="avatar_info.a_status===0">关注</el-button>
+                                                                    
+                                                                    <el-button type="info" size="mini" @click="notFollowUser(avatar_info.id)" v-if="avatar_info.a_status!==0 && avatar_info.b_status===0">已关注</el-button>
+    
+                                                                    <el-button icon="el-icon-sort" size="mini" @click="notFollowUser(avatar_info.id)" v-if="avatar_info.a_status!==0 && avatar_info.b_status!==0">互相关注</el-button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </el-card>
+                                                </div>
+                                            </transition>
                                         </div>
                                         <div class="list-content">
                                             <p class="title" style="margin-left:10px;">
@@ -187,10 +236,10 @@
     </el-container>
 
     <el-card class="fiex-card" :class="{'fiex-card-left':!aside_box}">
-        <p><a href="">我的帖子</a></p>
-        <p><a href="">我的评论</a></p>
-        <p><a href="">我的点赞</a></p>
-        <p><a href="">我的关注</a></p>
+        <p><a href="javascript:;" @click="checkLogin('{:url(\'myArticle\')}')">我的帖子</a></p>
+        <p><a href="javascript:;" @click="checkLogin('{:url(\'myComment\')}')">我的评论</a></p>
+        <p><a href="javascript:;" @click="checkLogin('{:url(\'myLike\')}')">我的点赞</a></p>
+        <p><a href="javascript:;" @click="checkLogin('{:url(\'myFollow\')}')">我的关注</a></p>
         <div class="sh" @click="aside_box = !aside_box;">
             <span v-text="aside_box ? '<<':'>>'"></span>
         </div>
@@ -227,7 +276,8 @@
             userRank:[],
             rankDrawer: false,
             currentUserRank: null,
-            aside_box:false
+            aside_box:false,
+            avatar_info:{}
         },
         mounted () {
             this.getArticle(1);
@@ -336,6 +386,52 @@
                         parent.location.href = "/yslive/index/login";
                     }
                 });
+            },
+            getAvatarInfo(id,i){
+                axios.post("{:url('getAvatarInfo')}",{user_id:id}).then((res) => {
+                    this.avatar_info = res.data;
+                });
+
+            },
+            followUser(id){
+                axios.post("{:url('followUser')}",{id:id}).then((res) => {
+                    this.avatar_info.a_status = 1;
+                });
+            },
+            notFollowUser(id){
+                axios.post("{:url('notFollowUser')}",{id:id}).then((res) => {
+                    this.avatar_info.a_status = 0;
+                });
+            },
+            // changeFollowBtnText(type){
+            //     if(type == 0 && this.avatar_info.a_status!==0){
+            //         this.avatar_info.text = "取消关注";
+            //         console.log(this.avatar_info.text);
+            //     }else{
+            //         if(this.avatar_info.a_status===0){
+            //             this.avatar_info.text = "关注";
+            //         }else if(this.avatar_info.a_status!==0 && this.avatar_info.b_status===0){
+            //             this.avatar_info.text = "已关注";
+            //         }else if(this.avatar_info.a_status!==0 && this.avatar_info.b_status===1){
+            //             this.avatar_info.text = "互相关注";
+            //         }
+            //     }
+                
+            // },
+            checkLogin(targetUrl){
+                if('{$user_id}'){
+                    location.href = targetUrl;
+                }else{
+                    this.$confirm('正在前往登陆, 是否继续?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        parent.location.href = "/yslive/index/login";
+                    }).catch(() => {        
+                    });
+                    return false;
+                }
             }
         },
         watch:{

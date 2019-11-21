@@ -1,0 +1,130 @@
+<layout name="public@layout_live" />
+<style>
+[v-cloak]{display: none;}
+.fiex-card{width: 135px;position: fixed;top: 26px;left:0;padding: 0 0 0 20px;overflow: visible;z-index: 1000;transition: left .5s;-webkit-transition: left .5s;-moz-transition: left .5s;-o-transition: left .5s;}
+.fiex-card-left{left:-135px;}
+.sh{position: absolute;top: 0;right: -32px;background-color: #fff;padding: 10 10px;padding: 5px 10px;cursor: pointer;border-radius: 5px;color: #337A87;box-shadow: 5px 0px 7px rgba(0,0,0,.1);}
+/* 评论，分页 */
+.like_wrap{background-color: #fff;}
+.like_list{padding:0;list-style: none;margin:20px 0;}
+.like_list.flist{margin: 0 0 0 4%;zoom: .8;}
+.avatar{float: left;}
+.avatar>a>img{float: left;width:50px;height: 50px;border-radius: 50%;object-fit:cover;}
+.title > a{font-size:16px;color:#333;}
+.title > a:hover{color:#337ab7;}
+.auth_msg{color:#000;overflow: hidden;margin-left: 10px;font-size:12px;}
+.auth_msg a:hover{color:#337ab7;}
+.comment_item:hover>.comment_oper{visibility:visible;}
+.comment_reply{margin: 0 10px 20px 50px;}
+.like-row{overflow: hidden;margin-bottom:10px;border-bottom:1px solid #e6e6e6;}
+.like-row.fRow{border-top:1px solid #e6e6e6;border-bottom:0px;padding-top:10px;margin-bottom:0px;}
+.pagination{width:100%;text-align: center;}
+
+.comment .el-tabs__content{padding:0 20px;}
+.comment .el-tabs__header{padding:5px 20px;margin:0;}
+.comment .el-tabs{background-color: #fff;border: 1px solid #d2d2d2;margin-bottom:20px;}
+.comment .el-tabs__item{font-size:16px;font-weight: bold;}
+.el-dialog{overflow-y: scroll !important;height: 92% !important;}
+.auth_msg_item{cursor: pointer;}
+.auth_msg_item:hover{color: #bbb;}
+
+img{max-width: 100%;}
+
+</style>
+<div class="container" id="app" style="min-height: 650px;margin-top: 20px;" v-cloak>
+    <div class="comment">
+        <el-tabs >
+            <el-tab-pane label="我的点赞" name="first">
+                <span slot="label"><i class="el-icon-sunny"></i> 我的点赞</span>
+            </el-tab-pane>
+
+            <div class="like_wrap">
+                <ul class="like_list">
+                    <li class="like-row" v-for="(item,i) in like_list.list":key="item.id">
+                        <div class="comment_item">
+                            <div class="avatar">
+                                <a href="#">
+                                    <img :src="item.avatar ? '/' + item.avatar : '/upload/avatar/default.jpg'" alt="">
+                                </a>
+                            </div>
+                            <div>
+                                <div class="title" style="margin:0 0 5px 10px;font-size: 16px;" >
+                                    <a href="#" class="font-c-blue">{{item.user_nickname}}</a>&nbsp; 
+                                    <div style="display:inline-block;color:#8c8c8c;">
+                                        点赞了你的文章&nbsp; 
+                                        <a :href="'/{$Request.module}/{$Request.controller}/articleDet/id/' + item.article_id" class="font-c-blue">{{item.title}}</a>
+                                    </div>&nbsp;
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <div class="pagination" style="margin-top:0;">
+                    <el-pagination
+                        background
+                        layout="prev, pager, next"
+                        :page-size="like_list.page_size"
+                        :total="like_list.total"
+                        @current-change="toPage"
+                        @prev-click="toPage"
+                        @next-click="toPage"
+                        v-if="like_list.total > 0">
+                    </el-pagination>
+                    <p style="margin:0;color:#ab1515;" v-else> 还没有人评论，赶紧来抢沙发吧！ </p>
+                </div>
+            </div> 
+        </el-tabs>
+    </div>
+
+    <el-card class="fiex-card" :class="{'fiex-card-left':!aside_box}">
+        <p><a href="javascript:;" @click="checkLogin('{:url(\'myArticle\')}')">我的帖子</a></p>
+        <p><a href="javascript:;" @click="checkLogin('{:url(\'myComment\')}')">我的评论</a></p>
+        <p><a href="javascript:;" @click="checkLogin('{:url(\'myLike\')}')">我的点赞</a></p>
+        <p><a href="javascript:;" @click="checkLogin('{:url(\'myFollow\')}')">我的关注</a></p>
+        <div class="sh" @click="aside_box = !aside_box;">
+            <span v-text="aside_box ? '<<':'>>'"></span>
+        </div>
+    </el-card>
+    
+</div>
+<script>
+    var vue = {
+        el:"#app",
+        data:{
+            comment:'',
+            page: 1,
+            like_list:{},
+            aside_box:false
+        },
+        mounted() {
+            this.getLikeList(this.page);
+        },
+        methods: {
+            getLikeList(page,index){
+                //getComList
+                axios.post("{:url('getLikeListByUserId')}",{page:page}).then((res)=>{
+                    this.like_list = res.data;
+                })
+            },
+            toPage(page){
+                this.page = page;
+                this.getComList(this.page);
+            },
+            checkLogin(targetUrl){
+                if('{$user_id}'){
+                    location.href = targetUrl;
+                }else{
+                    this.$confirm('正在前往登陆, 是否继续?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        parent.location.href = "/yslive/index/login";
+                    }).catch(() => {        
+                    });
+                    return false;
+                }
+            }
+        }
+    }
+</script>

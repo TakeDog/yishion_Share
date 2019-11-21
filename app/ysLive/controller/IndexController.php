@@ -14,8 +14,45 @@ class IndexController extends HomeBaseController{
         return $this->fetch();
     }
 
-     //以纯动态静态页：
-     public function ActionIndex(){
+    //以纯动态静态页：
+    public function ActionIndex(){
+        return $this -> fetch();
+    }
+
+    //我的帖子
+    public function myArticle(){
+        if(getLiveUser()){
+            $this -> assign("user_id",getLiveUser()['id']);
+        }else{
+            $this -> assign("user_id",null);
+        }
+        return $this -> fetch();
+    }
+    //我的评论
+    public function myComment(){
+        if(getLiveUser()){
+            $this -> assign("user_id",getLiveUser()['id']);
+        }else{
+            $this -> assign("user_id",null);
+        }
+        return $this -> fetch();
+    }
+    //我的点赞
+    public function myLike(){
+        if(getLiveUser()){
+            $this -> assign("user_id",getLiveUser()['id']);
+        }else{
+            $this -> assign("user_id",null);
+        }
+        return $this -> fetch();
+    }
+    //我的关注
+    public function myFollow(){
+        if(getLiveUser()){
+            $this -> assign("user_id",getLiveUser()['id']);
+        }else{
+            $this -> assign("user_id",null);
+        }
         return $this -> fetch();
     }
 
@@ -25,6 +62,12 @@ class IndexController extends HomeBaseController{
     }
     //页面待开发
     public function unblock(){
+        return $this -> fetch();
+    }
+    //查看帖子
+    public function checkArticle(){
+        $this -> assign("user_id",input('id'));
+        $this -> assign("user_nickname",input('user_nickname'));
         return $this -> fetch();
     }
 
@@ -66,8 +109,8 @@ class IndexController extends HomeBaseController{
         return $this -> fetch();
     }
 
-     //保存富文本内容
-     public function saveEditor(){
+    //保存富文本内容
+    public function saveEditor(){
         $data['content'] = input('post.content');
         
         //正则表达式匹配查找图片路径
@@ -112,26 +155,29 @@ class IndexController extends HomeBaseController{
         }
     }
 
-    public function getArticle(){
+    public function getArticleByUserId(){
         $sortType = input("param.sortType");
         $cur_page = input("param.page") ? input("param.page") : 1;
         $keyword = input("param.keyword");
+        $user_id = input("param.user_id");
         $num = 10;
-        
+        $where = "";
         if($sortType == 'time'){
             $sortStr = "ORDER BY DATE DESC";
         }else if($sortType == 'view'){
             $sortStr = "ORDER BY view_count DESC";
         }
-        // $query = Db::name("CArticle") -> alias('at') -> join("CUser u","at.user_id = u.id","LEFT") -> where('at.title','like','%'.$keyword.'%') -> order("date desc");
+        if($user_id == getLiveUser()['id']){
+            $where .= "AND at.status<>2";
+        }else{
+            $where .= "AND at.status=1";
+        }
+        
         $list_total = Db::query("SELECT at.*,u.user_name,u.avatar,u.user_nickname,(SELECT COUNT(id) FROM share_c_article_comment scac WHERE scac.article_id=at.id) AS comment_count,(SELECT COUNT(*) FROM share_c_article_like scal WHERE scal.article_id=at.id) AS like_count FROM share_c_article AT LEFT JOIN share_c_user u ON at.user_id=u.id
-        WHERE at.title LIKE '%$keyword%' AND at.status=1 $sortStr");
+        WHERE at.title LIKE '%$keyword%' $where AND user_id=$user_id $sortStr");
 
         $list = Db::query("SELECT at.*,u.user_name,u.avatar,u.user_nickname,(SELECT COUNT(id) FROM share_c_article_comment scac WHERE scac.article_id=at.id) AS comment_count,(SELECT COUNT(*) FROM share_c_article_like scal WHERE scal.article_id=at.id) AS like_count FROM share_c_article AT LEFT JOIN share_c_user u ON at.user_id=u.id
-        WHERE at.title LIKE '%$keyword%' AND at.status=1 $sortStr limit ".($cur_page-1)*$num .", $num");
-
-        // $list = $query -> limit(($cur_page-1)*$num , $num) -> field("at.*,u.user_name,u.avatar,u.user_nickname") -> select() -> toArray();
-        //增加已点赞状态值
+        WHERE at.title LIKE '%$keyword%' $where AND user_id=$user_id $sortStr limit ".($cur_page-1)*$num .", $num");
 
         if(session("user_info",'','live') != null){
 
@@ -174,6 +220,68 @@ class IndexController extends HomeBaseController{
         return json($data);
     }
 
+    public function getArticle(){
+        $sortType = input("param.sortType");
+        $cur_page = input("param.page") ? input("param.page") : 1;
+        $keyword = input("param.keyword") ? input("param.keyword") : '';
+        $num = 10;
+        
+        if($sortType == 'time'){
+            $sortStr = "ORDER BY DATE DESC";
+        }else if($sortType == 'view'){
+            $sortStr = "ORDER BY view_count DESC";
+        }
+        // $query = Db::name("CArticle") -> alias('at') -> join("CUser u","at.user_id = u.id","LEFT") -> where('at.title','like','%'.$keyword.'%') -> order("date desc");
+
+        $list = Db::query("SELECT at.*,u.user_name,u.avatar,u.user_nickname,(SELECT COUNT(id) FROM share_c_article_comment scac WHERE scac.article_id=at.id) AS comment_count,(SELECT COUNT(*) FROM share_c_article_like scal WHERE scal.article_id=at.id) AS like_count FROM share_c_article AT LEFT JOIN share_c_user u ON at.user_id=u.id
+        WHERE CONCAT_WS('',at.title,u.user_nickname) LIKE '%$keyword%' AND at.status=1 $sortStr limit ".($cur_page-1)*$num .", $num");
+
+        $list_total = Db::query("SELECT at.*,u.user_name,u.avatar,u.user_nickname,(SELECT COUNT(id) FROM share_c_article_comment scac WHERE scac.article_id=at.id) AS comment_count,(SELECT COUNT(*) FROM share_c_article_like scal WHERE scal.article_id=at.id) AS like_count FROM share_c_article AT LEFT JOIN share_c_user u ON at.user_id=u.id
+        WHERE CONCAT_WS('',at.title,u.user_nickname) LIKE '%$keyword%' AND at.status=1 $sortStr");
+
+        // $list = $query -> limit(($cur_page-1)*$num , $num) -> field("at.*,u.user_name,u.avatar,u.user_nickname") -> select() -> toArray();
+        //增加已点赞状态值
+        if(session("user_info",'','live') != null){
+
+            $user_info = session('user_info','','live');
+            $userLikeList = Db::name("CArticleLike") -> where('user_id',$user_info['id']) -> column("article_id");
+
+            foreach($list as $k => $v){
+                $list[$k]['like'] = in_array($v['id'],$userLikeList) ? true : false;
+            }
+            
+        }
+
+        $currentTime = time();
+
+        foreach($list as $k => $v){
+            $list[$k]['avatar_show'] = false;
+
+            $offsetTime = $currentTime - intval($v['date']);
+            
+            if($offsetTime / 60 / 60 / 24 > 1){
+                $list[$k]['offsetTime'] = floor(($offsetTime / 60 / 60 /24)).'天前 '.date("Y-m-d H:i:s",intval($v['date'])).'';
+                continue;
+            }
+
+            if($offsetTime / 60 / 60 > 1){
+                $list[$k]['offsetTime'] = floor(($offsetTime / 60 / 60)).'小时前';
+                continue;
+            }
+
+            if($offsetTime / 60  > 3){
+                $list[$k]['offsetTime'] = floor(($offsetTime / 60)).'分钟前';
+            }else{
+                $list[$k]['offsetTime'] = "刚刚";
+            }
+        }
+
+        $data['list'] = $list;
+        $data['page_size'] =  $num;
+        $data['total'] =  count($list_total);
+        return json($data);
+    }
+
     public function giveLike(){
         if(session("user_info",'','live') != null){
             $data['article_id'] = input("article_id");
@@ -196,7 +304,147 @@ class IndexController extends HomeBaseController{
         }
 
     }
+    public function getLikeListByUserId(){
+        $user_id = getLiveUser()['id'];
+        $cur_page = $this -> request -> param('page',0,'intval');
+        $num = 5;
 
+
+        $query = Db::name("CArticleLike") -> alias('a')
+        -> join('CArticle b','a.article_id=b.id','LEFT')
+         -> join('CUser c','c.id=a.user_id','LEFT')
+         -> where(array('b.user_id'=>$user_id));
+
+        $list = $query -> order("a.id desc")
+         -> field(' a.id,b.id article_id,b.title,b.user_id article_user_id,c.id user_id,c.user_nickname')
+         -> limit(($cur_page-1)*$num,$num)
+         -> select() -> toArray();
+
+        $data['list'] = $list;
+        $data['total'] = $query -> count();
+        $data['page_size'] = $num;
+        return json($data);
+    }
+
+    public function getAvatarInfo(){
+        $user_id = input("user_id");
+        $status = "";
+        if(session("user_info",'','live') != null){
+            $id = getLiveUser()['id'];
+            $status = "(SELECT COUNT(id) FROM share_c_follow scf WHERE scf.user_id=$id and scf.follow_id=$user_id) AS a_status,
+            (SELECT COUNT(id) FROM share_c_follow scf WHERE scf.user_id=$user_id and scf.follow_id=$id) AS b_status,";
+        }
+
+        $list = Db::query("SELECT u.id,u.user_name,u.avatar,u.user_nickname,
+        (SELECT COUNT(id) FROM share_c_follow scf WHERE scf.follow_id=u.id) AS be_follow_count,
+        $status
+        (SELECT COUNT(*) FROM share_c_article sca WHERE sca.user_id=u.id AND sca.status=1) AS article_count
+        FROM share_c_user u
+        WHERE u.id=$user_id");
+
+        return json($list[0]);
+
+    }
+
+    //关注和取消关注
+    public function followUser(){
+        $data['user_id'] = getLiveUser()['id'];
+        $data['follow_id'] = input("id");
+        $data['top'] = 0;
+
+        $count = Db::name('CFollow') -> where($data) -> count();
+
+        if($count == 0){
+            $res = Db::name('CFollow') -> insert($data);
+        }else{
+            return 1003;
+        }
+
+        if($res){
+            return 1001;
+        }else{
+            return 1002; 
+        }
+
+    }
+    public function notFollowUser(){
+        $data['user_id'] = getLiveUser()['id'];
+        $data['follow_id'] = input("id");
+
+
+        $res = Db::name('CFollow') -> where($data) -> delete();
+
+        if($res){
+            return 1001;
+        }else{
+            return 1002; 
+        }
+
+    }
+    public function getFollowListByUserId(){
+        $user_id = getLiveUser()['id'];
+        $keyword = input('keyword');
+        $type = input('type');
+        $cur_page = input('page');
+        $num = 5;
+
+
+        if($type=="myFollow"){
+            $where[] = ['a.user_id','=',$user_id];
+            $where[] = ['c.user_nickname|c.user_name','like',"%$keyword%"];
+        }else{
+            $where[] = ['a.follow_id','=',$user_id];
+            $where[] = ['b.user_nickname|c.user_name','like',"%$keyword%"];
+        }
+
+        $query = Db::name("CFollow") -> alias('a') 
+        -> join('CUser b','b.id=a.user_id','LEFT')
+        -> join('CUser c','c.id=a.follow_id','LEFT')
+        -> where($where);
+
+        $list = $query
+        -> field('a.id,a.top,b.id user_id,b.user_nickname nickname,b.avatar,c.id follow_id,c.user_nickname follow_nickname,c.avatar follow_avatar')
+        -> limit(($cur_page-1)*$num,$num)
+        -> order(['a.top'=>'desc','a.id'=>'desc'])
+        -> select() -> toArray();
+
+        foreach($list as $k => $v){
+            $list[$k]['avatar_show'] = false;
+        }
+
+        $data['count'] = Db::name('CFollow') -> where([['user_id','=',$user_id]]) -> count();
+        $data['followCount'] = Db::name('CFollow') -> where([['follow_id','=',$user_id]]) -> count();
+        $data['list'] = $list;
+        $data['total'] = $query -> count();
+        $data['page_size'] = $num;
+        return json($data);
+
+    }
+    public function topUser(){
+        $data['id'] = input("id");
+        $data['top'] = input("top");
+
+        $res = Db::name('CFollow') -> update($data);
+
+        if($res){
+            return 1001;
+        }else{
+            return 1002; 
+        }
+
+    }
+
+    public function delArticle(){
+        $data['id'] = input("id");
+
+        $res = Db::name('CArticle') ->where($data) -> update(['status' => 2]);
+        
+        if($res){
+            return 1001;
+        }else{
+            return 1002;
+        }
+    }
 
     public function articleDet(){
         $id = $this -> request -> param('id',0,'intval');
@@ -292,6 +540,31 @@ class IndexController extends HomeBaseController{
         }
 
         return json($list);
+    }
+
+    public function getComListByUserId(){
+        $user_id = getLiveUser()['id'];
+        $cur_page = $this -> request -> param('page',0,'intval');
+        $num = 5;
+
+
+        $query = Db::name("CArticle") -> alias('a')
+         -> join('CUser b','a.user_id = b.id','LEFT')
+         -> join('CArticleComment c','a.id=c.article_id','LEFT')
+         -> join('CUser d','d.id=c.user_id','LEFT')
+         -> join('CUser e','e.id=c.fuser_id','LEFT')
+         -> where(array('b.id'=>$user_id));
+
+        $list = $query -> order("c.date desc")
+         -> field('a.id article_id,a.title,a.user_id article_user_id,b.user_nickname article_user,c.date,c.id comment_id,c.comment,c.user_id user_id,d.user_nickname comment_user,e.id fuser_id,e.user_nickname fcomment_user,
+         c.top_id')
+         -> limit(($cur_page-1)*$num,$num)
+         -> select() -> toArray();
+
+        $data['list'] = $list;
+        $data['total'] = $query -> count();
+        $data['page_size'] = $num;
+        return json($data);
     }
 
     public function addViewCount(){
@@ -434,8 +707,4 @@ class IndexController extends HomeBaseController{
             return json($message);
         }
     }
-
-
-   
-    
 }
