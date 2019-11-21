@@ -147,9 +147,12 @@ class AdminBbsController extends AdminBaseController{
      * )
      */
     public function changeStatus(){
-        $id = $this -> request -> param('id',0,'intval');
-        $status = $this -> request -> param('status',0,'intval');
-        $res = Db::name('CArticle') -> where('id',$id) -> update(['status'=>$status]);
+        $data['id'] = $this -> request -> param('id',0,'intval');
+        $data['status'] = $this -> request -> param('status',0,'intval');
+        if($data['status'] == 1){
+            $data['check_time'] = date("Y-m-d h:i:s");
+        }
+        $res = Db::name('CArticle') -> update($data);
 
         if($res > 0){
             return 1001;

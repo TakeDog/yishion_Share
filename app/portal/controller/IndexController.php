@@ -29,6 +29,7 @@ class IndexController extends HomeBaseController
                     $status = true;
                     foreach ($protalOnline as $k => $v) {
                         if($v -> id == $id){
+                            $protalOnline[$k] -> login_id = $login_id;
                             $status = false;
                         }
                     }

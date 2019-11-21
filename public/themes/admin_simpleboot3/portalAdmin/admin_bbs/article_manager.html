@@ -128,8 +128,8 @@
             <el-table-column prop="view_count" label="阅读量" align="center" width="100px"></el-table-column>
             <el-table-column prop="status" label="是否展示" align="center" width="100px">
                 <template slot-scope="scope">
-                    <el-switch class="switchStyle" v-model="scope.row.status" active-color="#67C23A" active-text="是" active-value="1" 
-                inactive-color="#F56C6C" inactive-text="否" inactive-value="0" @change="changeStatus(scope.row,scope.row.id)">
+                    <el-switch class="switchStyle" v-model="scope.row.status" active-color="#67C23A" active-text="是" active-value="1" inactive-color="#F56C6C" inactive-text="否" inactive-value="0" @change="changeStatus(scope.row,scope.row.id)" v-if="scope.row.status!=2"></el-switch>
+                    <el-tag type="info" size="mini" v-if="scope.row.status==2">已删除</el-tag>
                 </template>
             </el-table-column>
             <el-table-column label="操作" align="center" width="290px">

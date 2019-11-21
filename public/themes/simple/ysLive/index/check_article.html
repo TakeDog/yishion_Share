@@ -1,0 +1,193 @@
+<layout name="public@layout_live" />
+<style>
+    [v-cloak]{display: none;}
+    .no-padding-card .el-card__body{padding: 0;}
+    .no-padding-card .el-table__header th,.no-padding-card .el-table__header tr.el-table__row td{text-align: center;padding:5px 0;}
+    .el-table__row td .cell{text-align: center;}
+    .el-table__row td{padding:5px 0;}
+    .main .el-tabs__header{margin:0 0 10px;}
+
+    .fiex-card{width: 135px;position: fixed;top: 26px;left:0;padding: 0 0 0 20px;overflow: visible;z-index: 1000;transition: left .5s;-webkit-transition: left .5s;-moz-transition: left .5s;-o-transition: left .5s;}
+    .fiex-card-left{left:-135px;}
+
+    .sortActive{color:#F5B6A7}
+    .sortActive:focus{color:#F5B6A7}
+    .auth_msg_item{cursor: pointer;}
+    .auth_msg_item:hover{color: #bbb;}
+    .currentRank_Div{margin-top:20px;width:100%;border-top:1px solid #ebeef5;border-bottom:1px solid #ebeef5;}
+    .currentRank_Div .rank_item{display: flex;padding: 5px 0px 5px 7px;}
+    .currentRank_Div .rank_item .cell{flex: 1;text-align: center;}
+    .el-table .current-user{background: oldlace;}
+    .color-blue{color:#409eff !important;}
+    #edui1_iframeholder{height: 245px !important;}
+    .sh{position: absolute;top: 0;right: -32px;background-color: #fff;padding: 10 10px;padding: 5px 10px;cursor: pointer;border-radius: 5px;color: #337A87;box-shadow: 5px 0px 7px rgba(0,0,0,.1);}
+</style>
+
+<div id="app" style="margin-top:20px;" v-cloak>
+    <el-container>
+        <div class="container" style="margin-bottom:20px;min-height: 750px;padding:0 30px;" id="main">
+            <el-container>          
+                <el-main>
+                    <div class="main">
+                        <el-tabs>
+                            <el-tab-pane label="我的帖子" name="first" >
+                                <span slot="label">
+                                    <i class="el-icon-sunny"></i>{$user_nickname}的帖子
+                                </span>
+                            </el-tab-pane>
+
+                            <p style="margin-left:5px;">
+                                <a href="javascript:" :class="{'sortActive':articleSort=='time'}" @click="sortChange('time')">按时间</a> | 
+                                <a href="javascript:" :class="{'sortActive':articleSort=='view'}" @click="sortChange('view')">按热门</a> | 
+                                <a href="javascript:" :class="{'sortActive':articleSort==''}" @click="sortChange('')">按关注</a>
+                            </p>
+
+                            <div class="search-row">
+                                <div class="input-group" style="margin-bottom:10px;">
+                                    <input type="text" class="form-control" placeholder="查找主题" style="height: 43px;" v-model="keyword" @keyup.enter="getArticle(1)">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-light-blue" type="button" style="line-height: 29px;" @click="getArticle(1)">
+                                            <span class="glyphicon glyphicon-search"></span>
+                                            搜索
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="main_wrap">
+                                <ul class="main_list">
+                                    <li class="main-row" v-for="(item,i) in articleList" :key="item.id">
+                                        <div class="avatar">
+                                            <a href="#">
+                                                <img :src="item.avatar ? '/' + item.avatar : '/upload/avatar/default.jpg'" alt="">
+                                            </a>
+                                        </div>
+                                        <div class="list-content">
+                                            <p class="title" style="margin-left:10px;">
+                                                <a :href="'/{$Request.module}/{$Request.controller}/articleDet/id/' + item.id">{{item.title}}</a>
+                                                <!-- <span class="label label-danger" style="padding-top:0.3em;">精</span> -->
+                                            </p>
+                                            <div class="auth_msg">
+                                                <a href="#" style="color:#000;">{{item.user_nickname}}</a>
+                                                <span>{{item.offsetTime}}</span>
+                                                <!-- <span>置顶</span> -->
+                                                <p class="pull-right">
+                                                    <span class="auth_msg_item" :class="{'color-blue':item.like}" ref="zan" @click="giveLike(item.id,i)">
+                                                        <span class="glyphicon glyphicon-thumbs-up"  ></span>&nbsp;{{item.like_count>999?"999+":item.like_count}}
+                                                    </span>
+                                                    &nbsp;&nbsp;
+                                                    <span>
+                                                        <span class="glyphicon glyphicon-eye-open"></span>&nbsp;{{item.view_count>999?"999+":item.view_count}}
+                                                    </span>
+                                                    &nbsp;&nbsp;
+                                                    <span>
+                                                        <span class="glyphicon glyphicon-comment"></span>&nbsp;{{item.comment_count>999?"999+":item.comment_count}}
+                                                    </span>   
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                </ul>
+                                <div class="pagination" v-if="total">
+                                    <el-pagination
+                                        background
+                                        layout="prev, pager, next"
+                                        :page-size="page_size"
+                                        :total="total"
+                                        @current-change="toPage"
+                                        @prev-click="toPage"
+                                        @next-click="toPage">
+                                    </el-pagination>
+                                </div>
+                            </div> 
+                        </el-tabs>
+                    </div>
+                </el-main>
+            </el-container>
+        </div>
+    </el-container>
+</div>
+
+<script>
+
+    var vue = {
+        el:"#app",
+        data:{
+            title:'',
+            name:"yejianfa",
+            age:18,
+            articleList:[],
+            total:0,
+            page_size:0,
+            keyword:'',
+            articleSort: 'time',
+            aside_box:false
+        },
+        mounted () {
+            this.getArticle(1);
+        },
+        methods: {
+            getArticle(page){
+                axios.get("{:url('getArticleByUserId')}",{
+                    params:{
+                        page,
+                        keyword:this.keyword,
+                        sortType: this.articleSort,
+                        user_id: '{$user_id}'
+                    }
+                }).then((res) => {
+                    var data = res.data;
+                    this.articleList = data['list'];
+                    this.total = data['total'];
+                    this.page_size = data['page_size'];
+                })
+            },
+            toPage(page){
+                this.getArticle(page);
+            },
+            sortChange(type){
+                this.articleSort = type;
+                this.getArticle(1);
+            },
+            giveLike(id,i){
+                axios.post("{:url('giveLike')}",{article_id:id}).then((res) => {
+                    if(res.data == 1001){
+                        ++this.articleList[i].like_count;
+                        this.$refs.zan[i].style="color:#409eff;"
+                    }else if(res.data == 1002){
+                        --this.articleList[i].like_count;
+                        this.$refs.zan[i].style="color:#8c8c8c;"
+                    }else if(res.data == 1004){
+                        parent.location.href = "/yslive/index/login";
+                    }
+                });
+            },
+            delArticle(id){
+                
+                this.$confirm('是否删除帖子?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    axios.post("{:url('delArticle')}",{id:id}).then((res) => {
+                        if(res.data == 1001){
+                            this.$message({
+                                message: '删除帖子成功！！！',
+                                type: 'success'
+                            });
+                            this.getArticle(1);
+                        }else{
+                            this.$message.error('删除帖子失败！！！');
+                        }
+                    });
+                }).catch(() => {        
+                });
+            }
+        },
+        watch:{
+            keyword:function(newV,oldV){
+                this.getArticle(1);
+            }
+        }
+    };
+</script>
