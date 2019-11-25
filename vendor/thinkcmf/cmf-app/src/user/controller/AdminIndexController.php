@@ -900,4 +900,42 @@ class AdminIndexController extends AdminBaseController
             $this->error("删除失败");
         }
     }
+
+    /**
+     * 批量操作
+     * @adminMenu(
+     *     'name'   => '批量操作',
+     *     'parent' => 'actionList',
+     *     'display'=> false,
+     *     'hasView'=> false,
+     *     'order'  => 10000,
+     *     'icon'   => '',
+     *     'remark' => '批量操作',
+     *     'param'  => ''
+     * )
+     */
+    public function bulkOperate(){
+        $ids = $this -> request -> param("ids");
+        $opt = $this -> request -> param("opt");
+
+        //opt: 1 - 启用，2-禁用，3-删除
+
+        switch ($opt) {
+            case '1':
+                Db::name("c_user")->where('id','in',$ids) -> setField('user_status', 1);
+                break;
+            case '2':
+                Db::name("c_user")->where('id','in',$ids) -> setField('user_status', 0);
+                $this->success("会员禁用成功！", '','',0);
+                break;
+            case '3':
+                Db::name("CUser")-> where('id','in',$ids) -> delete();
+                $this->success("会员删除成功！", '','',0);
+                break;
+        }
+
+        echo 1;
+
+    }
+
 }

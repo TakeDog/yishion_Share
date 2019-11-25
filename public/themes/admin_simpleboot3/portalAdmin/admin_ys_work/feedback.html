@@ -1,0 +1,145 @@
+<layout name="public@layout" />
+
+<style>
+    .el-upload__input {display: none !important;}
+    .table-striped tr th {width: 100px;}
+    .table-striped>tbody>tr>td {vertical-align: middle;}
+    .el-upload-list {text-align: left;}
+    i.file_edit {cursor: pointer;margin-right: 20px;}
+    i.file_edit:hover {color: #409EFF;}
+    .pagination-box {text-align: center;margin-top: 8px;}
+    /* position: absolute;bottom: 10px;width: 100%; */
+</style>
+
+<div class="container-fluid" id="app">
+    <el-breadcrumb separator-class="el-icon-arrow-right" style="margin:30px;">
+        <el-breadcrumb-item>首页</el-breadcrumb-item>
+        <el-breadcrumb-item>纯工作</el-breadcrumb-item>
+        <el-breadcrumb-item>反馈</el-breadcrumb-item>
+    </el-breadcrumb>
+
+    <a :href="'{:url('exportFB')}?block=' + block" class="btn btn-primary" style="margin-left:30px;">导出Excel</a>
+
+    <el-tabs tab-position="left" style="height: 700px;" v-model="block">
+
+        <el-tab-pane label="关于产品" name="1">
+            <template>
+                <el-table :data="tableData" stripe style="width: 100%">
+                    <el-table-column prop="id" label="ID" width="50">
+                    </el-table-column>
+                    <el-table-column prop="real_name" label="真实名字" width="150">
+                    </el-table-column>
+                    <el-table-column prop="product" label="产品" width="200">
+                    </el-table-column>
+                    <el-table-column prop="question" label="问题" >
+                    </el-table-column>
+                    <el-table-column prop="imgs" label="图片" width="180">
+                    </el-table-column>
+                    <el-table-column prop="create_time" label="日期" width="180">
+                    </el-table-column>
+                </el-table>
+            </template>
+        </el-tab-pane>
+
+        <el-tab-pane label="关于店铺" name="2">
+            <template>
+                <el-table :data="tableData" stripe style="width: 100%">
+                    <el-table-column prop="id" label="ID" width="50">
+                    </el-table-column>
+                    <el-table-column prop="real_name" label="真实名字" width="150">
+                    </el-table-column>
+                    <el-table-column prop="store_num" label="店铺编号" width="100">
+                    </el-table-column>
+                    <el-table-column prop="store_name" label="店铺名称" width="180">
+                    </el-table-column>
+                    <el-table-column prop="need_support" label="需要支持" >
+                    </el-table-column>
+                    <el-table-column prop="feedback" label="反馈">
+                    </el-table-column>
+                    <el-table-column prop="create_time" label="日期" width="180">
+                    </el-table-column>
+                </el-table>
+            </template>
+        </el-tab-pane>
+
+        <el-tab-pane label="关于纯分享" name="3">
+            <template>
+                <el-table :data="tableData" stripe style="width: 100%">
+                    <el-table-column prop="id" label="ID" width="50">
+                    </el-table-column>
+                    <el-table-column prop="real_name" label="真实名字" width="150">
+                    </el-table-column>
+                    <el-table-column prop="suggest" label="意见">
+                    </el-table-column>
+                    <el-table-column prop="bug" label="BUG">
+                    </el-table-column>
+                    <el-table-column prop="date" label="日期" width="180">
+                    </el-table-column>
+                </el-table>
+            </template>
+        </el-tab-pane>
+
+        <el-tab-pane label="其他问题反馈" name="4">
+            <template>
+                <el-table :data="tableData" stripe style="width: 100%">
+                    <el-table-column prop="id" label="ID" width="50">
+                    </el-table-column>
+                    <el-table-column prop="real_name" label="真实名字" width="150">
+                    </el-table-column>
+                    <el-table-column prop="bug" label="问题">
+                    </el-table-column>
+                    <el-table-column prop="date" label="日期" width="180">
+                    </el-table-column>
+                </el-table>
+            </template>
+        </el-tab-pane>
+
+    </el-tabs>
+
+    <!-- <el-row :gutter="10" style="margin-left:100px;">
+        <el-col :span="18">
+            <div class="pagination-box">
+                <el-pagination
+                    background
+                    layout="prev, pager, next"
+                    :total="pagination.total"
+                    :page-size="pagination.page_size"
+                    :current-page="pagination.page"
+                    @current-change="changePage"
+                >
+                </el-pagination>
+            </div>
+        </el-col>
+    </el-row> -->
+
+
+
+</div>
+
+
+<script>
+    var vue = {
+        el: "#app",
+        data: {
+            block: "1",
+            tableData:[]
+        },
+        methods: {
+            getData(){
+                axios.get("{:url('getFeedback')}",{
+                    params:{block:this.block}
+                }).then(res=>{
+                    this.tableData = res.data;
+                })
+            }
+        },
+        mounted () {
+            this.getData();
+        },
+        watch: {
+            "block":function(newV,oldV){
+                this.getData();
+            }
+        }
+    }
+</script>

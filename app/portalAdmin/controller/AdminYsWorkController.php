@@ -4,6 +4,9 @@ use think\Controller;
 use think\Db;
 use cmf\controller\AdminBaseController;
 use app\portal\model\DeptModel;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 /**
 * Class AdminUIController
 * @package app\portalAdmin\controller
@@ -38,6 +41,179 @@ class AdminYsWorkController extends AdminBaseController{
      */
     public function companyInfo(){
         return $this->fetch();
+    }
+
+    /**
+     * 反馈
+     * @adminMenu(
+     *     'name'   => '反馈',
+     *     'parent' => 'default',
+     *     'display'=> true,
+     *     'hasView'=> true,
+     *     'order'  => 1,
+     *     'icon'   => '',
+     *     'remark' => '反馈',
+     *     'param'  => ''
+     * )
+     */
+    public function feedback(){
+        return $this->fetch();
+    }
+
+    /**
+     * 获取反馈记录
+     * @adminMenu(
+     *     'name'   => '获取反馈记录',
+     *     'parent' => 'feedback',
+     *     'display'=> false,
+     *     'hasView'=> false,
+     *     'order'  => 1,
+     *     'icon'   => '',
+     *     'remark' => '获取反馈记录',
+     *     'param'  => ''
+     * )
+     */
+    public function getFeedback(){
+        $block = $this -> request -> param("block",0,"intval");
+        switch ($block) {
+            case 1:
+                $tableData = Db::name("CFeedbackProduct") -> alias('fp') -> join("CUser u","fp.user_id = u.id","LEFT") -> field("fp.*,u.real_name") -> select() -> toArray();
+                break;
+            case 2:
+                $tableData = Db::name("CFeedbackStore") -> alias('fp') -> join("CUser u","fp.user_id = u.id","LEFT") -> field("fp.*,u.real_name") -> select() -> toArray();
+                break;
+            case 3:
+                $tableData = Db::name("CFeedbackWebsite") -> alias('fp') -> join("CUser u","fp.user_id = u.id","LEFT") -> field("fp.*,u.real_name") -> select() -> toArray();
+                break;
+            case 4:
+                $tableData = Db::name("CFeedbackOther") -> alias('fp') -> join("CUser u","fp.user_id = u.id","LEFT") -> field("fp.*,u.real_name") -> select() -> toArray();
+                break;
+        }
+        echo json_encode($tableData);
+    }
+
+    /**
+     * 导出反馈记录
+     * @adminMenu(
+     *     'name'   => '导出反馈记录',
+     *     'parent' => 'feedback',
+     *     'display'=> false,
+     *     'hasView'=> false,
+     *     'order'  => 1,
+     *     'icon'   => '',
+     *     'remark' => '导出反馈记录',
+     *     'param'  => ''
+     * )
+     */
+    public function exportFB(){
+        $block = $this -> request -> param("block",0,"intval");
+
+        $spreadsheet = new Spreadsheet();  //创建一个新的excel文档
+        $objSheet = $spreadsheet->getActiveSheet();  //获取当前操作sheet的对象
+        $objSheet->setTitle('用户数据分析统计表');  //设置当前sheet的标题
+
+        //设置默认字体
+        $spreadsheet->getDefaultStyle()->getFont()->setName('Arial');
+        $spreadsheet->getDefaultStyle()->getFont()->setSize(11);
+        //设置列宽
+        $objSheet->getDefaultColumnDimension()->setWidth(14);
+        $objSheet->getColumnDimension('J')->setWidth(55);
+        //设置行高
+        // $objSheet->getDefaultRowDimension()->setRowHeight(38);
+        //设置垂直居中
+        $spreadsheet->getDefaultStyle()->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $spreadsheet->getDefaultStyle()->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+
+        switch ($block) {
+            case 1:
+                $objSheet->setCellValue('A1', 'ID')
+                 ->setCellValue('B1', '真实名字')
+                 ->setCellValue('C1', '产品')
+                 ->setCellValue('D1', '问题')
+                 ->setCellValue('E1', '日期');
+                 
+                $tableData = Db::name("CFeedbackProduct") -> alias('fp') -> join("CUser u","fp.user_id = u.id","LEFT") -> field("fp.*,u.real_name") -> select() -> toArray();
+
+                $start = 2;
+                foreach($tableData as $k => $v){
+                    $objSheet->setCellValue('A'.$start, $v['id'])
+                    ->setCellValue('B'.$start, $v['real_name'])
+                    ->setCellValue('C'.$start, $v['product'])
+                    ->setCellValue('D'.$start, $v['question'])
+                    ->setCellValue('E'.$start, $v['create_time']);
+                    $start++;
+                }   
+
+                break;
+            case 2:
+                $objSheet->setCellValue('A1', 'ID')
+                 ->setCellValue('B1', '真实名字')
+                 ->setCellValue('C1', '店铺编号')
+                 ->setCellValue('D1', '店铺名称')
+                 ->setCellValue('E1', '需要支持')
+                 ->setCellValue('F1', '反馈')
+                 ->setCellValue('G1', '日期');
+
+                $tableData = Db::name("CFeedbackStore") -> alias('fp') -> join("CUser u","fp.user_id = u.id","LEFT") -> field("fp.*,u.real_name") -> select() -> toArray();
+
+                $start = 2;
+                foreach($tableData as $k => $v){
+                    $objSheet->setCellValue('A'.$start, $v['id'])
+                    ->setCellValue('B'.$start, $v['real_name'])
+                    ->setCellValue('C'.$start, $v['store_num'])
+                    ->setCellValue('D'.$start, $v['store_name'])
+                    ->setCellValue('E'.$start, $v['need_support'])
+                    ->setCellValue('F'.$start, $v['feedback'])
+                    ->setCellValue('G'.$start, $v['create_time']);
+                    $start++;
+                }   
+
+                break;
+            case 3:
+                $objSheet->setCellValue('A1', 'ID')
+                 ->setCellValue('B1', '用户名')
+                 ->setCellValue('C1', '意见')
+                 ->setCellValue('D1', 'bug')
+                 ->setCellValue('E1', '日期');
+                 
+                $tableData = Db::name("CFeedbackWebsite") -> alias('fp') -> join("CUser u","fp.user_id = u.id","LEFT") -> field("fp.*,u.real_name") -> select() -> toArray();
+
+                $start = 2;
+                foreach($tableData as $k => $v){
+                    $objSheet->setCellValue('A'.$start, $v['id'])
+                    ->setCellValue('B'.$start, $v['real_name'])
+                    ->setCellValue('C'.$start, $v['suggest'])
+                    ->setCellValue('D'.$start, $v['bug'])
+                    ->setCellValue('E'.$start, $v['date']);
+                    $start++;
+                }  
+                break;
+            case 4:
+                $objSheet->setCellValue('A1', 'ID')
+                 ->setCellValue('B1', '真实名字')
+                 ->setCellValue('C1', '问题')
+                 ->setCellValue('D1', '日期');
+                 
+                $tableData = Db::name("CFeedbackOther") -> alias('fp') -> join("CUser u","fp.user_id = u.id","LEFT") -> field("fp.*,u.real_name") -> select() -> toArray();
+
+                $start = 2;
+                foreach($tableData as $k => $v){
+                    $objSheet->setCellValue('A'.$start, $v['id'])
+                    ->setCellValue('B'.$start, $v['real_name'])
+                    ->setCellValue('C'.$start, $v['bug'])
+                    ->setCellValue('D'.$start, $v['date']);
+                    $start++;
+                } 
+                break;
+        }
+
+        
+
+        $writer = new Xlsx($spreadsheet);
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename="反馈.xlsx"');
+        header('Cache-Control: max-age=0');
+        $writer->save('php://output');
     }
 
     /**

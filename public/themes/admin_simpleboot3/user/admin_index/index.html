@@ -1,7 +1,13 @@
 <include file="public@header"/>
 </head>
 <body>
+
+
+
 <div class="wrap">
+
+    
+
     <ul class="nav nav-tabs">
         <li class="active"><a>{:lang('USER_INDEXADMIN_INDEX')}</a></li>
     </ul>
@@ -25,6 +31,7 @@
         <input type="submit" class="btn btn-primary" value="搜索"/>
         <a class="btn btn-danger" href="{:url('user/adminIndex/index')}">清空</a>
         <input type="submit" formaction="{:url('exportExcel')}" class="btn btn-success" value="导出Excel"/>
+        <input type="button" class="btn btn-success" data-toggle="modal" data-target="#myModal" value="操作已选中条目"/>
     </form>
     <p>
         <span style="color:#3FAD46;">已启用人数：{$user_count['valid']}</span> &emsp;
@@ -36,6 +43,7 @@
         <table class="table table-hover table-bordered">
             <thead>
             <tr>
+                <th>选择</th>
                 <th>ID</th>
                 <th>{:lang('USERNAME')}</th>
                 <th>{:lang('NICENAME')}</th>
@@ -61,6 +69,9 @@
             </php>
             <foreach name="list" item="vo">
                 <tr>
+                    <td>
+                        <input name="ids" type="checkbox" value="{$vo.id}" />
+                    </td>
                     <td>{$vo.id}</td>
                     <td>{$vo['user_name']?$vo['user_name']:($vo['mobile']?$vo['mobile']:lang('THIRD_PARTY_USER'))}
                     </td>
@@ -142,7 +153,57 @@
             <ul class="pagination" style="text-align: center;">{$page}</ul>
         </div>
     </form>
+
+        <div class="modal fade" tabindex="-1" id="myModal" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">选择操作</h4>
+                </div>
+                <div class="modal-body">
+                    <select class="form-control" name="operate" id="">
+                        <option value="1">启用</option>
+                        <option value="2">禁用</option>
+                        <option value="3">删除</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" id="opt_btn">确定</button>
+                </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
 </div>
 <script src="__STATIC__/js/admin.js"></script>
+<script>
+    $("#opt_btn").on('click',function(){
+
+        var ids = [];//定义一个空数组
+        $("input[name='ids']:checked").each(function(i){ 
+            ids[i] = parseInt($(this).val());
+        });
+        var opt = $("select[name='operate']").val();
+
+        $.ajax({
+            type: "post",
+            url: "{:url('bulkOperate')}",
+            data: {
+                ids:ids.join(','),
+                opt
+            },
+            success: function (res) {
+                var location  = window.location;
+                location.href = location.pathname + location.search;
+            }
+        });
+        
+        $('#myModal').modal('hide');
+
+    })
+
+</script>
 </body>
 </html>
