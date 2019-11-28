@@ -454,10 +454,10 @@ class AdminYsWorkController extends AdminBaseController{
         //$dept_type = $deptMsg['type'];
 
         //$jobs = Db::name("job") -> where(['ogn'=>$firstP,'dept_type'=>$dept_type]) -> select();
-        $jobs = Db::name("job") -> select();
+        //$jobs = Db::name("job") -> select();
         //$jobs = count($jobs) ? $jobs : Db::name("job") -> where(['ogn'=>$firstP]) -> select();
 
-        echo json_encode($jobDb -> jobClassify($jobs));
+        echo json_encode($jobDb -> jobClassify2());
    
     }
 

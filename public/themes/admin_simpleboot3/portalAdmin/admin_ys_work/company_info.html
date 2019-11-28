@@ -146,9 +146,9 @@ ul,li{
                 <span>岗位：</span>
                 <el-select v-model="authJob" placeholder="请选择" collapse-tags multiple :disabled="alljobFlag">
                     <el-option-group
-                        v-for="group in joboptions"
-                        :key="group.dept_type_id"
-                        :label="group.name">
+                        v-for="(group,gk) in joboptions"
+                        :key="gk"
+                        :label="group.ogn_name + ' , ' + group.dept_type">
                         <el-option
                             v-for="item in group.options"
                             :key="item.id"
@@ -208,9 +208,9 @@ ul,li{
                 <el-form-item label="岗位：" v-if="itemInfo.lev == 2">
                         <el-select v-model="authJob" placeholder="请选择" collapse-tags multiple :disabled="alljobFlag">
                             <el-option-group
-                                v-for="group in joboptions"
-                                :key="group.dept_type_id"
-                                :label="group.name">
+                                v-for="(group,gk) in joboptions"
+                                :key="gk"
+                                :label="group.ogn_name + ' , ' + group.dept_type">
                                 <el-option
                                     v-for="item in group.options"
                                     :key="item.id"
@@ -422,6 +422,7 @@ ul,li{
                     
                     axios.get("{:url('getJobOptions')}").then((res)=>{
                         this.joboptions = res.data;
+                        //console.log(this.joboptions);
                         // this.joboptions.unshift({
                         //     dept_type_id:0,
                         //     name: "全部",
