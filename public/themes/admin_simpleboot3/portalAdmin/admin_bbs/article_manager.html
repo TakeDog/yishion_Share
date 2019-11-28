@@ -135,8 +135,11 @@
             <el-table-column label="操作" align="center" width="290px">
                 <template slot-scope="scope">
                     <el-button size="mini" @click="checkArticle(scope.row.id)">查看</el-button>
-                    <el-button type="warning" size="mini">置顶</el-button>
-                    <el-button size="mini" type="danger">删除</el-button>
+                    <el-button type="warning" size="mini" v-if="scope.row.top==0" @click="topArticle(scope.row.id,scope.row.top)" :disabled="scope.row.status==2">置顶</el-button>
+                    <el-button type="warning" size="mini" v-else @click="topArticle(scope.row.id,scope.row.top)" :disabled="scope.row.status==2" plain>已置顶</el-button>
+
+                    <el-button size="mini" type="success" v-if="scope.row.status==2" @click="recoverArticle(scope.row.id)">恢复</el-button>
+                    <el-button size="mini" type="danger" v-else @click="delArticle(scope.row.id)">删除</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -173,6 +176,81 @@
                 axios.post("{:url('AdminBbs/getArtilceById')}",{id:id}).then((res)=>{
                     this.articleModal.visible = true;
                     this.articleModal.data = res.data;
+                });
+            },
+            delArticle(id){
+                this.$confirm('是否删除帖子?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    axios.post("{:url('AdminBbs/delArticleById')}",{id:id}).then((res)=>{
+                        if(res.data == 1001){
+                            this.$message({
+                                message: '删除帖子成功！！！',
+                                type: 'success'
+                            });
+                            this.getAllArticleData();
+                        }else{
+                            this.$message.error('删除帖子失败！！！');
+                        }
+                    });
+                }).catch(() => {   
+                    this.$message.error('删除帖子失败！！！');     
+                });
+
+            },
+            recoverArticle(id){
+                this.$confirm('是否恢复?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    axios.post("{:url('AdminBbs/recoverArticleById')}",{id:id}).then((res)=>{
+                        if(res.data == 1001){
+                            this.$message({
+                                message: '恢复帖子成功！！！',
+                                type: 'success'
+                            });
+                            this.getAllArticleData();
+                        }else{
+                            this.$message.error('恢复帖子失败！！！');
+                        }
+                    });
+                }).catch(() => {   
+                    this.$message.error('恢复帖子失败！！！');     
+                });
+            },
+            topArticle(id,top){
+                let msg = '';
+                let resMsg = '';
+                if(top == 0){
+                    top = 1;
+                    msg = '是否置顶帖子?';
+                    resMsg = '置顶帖子';
+                }else{
+                    top = 0;
+                    msg = '是否取消置顶?';
+                    resMsg = '取消置顶帖子';
+                }
+                this.$confirm(msg, '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    axios.post("{:url('AdminBbs/topArticleById')}",{id:id,top:top}).then((res)=>{
+                        if(res.data == 1001){
+                            this.$message({
+                                message: resMsg+"成功！！！",
+                                type: 'success'
+                            });
+                            this.getAllArticleData();
+                        }else{
+                            this.$message.error(resMsg+"失败！！！");
+                        }
+                    });
+                }).catch(() => {   
+                    this.$message.error(resMsg+"失败！！！");     
                 });
             },
             changeStatus(row,id){
