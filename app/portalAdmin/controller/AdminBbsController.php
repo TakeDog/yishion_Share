@@ -72,10 +72,10 @@ class AdminBbsController extends AdminBaseController{
     public function getAllArticleData(){
         $data = $this -> request -> param();
 
-        $list_total = Db::query("SELECT at.id,at.title,at.view_count,at.status,at.date,u.user_name,u.user_nickname,(SELECT COUNT(id) FROM share_c_article_comment scac WHERE scac.article_id=at.id) AS comment_count FROM share_c_article AT LEFT JOIN share_c_user u ON at.user_id=u.id
+        $list_total = Db::query("SELECT at.id,at.title,at.view_count,at.status,at.date,at.top,u.user_name,u.user_nickname,(SELECT COUNT(id) FROM share_c_article_comment scac WHERE scac.article_id=at.id) AS comment_count FROM share_c_article AT LEFT JOIN share_c_user u ON at.user_id=u.id
         WHERE at.title LIKE '%".$data['title']."%' ORDER BY DATE DESC");
 
-        $list = Db::query("SELECT at.id,at.title,at.view_count,at.status,at.date,u.user_name,u.user_nickname,(SELECT COUNT(id) FROM share_c_article_comment scac WHERE scac.article_id=at.id) AS comment_count FROM share_c_article AT LEFT JOIN share_c_user u ON at.user_id=u.id
+        $list = Db::query("SELECT at.id,at.title,at.view_count,at.status,at.date,at.top,u.user_name,u.user_nickname,(SELECT COUNT(id) FROM share_c_article_comment scac WHERE scac.article_id=at.id) AS comment_count FROM share_c_article AT LEFT JOIN share_c_user u ON at.user_id=u.id
         WHERE at.title LIKE '%".$data['title']."%' ORDER BY DATE DESC limit ".($data['page']-1)*$data['pageSize'] .",".$data['pageSize']);
 
         foreach($list as $k => $v){
@@ -152,6 +152,79 @@ class AdminBbsController extends AdminBaseController{
         if($data['status'] == 1){
             $data['check_time'] = date("Y-m-d h:i:s");
         }
+        $res = Db::name('CArticle') -> update($data);
+
+        if($res > 0){
+            return 1001;
+        }else{
+            return 1002;
+        }
+    }
+
+    /**
+     * 恢复已删除文章
+     * @adminMenu(
+     *     'name'   => '恢复已删除文章',
+     *     'parent' => 'articleManager',
+     *     'display'=> false,
+     *     'hasView'=> false,
+     *     'order'  => 1,
+     *     'icon'   => '',
+     *     'remark' => '恢复已删除文章',
+     *     'param'  => ''
+     * )
+     */
+    public function recoverArticleById(){
+        $data['id'] = $this -> request -> param('id',0,'intval');
+        $data['status'] = 0;
+        $res = Db::name('CArticle') -> update($data);
+
+        if($res > 0){
+            return 1001;
+        }else{
+            return 1002;
+        }
+    }
+    /**
+     * 删除文章
+     * @adminMenu(
+     *     'name'   => '删除文章',
+     *     'parent' => 'articleManager',
+     *     'display'=> false,
+     *     'hasView'=> false,
+     *     'order'  => 1,
+     *     'icon'   => '',
+     *     'remark' => '删除文章',
+     *     'param'  => ''
+     * )
+     */
+    public function delArticleById(){
+        $data['id'] = $this -> request -> param('id',0,'intval');
+        $data['status'] = 2;
+        $res = Db::name('CArticle') -> update($data);
+
+        if($res > 0){
+            return 1001;
+        }else{
+            return 1002;
+        }
+    }
+    /**
+     * 置顶文章
+     * @adminMenu(
+     *     'name'   => '置顶文章',
+     *     'parent' => 'articleManager',
+     *     'display'=> false,
+     *     'hasView'=> false,
+     *     'order'  => 1,
+     *     'icon'   => '',
+     *     'remark' => '置顶文章',
+     *     'param'  => ''
+     * )
+     */
+    public function topArticleById(){
+        $data['id'] = $this -> request -> param('id',0,'intval');
+        $data['top'] = $this -> request -> param('top',0,'intval');
         $res = Db::name('CArticle') -> update($data);
 
         if($res > 0){
