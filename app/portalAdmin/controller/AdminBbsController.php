@@ -149,8 +149,13 @@ class AdminBbsController extends AdminBaseController{
     public function changeStatus(){
         $data['id'] = $this -> request -> param('id',0,'intval');
         $data['status'] = $this -> request -> param('status',0,'intval');
+        $data['check_time'] = date("Y-m-d h:i:s");
+
+        $msgDb = model("CMsg");
         if($data['status'] == 1){
-            $data['check_time'] = date("Y-m-d h:i:s");
+            $msgDb -> saveMsg($data['id'],1);
+        }else{
+            $msgDb -> delMsg($data['id'],1);
         }
         $res = Db::name('CArticle') -> update($data);
 
@@ -175,11 +180,17 @@ class AdminBbsController extends AdminBaseController{
      * )
      */
     public function recoverArticleById(){
+        $msgDb = model("CMsg");
+
         $data['id'] = $this -> request -> param('id',0,'intval');
         $data['status'] = 0;
+        $data['check_time'] = date("Y-m-d h:i:s");
+
         $res = Db::name('CArticle') -> update($data);
 
         if($res > 0){
+            $msgDb -> delMsg($data['id'],1);
+            $msgDb -> delMsg($data['id'],2);
             return 1001;
         }else{
             return 1002;
@@ -199,11 +210,16 @@ class AdminBbsController extends AdminBaseController{
      * )
      */
     public function delArticleById(){
+        $msgDb = model("CMsg");
         $data['id'] = $this -> request -> param('id',0,'intval');
         $data['status'] = 2;
+        $data['check_time'] = date("Y-m-d h:i:s");
+        
         $res = Db::name('CArticle') -> update($data);
 
         if($res > 0){
+            $msgDb -> delMsg($data['id'],1);
+            $msgDb -> saveMsg($data['id'],2);
             return 1001;
         }else{
             return 1002;

@@ -68,7 +68,7 @@
                     <img src="__STATIC__/images/my_msg.jpg" alt="" class="part-img">
                 </p>
                 <div class="list">
-                    <php>$user_info = session('user_info','','portal');</php>
+                    
                     <div style="float: right;">
                         <el-tooltip class="item" effect="dark" content="编辑个人信息" placement="top">
                             <i class="fa fa-pencil-square-o edit_btn" style="font-size: 15px;" aria-hidden="true" @click="infoModal"></i>
@@ -76,9 +76,9 @@
                     </div>
                     <ul>
                         <li><a href="">姓名：{$user_info['user_nickname']}</a></li>
-                        <li><a href="">岗位：{$user_info['jop'] ? $user_info['jop'] : '空'}</a> </li>
-                        <li><a href="">机构：{$user_info['part']}</a> </li>
-                        <li><a href="">店铺：{$user_info['dept']}</a> </li>
+                        <li><a href="">岗位：{$user_info['job'] ? $user_info['job'] : '空'}</a> </li>
+                        <li><a href="">机构：{$user_info['jg']}</a> </li>
+                        <li><a href="">部门：{$user_info['dept']}</a> </li>
                     </ul>
                 </div>
         </el-col>

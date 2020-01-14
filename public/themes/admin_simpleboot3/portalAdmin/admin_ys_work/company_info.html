@@ -663,14 +663,14 @@ ul,li{
                     this.fileList = fileList;
                 },
                 beforeUpload(file) {
-                    let isLt200M = file.size / 1024 / 1024 < 200     //这里做文件大小限制
-                    if(!isLt200M) {
-                        this.$message({
-                            message: '上传文件大小不能超过 200MB!',
-                            type: 'warning'
-                        });
-                        return false;
-                    }
+                    // let isLt200M = file.size / 1024 / 1024 < 200     //这里做文件大小限制
+                    // if(!isLt200M) {
+                    //     this.$message({
+                    //         message: '上传文件大小不能超过 200MB!',
+                    //         type: 'warning'
+                    //     });
+                    //     return false;
+                    // }
                 },
                 // updateDel(item){
                 //     item.del = item.del==0?1:0;

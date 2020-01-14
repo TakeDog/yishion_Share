@@ -28,7 +28,7 @@
     .full-head .el-badge{background-color: #FADAD3;}
     .el-dropdown-menu__item .el-badge{background-color: #FFF;}
     .el-dropdown-menu__item:focus .el-badge,.el-dropdown-menu__item:not(.is-disabled):hover .el-badge{background-color:#ecf5ff;}
-    .el-dropdown-menu__item a{color:#FADAD3 ;}
+    .el-dropdown-menu__item a{color:#000 ;}
     .el-dropdown-menu__item a:hover{color:#66b1ff;text-decoration: none;}
 
     .full-head p, .full-head p>a{color:#000;}
@@ -50,7 +50,50 @@
                         <p>
                             <a href="#" class="navbar-link color-b">帮助</a> |
                             <a href="#" class="navbar-link color-b">在线人数：20</a> | 
-                            <a href="#" class="navbar-link color-b">通知</a> |
+
+                            <el-dropdown placement="bottom" style="top:-1px;"> 
+                                <span class="el-dropdown-link" style="color:#000;">
+                                    消息
+                                    <if condition="isset($news) AND $news['all'] gt 0">
+                                        <el-badge class="mark" value="{$news['all']}"/>
+                                    </if>
+                                </span>
+                                <if condition="isset($news)">
+                                    <el-dropdown-menu slot="dropdown">
+                                        <el-dropdown-item>
+                                            <a href="{:url('passArt')}">已通过</a>
+                                            <if condition="$news['msg_type1'] gt 0">
+                                                <el-badge class="mark" value="{$news['msg_type1']}"/>
+                                            </if>
+                                        </el-dropdown-item>
+                                        <el-dropdown-item>
+                                            <a href="{:url('MsgOpeate',['msg_type'=>2])}">已删除</a>
+                                            <if condition="$news['msg_type2'] gt 0">
+                                                <el-badge class="mark" value="{$news['msg_type2']}"/>
+                                            </if>
+                                        </el-dropdown-item>
+                                        <el-dropdown-item>
+                                            <a href="{:url('MsgOpeate',['msg_type'=>3])}">新评论</a>
+                                            <if condition="$news['msg_type3'] gt 0">
+                                                <el-badge class="mark" value="{$news['msg_type3']}"/>
+                                            </if>
+                                        </el-dropdown-item>
+                                        <el-dropdown-item>
+                                            <a href="{:url('MsgOpeate',['msg_type'=>4])}">新点赞</a>
+                                            <if condition="$news['msg_type4'] gt 0">
+                                                <el-badge class="mark" value="{$news['msg_type4']}"/>
+                                            </if>
+                                        </el-dropdown-item>
+                                        <el-dropdown-item>
+                                            <a href="{:url('MsgFocusOpeate')}">新关注</a>
+                                            <if condition="$news['msg_type5'] gt 0">
+                                                <el-badge class="mark" value="{$news['msg_type5']}"/>
+                                            </if>
+                                        </el-dropdown-item>
+                                    </el-dropdown-menu>
+                                </if>
+                            </el-dropdown> |
+
                             <php>
                                 $user_info = session('user_info','','live');
                             </php>
@@ -81,7 +124,7 @@
                                 <span class="icon-bar"></span>
                                 <span class="icon-bar"></span>
                             </button>
-                            <a class="navbar-brand" href="{:url('staff_index2')}">
+                            <a class="navbar-brand" href="{:url('home')}">
                                 <img alt="Brand" src="__STATIC__/images/logo.png" width="100px">
                             </a>
                         </div>
@@ -130,10 +173,10 @@
     var vm = new Vue({
         el: "#app",
         data: {
-
+            
         },
         methods: {
-        
+            
         },
     });
 </script>

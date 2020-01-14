@@ -1,10 +1,41 @@
 <layout name="public@layout" />
 <style>
-
+    [v-cloak]{display: none;}
+    .feedForm{
+        width: 50%;
+        margin: 2% auto 20% auto;
+    }
 </style>
 
 <div id="app" class="container" style="min-height: 635px;">
-    <form action="{:url('Feedback/otherHandle')}" method="POST">
+
+    <el-form class="feedForm" :rules="rules" ref="form" :model="form" label-width="90px" size="small">
+        <el-form-item label="分公司" prop="com_part">
+            <el-input v-model="form.com_part" placeholder="请输入所属分公司"></el-input>
+        </el-form-item>
+
+        <el-form-item label="所属客户" prop="client">
+            <el-input v-model="form.client" placeholder="请输入所属客户"></el-input>
+        </el-form-item>
+        <el-form-item label="店铺编号" prop="shop_num">
+            <el-input v-model="form.shop_num" placeholder="请输入店铺编号"></el-input>
+        </el-form-item>
+        <el-form-item label="客户主任" prop="director">
+            <el-input v-model="form.director" placeholder="请输入客户主任"></el-input>
+        </el-form-item>
+
+        <el-form-item label="其他反馈：">
+            <el-input type="textarea" v-model="form.bug" :rows="6" resize="none"></el-input>
+        </el-form-item>
+
+        <el-form-item>
+            <el-button type="primary" @click="onSubmit('form')">确认提交</el-button>
+        </el-form-item>
+
+    </el-form>
+
+
+    <!-- <form action="{:url('Feedback/otherHandle')}" method="POST">
         <el-row>
             <el-col :span="24">
                 <p>其他问题反馈：</p>
@@ -16,11 +47,61 @@
             <button type="submit" class="btn btn-primary">确认提交</button>
         </p>
         
-    </form>
+    </form> -->
 </div>
 
 <script>
     var vue = {
-        el:"#app"
+        el:"#app",
+        data:{
+            form:{
+                com_part:'',
+                client:'',
+                shop_num:'',
+                director:'',
+                bug:''
+            },
+            rules: {
+                com_part: [
+                    { required: true,message: '请输入分公司名称',trigger: 'blur'}
+                ],
+                client: [
+                    { required: true,message: '请输入所属客户',trigger: 'blur'}
+                ],
+                shop_num: [
+                    { required: true,message: '请填写店铺编号',trigger: 'blur'}
+                ],
+                director: [
+                    { required: true,message: '请填写客户主任',trigger: 'blur'}
+                ],
+                bug: [
+                    { required: true,message: '请填写反馈',trigger: 'blur'}
+                ]
+            }
+        },
+        methods: {
+            onSubmit:function(formName){
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        axios.post("{:url('otherHandle')}",this.form).then((res)=>{
+                            if(res.data.status == 1001){
+                                this.$message({
+                                    message: res.data.msg,
+                                    type: 'success'
+                                });
+                                this.$refs[formName].resetFields();
+                            }else{
+                                this.$message({
+                                    message: res.data.msg,
+                                    type: 'error'
+                                });
+                            }
+                        });
+                    } else {
+                        return false;
+                    }
+                });
+            }
+        },
     }
 </script>

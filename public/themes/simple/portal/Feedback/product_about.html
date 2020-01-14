@@ -31,6 +31,18 @@
         <img width="100%" :src="dialogImageUrl" alt="">
     </el-dialog>
     <el-form class="feedForm" :rules="rules" ref="form" :model="form" label-width="80px" size="small">
+        <el-form-item label="分公司" prop="com_part">
+            <el-input v-model="form.com_part" placeholder="请输入所属分公司"></el-input>
+        </el-form-item>
+        <el-form-item label="所属客户" prop="client">
+            <el-input v-model="form.client" placeholder="请输入所属客户"></el-input>
+        </el-form-item>
+        <el-form-item label="店铺编号" prop="shop_num">
+            <el-input v-model="form.shop_num" placeholder="请输入店铺编号"></el-input>
+        </el-form-item>
+        <el-form-item label="客户主任" prop="director">
+            <el-input v-model="form.director" placeholder="请输入客户主任"></el-input>
+        </el-form-item>
         <el-form-item label="产品" prop="product">
             <el-input v-model="form.product" placeholder="请输入产品名称"></el-input>
         </el-form-item>
@@ -57,6 +69,10 @@
             form:{
                 product: '',
                 question: '',
+                com_part:'',
+                client:'',
+                shop_num:'',
+                director:'',
                 fileList: []
             },
             rules: {
@@ -65,6 +81,18 @@
                 ],
                 question: [
                     { required: true,message: '请选择问题',trigger: 'blur'}
+                ],
+                com_part: [
+                    { required: true,message: '请输入分公司名称',trigger: 'blur'}
+                ],
+                client: [
+                    { required: true,message: '请输入所属客户',trigger: 'blur'}
+                ],
+                shop_num: [
+                    { required: true,message: '请输入店铺编号',trigger: 'blur'}
+                ],
+                director: [
+                    { required: true,message: '请填写客户主任',trigger: 'blur'}
                 ]
             }
         },
@@ -107,6 +135,12 @@
                         formData.append("fileLength",this.form.fileList.length);
                         formData.append("product",this.form.product);
                         formData.append("question",this.form.question);
+
+                        formData.append("com_part",this.form.com_part);
+                        formData.append("client",this.form.client);
+                        formData.append("shop_num",this.form.shop_num);
+                        formData.append("director",this.form.director);
+
                         axios.post("{:url('submitProductForm')}",formData,{ headers: {"Content-Type": "multipart/form-data"}}).then((res)=>{
                             if(res.data.status === 1001){
                                 this.$message({
@@ -117,6 +151,11 @@
                                 this.form.fileList = [];
                                 this.form.product = '';
                                 this.form.question = '';
+                                this.form.com_part = '';
+                                this.form.client = '';
+                                this.form.shop_num = '';
+                                this.form.director = '';
+
                             }else{
                                 this.$message({
                                     message: res.data.msg,

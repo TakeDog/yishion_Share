@@ -7,11 +7,30 @@ use cmf\controller\HomeBaseController;
 use app\common\Category;
 use app\common\OperateConfig;
 use app\portal\model\CUserModel;
+use app\portalAdmin\model\CMsgModel;
 
 class IndexController extends HomeBaseController{
 
     public function index(){
+        
+        if(session('?user_info','','live')){
+            $msgDb = new CMsgModel();
+            $user_info = session('user_info','','live');
+            $news = $msgDb -> getNews($user_info['id']);
+            $this -> assign('news',$news);
+        }
+
         return $this->fetch();
+    }
+
+    //通知处理
+    public function MsgOpeate(){
+        $msg_type = $this -> request -> param('msg_type','','intval');
+        
+    }
+
+    public function MsgFocusOpeate(){
+
     }
 
     //以纯动态静态页：
@@ -283,19 +302,28 @@ class IndexController extends HomeBaseController{
     }
 
     public function giveLike(){
+        $msgDb = new CMsgModel();
+
         if(session("user_info",'','live') != null){
             $data['article_id'] = input("article_id");
             $data['user_id'] = getLiveUser()['id'];
-
+           
             $likeCount = Db::name('CArticleLike') ->where($data) -> count();
 
             if($likeCount > 0){
                 Db::name('CArticleLike') ->where($data) -> delete();
 
+                $info = Db::name('CArticle')  -> field('id,user_id') -> find($data['article_id']);
+                $user_id = $info['user_id'];
+
+                $ids = $msgDb -> where(['user_id'=>$user_id,'article_id'=>$data['article_id'],'msg_type'=>4]) -> column('id');
+                $rs = $msgDb -> where('id',$ids[0]) -> delete();
+
                 return 1002;
             }else{
+                $data['date'] = date("Y-m-d H:i:s");
                 Db::name('CArticleLike') -> insert($data);
-
+                $msgDb -> saveMsg($data['article_id'],4);
                 return 1001;
             }
 
@@ -361,6 +389,10 @@ class IndexController extends HomeBaseController{
         }
 
         if($res){
+            $existMsg = Db::name('CFocusMsg') -> where(['user_id'=>$data['follow_id'],'action_user_id'=>$data['user_id']]) -> count();
+            if(!$existMsg){
+                Db::name('CFocusMsg') -> insert(['user_id'=>$data['follow_id'],'action_user_id'=>$data['user_id']]);
+            }
             return 1001;
         }else{
             return 1002; 
@@ -373,6 +405,11 @@ class IndexController extends HomeBaseController{
 
 
         $res = Db::name('CFollow') -> where($data) -> delete();
+
+        $existMsg = Db::name('CFocusMsg') -> where(['user_id'=>$data['user_id'],'follow_id'=>$data['follow_id']]) -> count();
+        if($existMsg){
+            Db::name('CFocusMsg') -> where(['user_id'=>$data['user_id'],'follow_id'=>$data['follow_id']]) -> delete();
+        }
 
         if($res){
             return 1001;
@@ -475,6 +512,7 @@ class IndexController extends HomeBaseController{
     }
 
     public function addComment(){
+        $msgDb = new CMsgModel();
         $data = $this -> request -> param();
         $data['date'] = date("Y-m-d H:i:s");
         $data['user_id'] = getLiveUser()['id'];
@@ -488,6 +526,7 @@ class IndexController extends HomeBaseController{
         $insert = Db::name("CArticleComment") -> insert($data);
 
         if($insert){
+            $msgDb -> saveMsg($data['article_id'],3);
             $error['error'] = 1000;
             $error['msg'] = "评论成功";
             return json($error);
@@ -706,5 +745,27 @@ class IndexController extends HomeBaseController{
             $message['status'] = 1002;
             return json($message);
         }
+    }
+    //已通过
+    public function passArt(){
+        return $this -> fetch();
+    }
+
+    //已删除
+    public function deledArt(){
+        return $this -> fetch();
+    }
+
+    //新评论
+    public function newComment(){
+        return $this -> fetch();
+    }
+    //新点赞
+    public function newLike(){
+        return $this -> fetch();
+    }
+    //新关注
+    public function newFollow(){
+        return $this -> fetch();
     }
 }

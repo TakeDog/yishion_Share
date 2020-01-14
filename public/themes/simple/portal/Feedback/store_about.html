@@ -9,6 +9,17 @@
 
 <div class="container" id="app" v-cloak>
     <el-form class="feedForm" :rules="rules" ref="form" :model="form" label-width="90px" size="small">
+
+        <el-form-item label="分公司" prop="com_part">
+            <el-input v-model="form.com_part" placeholder="请输入所属分公司"></el-input>
+        </el-form-item>
+        <el-form-item label="所属客户" prop="client">
+            <el-input v-model="form.client" placeholder="请输入所属客户"></el-input>
+        </el-form-item>
+        <el-form-item label="客户主任" prop="director">
+            <el-input v-model="form.director" placeholder="请输入客户主任"></el-input>
+        </el-form-item>
+
         <el-form-item label="店铺编号" prop="store_num">
             <el-input v-model="form.store_num" placeholder="请输入店铺编号"></el-input>
         </el-form-item>
@@ -32,6 +43,9 @@
         el:"#app",
         data:{
             form:{
+                com_part:'',
+                client:'',
+                director:'',
                 store_num: '',
                 store_name: '',
                 need_support: '',
@@ -49,6 +63,15 @@
                 ],
                 feedback: [
                     {max: 255, message: '长度在 255 个字符内', trigger: 'blur' }
+                ],
+                com_part: [
+                    { required: true,message: '请输入分公司名称',trigger: 'blur'}
+                ],
+                client: [
+                    { required: true,message: '请输入所属客户',trigger: 'blur'}
+                ],
+                director: [
+                    { required: true,message: '请填写客户主任',trigger: 'blur'}
                 ]
             }
         },

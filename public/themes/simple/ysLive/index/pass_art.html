@@ -1,0 +1,104 @@
+<layout name="public@layout_live" />
+<style>
+    .article_wrap{background-color: #fff;padding:15px 20px;margin-bottom: 10px;font-size: 16px;}
+    .article_wrap p{margin-bottom: 0;}
+    .article_wrap .auth_avator{height:30px;margin:12px 0;font-size:14px;font-weight:900;}
+    .article_wrap .auth_avator img{width:30px;height:30px;object-fit:cover;}
+    .article_wrap .article_msg{display:flex;justify-content:space-between;color:#94979e;font-size:10px;margin-top:10px;}
+    /* 评论，分页 */
+    .comment_wrap{background-color: #fff;}
+    .comment_list{padding:0;list-style: none;}
+    .comment_list.flist{margin: 0 0 0 4%;zoom: .8;}
+    .avatar{float: left;}
+    .avatar>a>img{float: left;width:50px;height: 50px;border-radius: 50%;object-fit:cover;}
+    .title > a{font-size:16px;color:#333;}
+    .title > a:hover{color:#337ab7;}
+    .auth_msg{color:#000;overflow: hidden;margin-left: 10px;font-size:12px;}
+    .auth_msg a:hover{color:#337ab7;}
+    .comment_oper{visibility:hidden;text-align:right;}
+    .comment_item:hover>.comment_oper{visibility:visible;}
+    .comment_reply{margin: 0 10px 20px 50px;}
+    .comment-row{overflow: hidden;margin-bottom:10px;border-bottom:1px solid #e6e6e6;}
+    .comment-row.fRow{border-top:1px solid #e6e6e6;border-bottom:0px;padding-top:10px;margin-bottom:0px;}
+    .pagination{width:100%;text-align: center;}
+    
+    .comment .el-tabs__content{padding:0 20px;}
+    .comment .el-tabs__header{padding:5px 20px;margin:0;}
+    .comment .el-tabs{background-color: #fff;border: 1px solid #d2d2d2;margin-bottom:20px;}
+    .comment .el-tabs__item{font-size:16px;font-weight: bold;}
+    .el-dialog{overflow-y: scroll !important;height: 92% !important;}
+    .auth_msg_item{cursor: pointer;}
+    .auth_msg_item:hover{color: #bbb;}
+    
+    img{max-width: 100%;}
+</style>
+<div class="container" id="app" style="min-height: 650px;">
+    <br><br><br>
+    <div class="comment">
+        <el-tabs >
+            <el-tab-pane label="已通过文章" name="first">
+                <span slot="label"><i class="el-icon-sunny"></i> 已通过文章</span>
+            </el-tab-pane>
+
+            <div class="comment_wrap">
+                <ul class="comment_list">
+                    <li class="comment-row" >
+                        <div class="comment_item">
+                            <!-- <div class="avatar">
+                                <a href="#">
+                                    <img :src="item.avatar ? '/' + item.avatar : '/upload/avatar/default.jpg'" alt="">
+                                </a>
+                            </div> -->
+                            <div class="comment_content">
+                                <p class="title" style="margin:0 0 5px 10px;line-height: 35px;" >
+                                    <spa>您发表的文章</spa>
+                                    <a href="#" class="font-c-blue font14">嘿嘿嘿</a>&nbsp; 于 
+                                    <span style="font-size: 14px;color:#67c23a;">2019-11-29 15:34:21</span>
+                                    通过审核
+                                </p>
+                                <!-- <div class="auth_msg" style="font-size: 16px;margin-bottom:10px;">
+                                    <span>{{item.comment}}</span>
+                                </div> -->
+                            </div> 
+                        </div>
+                       
+                    </li>
+
+                    <li class="comment-row" >
+                        <div class="comment_item">
+                            <!-- <div class="avatar">
+                                <a href="#">
+                                    <img :src="item.avatar ? '/' + item.avatar : '/upload/avatar/default.jpg'" alt="">
+                                </a>
+                            </div> -->
+                            <div class="comment_content">
+                                <p class="title" style="margin:0 0 5px 10px;line-height: 35px;" >
+                                    <spa>您发表的文章</spa>
+                                    <a href="#" class="font-c-blue font14">MMP</a>&nbsp; 于 
+                                    <span style="font-size: 14px;color:#67c23a;">2019-11-29 15:34:21</span>
+                                    通过审核
+                                </p>
+                                <!-- <div class="auth_msg" style="font-size: 16px;margin-bottom:10px;">
+                                    <span>{{item.comment}}</span>
+                                </div> -->
+                            </div> 
+                        </div>
+                        
+                    </li>
+                </ul>
+                
+            </div> 
+        </el-tabs>
+    </div>
+</div>
+<script>
+    var vue = {
+        el:"#app",
+        data:{
+           
+        },
+        methods: {
+        }
+       
+    }
+</script>

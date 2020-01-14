@@ -6,11 +6,22 @@ use think\Db;
 use cmf\controller\HomeBaseController;
 use app\common\Category;
 use app\common\OperateConfig;
+use app\portalAdmin\model\DeptModel;
 
 class FeedbackController extends HomeBaseController{
 
    public function index(){
-    
+        $user = session('user_info','','portal');
+
+        $user_info = Db::name("CUser") -> alias('u') -> join('share_dept d','u.dept_id=d.id','LEFT') -> join('share_job j','u.job_id=j.id','LEFT') -> where('u.id',$user['id']) -> field('u.*,d.name as dept,j.job as job') -> find();
+
+        $deptDb = new DeptModel();
+        $deptP = $deptDb->getFirstAllP($user_info['dept_id']);
+
+        unset($user_info['pwd']);
+        
+        $user_info['jg'] = $deptP['name'];
+        $this -> assign('user_info',$user_info);
         return $this -> fetch();
    }
 
@@ -21,21 +32,27 @@ class FeedbackController extends HomeBaseController{
    public function websiteHandle(){
        $form = $this -> request -> param();
 
-       if(!$form['bug'] && !$form['suggest']){
-            $this -> success('反馈成功，正在为您返回','Feedback/index');
-            exit;
-       }
+    //    if(!$form['bug'] && !$form['suggest']){
+    //         $this -> success('反馈成功，正在为您返回','Feedback/index');
+    //         exit;
+    //    }
 
        $user_info = session('user_info','','portal');
 
+
        $form['user_id'] = $user_info['id'];
        $form['date'] = date("Y-m-d H:i:s");
+
        $inserId = Db::name("CFeedbackWebsite") -> insert($form);
 
        if($inserId){
-            $this -> success('反馈成功，正在为您返回','Feedback/index');
+            $res['status'] = 1001;
+            $res['msg'] = "反馈成功。";
+            return json($res);
        }else{
-            $this->error('反馈失败，正在为您返回');
+            $res['status'] = 1002;
+            $res['msg'] = "反馈失败。";
+            return json($res);
        }
     }
    /**其他问题反馈 */
@@ -47,10 +64,10 @@ class FeedbackController extends HomeBaseController{
 
         $form = $this -> request -> param();
 
-       if(!$form['bug']){
-            $this -> success('反馈成功，正在为您返回','Feedback/index');
-            exit;
-       }
+    //    if(!$form['bug']){
+    //         $this -> success('反馈成功，正在为您返回','Feedback/index');
+    //         exit;
+    //    }
 
        $user_info = session('user_info','','portal');
 
@@ -59,9 +76,13 @@ class FeedbackController extends HomeBaseController{
        $inserId = Db::name("CFeedbackOther") -> insert($form);
 
        if($inserId){
-            $this -> success('反馈成功，正在为您返回','Feedback/index');
+            $res['status'] = 1001;
+            $res['msg'] = "反馈成功。";
+            return json($res);
        }else{
-            $this->error('反馈失败，正在为您返回');
+            $res['status'] = 1002;
+            $res['msg'] = "反馈失败。";
+            return json($res);
        }
    }
     public function productAbout(){
@@ -75,6 +96,12 @@ class FeedbackController extends HomeBaseController{
     public function submitProductForm(){
         $user_info = session('user_info','','portal');
         $files = $this -> request -> file("files")?$this -> request -> file("files"):[];
+
+        $data['com_part'] = $this -> request -> param("com_part");
+        $data['client'] = $this -> request -> param("client");
+        $data['shop_num'] = $this -> request -> param("shop_num");
+        $data['director'] = $this -> request -> param("director");
+
         $data['product'] = $this -> request -> param("product");
         $data['question'] = $this -> request -> param("question");
         $data['user_id'] = $user_info['id'];
@@ -102,6 +129,10 @@ class FeedbackController extends HomeBaseController{
 
     public function submitStoreForm(){
         $user_info = session('user_info','','portal');
+
+        $data['com_part'] = $this -> request -> param("com_part");
+        $data['client'] = $this -> request -> param("client");
+        $data['director'] = $this -> request -> param("director");
         $data['store_num'] = $this -> request -> param("store_num");
         $data['store_name'] = $this -> request -> param("store_name");
         $data['need_support'] = $this -> request -> param("need_support");

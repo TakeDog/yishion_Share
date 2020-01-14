@@ -77,16 +77,16 @@ class AdminYsWorkController extends AdminBaseController{
         $block = $this -> request -> param("block",0,"intval");
         switch ($block) {
             case 1:
-                $tableData = Db::name("CFeedbackProduct") -> alias('fp') -> join("CUser u","fp.user_id = u.id","LEFT") -> field("fp.*,u.real_name") -> select() -> toArray();
+                $tableData = Db::name("CFeedbackProduct") -> alias('fp') -> join("CUser u","fp.user_id = u.id","LEFT") -> join("Dept d","u.dept_id=d.id") -> field("fp.*,u.real_name,d.name as dept_name") -> select() -> toArray();
                 break;
             case 2:
-                $tableData = Db::name("CFeedbackStore") -> alias('fp') -> join("CUser u","fp.user_id = u.id","LEFT") -> field("fp.*,u.real_name") -> select() -> toArray();
+                $tableData = Db::name("CFeedbackStore") -> alias('fp') -> join("CUser u","fp.user_id = u.id","LEFT") -> join("Dept d","u.dept_id=d.id") -> field("fp.*,u.real_name,d.name as dept_name") -> select() -> toArray();
                 break;
             case 3:
-                $tableData = Db::name("CFeedbackWebsite") -> alias('fp') -> join("CUser u","fp.user_id = u.id","LEFT") -> field("fp.*,u.real_name") -> select() -> toArray();
+                $tableData = Db::name("CFeedbackWebsite") -> alias('fp') -> join("CUser u","fp.user_id = u.id","LEFT") -> join("Dept d","u.dept_id=d.id") -> field("fp.*,u.real_name,d.name as dept_name") -> select() -> toArray();
                 break;
             case 4:
-                $tableData = Db::name("CFeedbackOther") -> alias('fp') -> join("CUser u","fp.user_id = u.id","LEFT") -> field("fp.*,u.real_name") -> select() -> toArray();
+                $tableData = Db::name("CFeedbackOther") -> alias('fp') -> join("CUser u","fp.user_id = u.id","LEFT") -> join("Dept d","u.dept_id=d.id") -> field("fp.*,u.real_name,d.name as dept_name") -> select() -> toArray();
                 break;
         }
         echo json_encode($tableData);
@@ -130,9 +130,14 @@ class AdminYsWorkController extends AdminBaseController{
                  ->setCellValue('B1', '真实名字')
                  ->setCellValue('C1', '产品')
                  ->setCellValue('D1', '问题')
-                 ->setCellValue('E1', '日期');
+                 ->setCellValue('E1', '日期')
+                 ->setCellValue('F1', '分公司')
+                 ->setCellValue('G1', '所属客户')
+                 ->setCellValue('H1', '店铺编号')
+                 ->setCellValue('I1', '客户主任')
+                 ->setCellValue('J1', '部门');
                  
-                $tableData = Db::name("CFeedbackProduct") -> alias('fp') -> join("CUser u","fp.user_id = u.id","LEFT") -> field("fp.*,u.real_name") -> select() -> toArray();
+                $tableData = Db::name("CFeedbackProduct") -> alias('fp') -> join("CUser u","fp.user_id = u.id","LEFT") -> join("Dept d","u.dept_id=d.id") -> field("fp.*,u.real_name,d.name as dept_name") -> select() -> toArray();
 
                 $start = 2;
                 foreach($tableData as $k => $v){
@@ -140,7 +145,13 @@ class AdminYsWorkController extends AdminBaseController{
                     ->setCellValue('B'.$start, $v['real_name'])
                     ->setCellValue('C'.$start, $v['product'])
                     ->setCellValue('D'.$start, $v['question'])
-                    ->setCellValue('E'.$start, $v['create_time']);
+                    ->setCellValue('E'.$start, $v['create_time'])
+                    ->setCellValue('F'.$start, $v['com_part'])
+                    ->setCellValue('G'.$start, $v['client'])
+                    ->setCellValue('H'.$start, $v['shop_num'])
+                    ->setCellValue('I'.$start, $v['director'])
+                    ->setCellValue('J'.$start, $v['dept_name']);
+
                     $start++;
                 }   
 
@@ -152,9 +163,13 @@ class AdminYsWorkController extends AdminBaseController{
                  ->setCellValue('D1', '店铺名称')
                  ->setCellValue('E1', '需要支持')
                  ->setCellValue('F1', '反馈')
-                 ->setCellValue('G1', '日期');
+                 ->setCellValue('G1', '日期')
+                 ->setCellValue('H1', '所属客户')
+                 ->setCellValue('I1', '客户主任')
+                 ->setCellValue('J1', '部门')
+                 ->setCellValue('K1', '分公司');
 
-                $tableData = Db::name("CFeedbackStore") -> alias('fp') -> join("CUser u","fp.user_id = u.id","LEFT") -> field("fp.*,u.real_name") -> select() -> toArray();
+                $tableData = Db::name("CFeedbackStore") -> alias('fp') -> join("CUser u","fp.user_id = u.id","LEFT") -> join("Dept d","u.dept_id=d.id") -> field("fp.*,u.real_name,d.name as dept_name") -> select() -> toArray();
 
                 $start = 2;
                 foreach($tableData as $k => $v){
@@ -164,7 +179,11 @@ class AdminYsWorkController extends AdminBaseController{
                     ->setCellValue('D'.$start, $v['store_name'])
                     ->setCellValue('E'.$start, $v['need_support'])
                     ->setCellValue('F'.$start, $v['feedback'])
-                    ->setCellValue('G'.$start, $v['create_time']);
+                    ->setCellValue('G'.$start, $v['create_time'])
+                    ->setCellValue('H'.$start, $v['client'])
+                    ->setCellValue('I'.$start, $v['director'])
+                    ->setCellValue('J'.$start, $v['dept_name'])
+                    ->setCellValue('K'.$start, $v['com_part']);
                     $start++;
                 }   
 
@@ -174,9 +193,14 @@ class AdminYsWorkController extends AdminBaseController{
                  ->setCellValue('B1', '用户名')
                  ->setCellValue('C1', '意见')
                  ->setCellValue('D1', 'bug')
-                 ->setCellValue('E1', '日期');
+                 ->setCellValue('E1', '日期')
+                 ->setCellValue('F1', '分公司')
+                 ->setCellValue('G1', '店铺编号')
+                 ->setCellValue('H1', '所属客户')
+                 ->setCellValue('I1', '客户主任')
+                 ->setCellValue('J1', '部门');
                  
-                $tableData = Db::name("CFeedbackWebsite") -> alias('fp') -> join("CUser u","fp.user_id = u.id","LEFT") -> field("fp.*,u.real_name") -> select() -> toArray();
+                $tableData = Db::name("CFeedbackWebsite") -> alias('fp') -> join("CUser u","fp.user_id = u.id","LEFT") -> join("Dept d","u.dept_id=d.id") -> field("fp.*,u.real_name,d.name as dept_name") -> select() -> toArray();
 
                 $start = 2;
                 foreach($tableData as $k => $v){
@@ -184,7 +208,12 @@ class AdminYsWorkController extends AdminBaseController{
                     ->setCellValue('B'.$start, $v['real_name'])
                     ->setCellValue('C'.$start, $v['suggest'])
                     ->setCellValue('D'.$start, $v['bug'])
-                    ->setCellValue('E'.$start, $v['date']);
+                    ->setCellValue('E'.$start, $v['date'])
+                    ->setCellValue('F'.$start, $v['com_part'])
+                    ->setCellValue('G'.$start, $v['shop_num'])
+                    ->setCellValue('H'.$start, $v['client'])
+                    ->setCellValue('I'.$start, $v['director'])
+                    ->setCellValue('J'.$start, $v['dept_name']);
                     $start++;
                 }  
                 break;
@@ -192,16 +221,26 @@ class AdminYsWorkController extends AdminBaseController{
                 $objSheet->setCellValue('A1', 'ID')
                  ->setCellValue('B1', '真实名字')
                  ->setCellValue('C1', '问题')
-                 ->setCellValue('D1', '日期');
+                 ->setCellValue('D1', '日期')
+                 ->setCellValue('E1', '分公司')
+                 ->setCellValue('F1', '店铺编号')
+                 ->setCellValue('G1', '所属客户')
+                 ->setCellValue('H1', '客户主任')
+                 ->setCellValue('I1', '部门');
                  
-                $tableData = Db::name("CFeedbackOther") -> alias('fp') -> join("CUser u","fp.user_id = u.id","LEFT") -> field("fp.*,u.real_name") -> select() -> toArray();
+                $tableData = Db::name("CFeedbackOther") -> alias('fp') -> join("CUser u","fp.user_id = u.id","LEFT") -> join("Dept d","u.dept_id=d.id") -> field("fp.*,u.real_name,d.name as dept_name") -> select() -> toArray();
 
                 $start = 2;
                 foreach($tableData as $k => $v){
                     $objSheet->setCellValue('A'.$start, $v['id'])
                     ->setCellValue('B'.$start, $v['real_name'])
                     ->setCellValue('C'.$start, $v['bug'])
-                    ->setCellValue('D'.$start, $v['date']);
+                    ->setCellValue('D'.$start, $v['date'])
+                    ->setCellValue('E'.$start, $v['com_part'])
+                    ->setCellValue('F'.$start, $v['shop_num'])
+                    ->setCellValue('G'.$start, $v['client'])
+                    ->setCellValue('H'.$start, $v['director'])
+                    ->setCellValue('I'.$start, $v['dept_name']);
                     $start++;
                 } 
                 break;
@@ -599,12 +638,17 @@ class AdminYsWorkController extends AdminBaseController{
         $file = $this -> request -> file("file");
         $old_dir = $this -> request -> param("old_file");
 
+
+        // var_dump($old_dir);
+        // exit;
+
         $dirArr = explode('/',$root.$old_dir);
         unset($dirArr[count($dirArr)-1 ]);
         $dir = implode('/',$dirArr);
         $in = $file -> getInfo();
 
         unlink(iconv("utf-8","gbk",$root.$old_dir));
+
         if($file){
             //不建立日期子文件夹及修改名称;
             $info = $file->move( iconv('utf-8','gbk',$dir) ,'');
